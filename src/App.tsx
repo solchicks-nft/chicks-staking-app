@@ -17,9 +17,10 @@ import {
   Toolbar,
 } from '@material-ui/core';
 import { BrowserView, MobileView } from 'react-device-detect';
-import { StakingView } from './pages/StakingView';
+import { FlexiblePoolView } from './pages/FlexiblePoolView';
 import SolChicksLogo from './icons/chicks.svg';
 import { COLORS, theme } from './muiTheme.js';
+import { LockedPoolView } from './pages/LockedPoolView';
 
 const useStyles = makeStyles(() => ({
   appBar: {
@@ -112,12 +113,18 @@ function App() {
               onChange={handleTabChange}
               indicatorColor="primary"
             >
-              <Tab className={classes.tab} label="Staking" value="/" />
+              <Tab className={classes.tab} label="Flexible Pool" value="/" />
+              <Tab
+                className={classes.tab}
+                label="Locked Pool"
+                value="/locked"
+              />
             </Tabs>
           </Container>
         </div>
         <Routes>
-          <Route path="/" element={<StakingView />} />
+          <Route path="/" element={<FlexiblePoolView />} />
+          <Route path="/locked" element={<LockedPoolView />} />
         </Routes>
         <div className={classes.spacer} />
       </BrowserView>

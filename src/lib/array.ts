@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-use-before-define,no-nested-ternary,no-empty */
 import { PublicKey } from '@solana/web3.js';
 import { hexValue, hexZeroPad, stripZeros } from 'ethers/lib/utils';
 import { arrayify, zeroPad } from '@ethersproject/bytes';
@@ -22,7 +23,6 @@ export const isEVMChain = (chainId: ChainId) =>
 
 export const isHexNativeTerra = (h: string) => h.startsWith('01');
 export const nativeTerraHexToDenom = (h: string) =>
-  // eslint-disable-next-line @typescript-eslint/no-use-before-define
   Buffer.from(stripZeros(hexToUint8Array(h.substr(2)))).toString('ascii');
 export const uint8ArrayToHex = (a: Uint8Array) =>
   Buffer.from(a).toString('hex');
@@ -30,22 +30,17 @@ export const hexToUint8Array = (h: string) =>
   new Uint8Array(Buffer.from(h, 'hex'));
 export const hexToNativeString = (h: string | undefined, c: ChainId) => {
   try {
-    // eslint-disable-next-line no-nested-ternary
     return !h
       ? undefined
-      : // eslint-disable-next-line no-nested-ternary
-      c === CHAIN_ID_SOLANA
+      : c === CHAIN_ID_SOLANA
       ? new PublicKey(hexToUint8Array(h)).toString()
-      : // eslint-disable-next-line no-nested-ternary
-      isEVMChain(c)
+      : isEVMChain(c)
       ? hexZeroPad(hexValue(hexToUint8Array(h)), 20)
-      : // eslint-disable-next-line no-nested-ternary
-      c === CHAIN_ID_TERRA
+      : c === CHAIN_ID_TERRA
       ? isHexNativeTerra(h)
         ? nativeTerraHexToDenom(h)
-        : '' // humanAddress(hexToUint8Array(h.substr(24))) // terra expects 20 bytes, not 32
+        : ''
       : h;
-    // eslint-disable-next-line no-empty
   } catch (e) {}
   return undefined;
 };

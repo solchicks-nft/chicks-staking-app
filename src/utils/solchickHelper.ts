@@ -9,7 +9,7 @@ import {
   SOLCHICK_DECIMALS_ON_ETH,
 } from './solchickConsts';
 
-export const getSolChicksAssociatedAddress = async (
+export const getSolChickAssocAddress = async (
   address: string | PublicKey,
 ): Promise<PublicKey> =>
   getAssociatedTokenAddress(SOLCHICK_TOKEN_MINT_ON_SOL, address);

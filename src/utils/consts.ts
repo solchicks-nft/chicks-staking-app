@@ -9,15 +9,6 @@ import {
   CHAIN_ID_SOLANA,
   CHAIN_ID_TERRA,
 } from '../lib/consts';
-// import {getAddress} from "ethers/lib/utils";
-// import avaxIcon from "../icons/avax.svg";
-import bscIcon from '../icons/bsc.svg';
-import ethIcon from '../icons/eth.svg';
-// import oasisIcon from "../icons/oasis-network-rose-logo.svg";
-// import polygonIcon from "../icons/polygon.svg";
-import solanaIcon from '../icons/solana.svg';
-// import terraIcon from "../icons/terra.svg";
-// import {WalletAdapterNetwork} from '@solana/wallet-adapter-base';
 import { isEVMChain } from '../lib/array';
 
 // It's difficult to project how many fees the user will accrue during the
@@ -51,7 +42,7 @@ export const isSufficientBalance = (
 };
 
 export const getDefaultNativeCurrencySymbol = (chainId: ChainId): string => {
-  let symbol = '';
+  let symbol: string;
   switch (chainId) {
     case CHAIN_ID_SOLANA:
       symbol = 'SOL';
@@ -94,65 +85,9 @@ export interface ChainInfo {
   logo: string;
 }
 
-export const CHAINS =
-  // eslint-disable-next-line no-nested-ternary
-  CLUSTER === 'mainnet'
-    ? [
-        {
-          id: CHAIN_ID_BSC,
-          name: 'Binance Smart Chain',
-          logo: bscIcon,
-        },
-        {
-          id: CHAIN_ID_ETH,
-          name: 'Ethereum',
-          logo: ethIcon,
-        },
-        {
-          id: CHAIN_ID_SOLANA,
-          name: 'Solana',
-          logo: solanaIcon,
-        },
-      ]
-    : CLUSTER === 'testnet'
-    ? [
-        {
-          id: CHAIN_ID_BSC,
-          name: 'Binance Smart Chain',
-          logo: bscIcon,
-        },
-        {
-          id: CHAIN_ID_ETH,
-          name: 'Ethereum (Ropsten)',
-          logo: ethIcon,
-        },
-        {
-          id: CHAIN_ID_SOLANA,
-          name: 'Solana',
-          logo: solanaIcon,
-        },
-      ]
-    : [
-        {
-          id: CHAIN_ID_BSC,
-          name: 'Binance Smart Chain',
-          logo: bscIcon,
-        },
-        {
-          id: CHAIN_ID_ETH,
-          name: 'Ethereum',
-          logo: ethIcon,
-        },
-        {
-          id: CHAIN_ID_SOLANA,
-          name: 'Solana',
-          logo: solanaIcon,
-        },
-      ];
-
+export const CHAINS = [];
 export const BETA_CHAINS: ChainId[] =
   CLUSTER === 'mainnet' ? [CHAIN_ID_AVAX] : [];
-
 export const CHAINS_WITH_NFT_SUPPORT = CHAINS.filter(
   ({ id }) =>
     id === CHAIN_ID_AVAX ||
@@ -185,11 +120,6 @@ export const AVAX_NETWORK_CHAIN_ID =
   // eslint-disable-next-line no-nested-ternary
   CLUSTER === 'mainnet' ? 43114 : CLUSTER === 'testnet' ? 43113 : 1381;
 
-const BSC_RPC_URL_TEST = 'https://data-seed-prebsc-1-s1.binance.org:8545';
-const BSC_RPC_URL_MAIN = 'https://bsc-dataseed.binance.org';
-export const BSC_RPC_URL =
-  CLUSTER === 'mainnet' ? BSC_RPC_URL_MAIN : BSC_RPC_URL_TEST;
-
 export const getEvmChainId = (chainId: ChainId) =>
   // eslint-disable-next-line no-nested-ternary
   chainId === CHAIN_ID_ETH
@@ -216,31 +146,3 @@ export const SOLANA_HOST = process.env.REACT_APP_SOLANA_API_URL
   : CLUSTER === 'testnet'
   ? clusterApiUrl('devnet')
   : 'http://localhost:8899';
-
-export const getExplorerName = (chainId: ChainId) =>
-  // eslint-disable-next-line no-nested-ternary
-  chainId === CHAIN_ID_ETH || chainId === CHAIN_ID_ETHEREUM_ROPSTEN
-    ? 'Etherscan'
-    : // eslint-disable-next-line no-nested-ternary
-    chainId === CHAIN_ID_BSC
-    ? 'BscScan'
-    : 'Explorer';
-
-export const getExplorerAddress = (chainId: ChainId, txId: string) => {
-  if (chainId === CHAIN_ID_ETH) {
-    return `https://${
-      CLUSTER === 'testnet' ? 'ropsten.' : ''
-    }etherscan.io/tx/${txId}`;
-  }
-  if (chainId === CHAIN_ID_BSC) {
-    return `https://${
-      CLUSTER === 'testnet' ? 'testnet.' : ''
-    }bscscan.com/tx/${txId}`;
-  }
-  if (chainId === CHAIN_ID_SOLANA) {
-    return `https://explorer.solana.com/tx/${txId}${
-      CLUSTER === 'testnet' ? '?cluster=devnet' : ''
-    }`;
-  }
-  return '';
-};

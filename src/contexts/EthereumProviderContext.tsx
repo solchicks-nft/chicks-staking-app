@@ -1,7 +1,6 @@
 /* eslint-disable no-empty,@typescript-eslint/no-empty-function */
 import detectEthereumProvider from '@metamask/detect-provider';
 import { BigNumber, ethers } from 'ethers';
-import { ExternalProvider } from '@ethersproject/providers';
 import React, {
   JSXElementConstructor,
   ReactChildren,
@@ -11,6 +10,8 @@ import React, {
   useMemo,
   useState,
 } from 'react';
+import { ExternalProvider } from '@ethersproject/providers';
+import { toast } from 'react-toastify';
 
 export type Provider = ethers.providers.Web3Provider | undefined;
 export type Signer = ethers.Signer | undefined;
@@ -41,6 +42,7 @@ const EthereumProviderContext = React.createContext<IEthereumProviderContext>({
   signerAddress: undefined,
   providerError: null,
 });
+
 export const EthereumProviderProvider = ({
   children,
 }: {
@@ -59,7 +61,7 @@ export const EthereumProviderProvider = ({
   const connect = useCallback(() => {
     setProviderError(null);
     detectEthereumProvider()
-      .then((detectedProvider) => {
+      .then((detectedProvider: IDetectedProvider | unknown) => {
         if (detectedProvider) {
           const walletProvider = new ethers.providers.Web3Provider(
             detectedProvider as ExternalProvider,
@@ -77,7 +79,7 @@ export const EthereumProviderProvider = ({
                 })
                 .catch(() => {
                   setProviderError(
-                    'An error occurred while getting the network',
+                    'An error occurred while getting the network.',
                   );
                 });
               const walletSigner = walletProvider.getSigner();
@@ -89,16 +91,26 @@ export const EthereumProviderProvider = ({
                 })
                 .catch(() => {
                   setProviderError(
-                    'An error occurred while getting the signer address',
+                    'An error occurred while getting the signer address.',
                   );
                 });
-              if (detectedProvider && (detectedProvider as IDetectedProvider)) {
+              if (
+                detectedProvider &&
+                (detectedProvider as IDetectedProvider).on
+              ) {
                 (detectedProvider as IDetectedProvider).on(
                   'chainChanged',
-                  (updatedChainId) => {
+                  (updatedChainId: BigNumber) => {
                     try {
                       setChainId(BigNumber.from(updatedChainId).toNumber());
-                    } catch (e) {}
+                    } catch (e) {
+                      toast.error(
+                        'We could not process your request at this time. Please try again later.',
+                        {
+                          toastId: 'unknown-error',
+                        },
+                      );
+                    }
                   },
                 );
                 (detectedProvider as IDetectedProvider).on(
@@ -114,10 +126,17 @@ export const EthereumProviderProvider = ({
                         })
                         .catch(() => {
                           setProviderError(
-                            'An error occurred while getting the signer address',
+                            'An error occurred while getting the signer address.',
                           );
                         });
-                    } catch (e) {}
+                    } catch (_e) {
+                      toast.error(
+                        'We could not process your request at this time. Please try again later.',
+                        {
+                          toastId: 'unknown-error',
+                        },
+                      );
+                    }
                   },
                 );
               }
@@ -135,6 +154,7 @@ export const EthereumProviderProvider = ({
         setProviderError('Please install MetaMask');
       });
   }, []);
+
   const disconnect = useCallback(() => {
     setProviderError(null);
     setProvider(undefined);
@@ -142,6 +162,7 @@ export const EthereumProviderProvider = ({
     setSigner(undefined);
     setSignerAddress(undefined);
   }, []);
+
   const contextValue = useMemo(
     () => ({
       connect,
@@ -162,6 +183,7 @@ export const EthereumProviderProvider = ({
       providerError,
     ],
   );
+
   return (
     <EthereumProviderContext.Provider value={contextValue}>
       {children}

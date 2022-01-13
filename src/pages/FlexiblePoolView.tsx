@@ -1,4 +1,123 @@
 /* eslint-disable react/jsx-props-no-spreading */
-import React from 'react';
+import React, { useCallback, useState } from 'react';
+import {
+  Button,
+  Container,
+  Step,
+  Stepper,
+  Tab,
+  Tabs,
+} from '@material-ui/core';
+import { useStyles } from './useStyles';
 
-export const FlexiblePoolView = () => <div />;
+export const FlexiblePoolView = () => {
+  const classes = useStyles();
+  const [tab, setTab] = useState('1');
+
+  const handleChange = useCallback((event, value) => {
+    setTab(value);
+  }, []);
+
+  return (
+    <>
+      <Container className="container">
+        <Stepper
+          orientation="vertical"
+          className="step"
+        >
+          <Step expanded>
+            <div className={classes.card}>
+              <div className={classes.header}>POOL INFO</div>
+              <div className={classes.content}>
+                <div className={classes.mainContent}>
+                  <div className={classes.contentheading}>
+                    Total AURY Staked
+                  </div>
+                  <div className={classes.contentpara}>2,337,490</div>
+                </div>
+                <div className={classes.mainContent}>
+                  <div className={classes.contentheading}>Est APR</div>
+                  <div className={classes.contentpara}>34%</div>
+                </div>
+              </div>
+            </div>
+
+            <div className={classes.card}>
+              <div className={classes.header}>MY REWARDS</div>
+              <div className={classes.content}>
+                <div className={classes.mainContent}>
+                  <div className={classes.contentheading}>
+                    Current AURY Amount
+                  </div>
+                  <div className={classes.contentpara}>0.0000</div>
+                </div>
+                <div className={classes.mainContent}>
+                  <div className={classes.contentheading}>Est AURY per day</div>
+                  <div className={classes.contentpara}>0.000000000</div>
+                </div>
+              </div>
+            </div>
+
+            <div className={classes.card}>
+              <div className={classes.header}>MY BALANCE</div>
+              <div className={classes.content}>
+                <div className={classes.mainContent}>
+                  <div className={classes.contentheading}>
+                    Current AURY Amount
+                  </div>
+                  <div className={classes.contentpara}>0.0000</div>
+                </div>
+                <div className={classes.mainContent}>
+                  <div className={classes.contentheading}>Est AURY per day</div>
+                  <div className={classes.contentpara}>0.000000000</div>
+                </div>
+              </div>
+              <div className={classes.mainTab}>
+                <div className={classes.centerTab}>
+                  <Tabs
+                    value={tab}
+                    variant="fullWidth"
+                    indicatorColor="primary"
+                    onChange={handleChange}
+                  >
+                    <Tab className={classes.tab} label="STAKE" value="1" />
+                    <Tab className={classes.tab} label="UNSTAKE" value="2" />
+                  </Tabs>
+                  <div className={classes.tabmain}>
+                    {tab === '1' ? (
+                      <div className={classes.mainleft}>
+                        <div className={classes.balanceTab}>
+                          <div className={classes.amount}>
+                            0.00
+                            <span className={classes.amountText}>AURY</span>
+                          </div>
+                          <Button className={classes.max}>Max</Button>
+                        </div>
+                        <Button className={classes.wallet}>
+                          Connect Wallet
+                        </Button>
+                      </div>
+                    ) : (
+                      <div className={classes.mainleft}>
+                      <div className={classes.balanceTab}>
+                        <div className={classes.amount}>
+                          0.00
+                          <span className={classes.amountText}>x AURY</span>
+                        </div>
+                        <Button className={classes.max}>Max</Button>
+                      </div>
+                      <Button className={classes.wallet}>
+                        Connect Wallet
+                      </Button>
+                    </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </Step>
+        </Stepper>
+      </Container>
+    </>
+  );
+};

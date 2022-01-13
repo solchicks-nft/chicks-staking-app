@@ -6,6 +6,7 @@ import {
   Route,
   useNavigate,
   Link as RouterLink,
+  
 } from 'react-router-dom';
 import {
   AppBar,
@@ -17,9 +18,9 @@ import {
   Toolbar,
 } from '@material-ui/core';
 import { BrowserView, MobileView } from 'react-device-detect';
-import { FlexiblePoolView } from './pages/FlexiblePoolView';
 import SolChicksLogo from './icons/chicks.svg';
 import { COLORS, theme } from './muiTheme.js';
+import { FlexiblePoolView } from './pages/FlexiblePoolView';
 import { LockedPoolView } from './pages/LockedPoolView';
 
 const useStyles = makeStyles(() => ({
@@ -40,6 +41,13 @@ const useStyles = makeStyles(() => ({
     '&:hover': {
       textDecoration: 'none',
     },
+  },
+  stakingLink: {
+    paddingLeft: '40px',
+    fontSize: '14px',
+    fontWeight: 'bold',
+    lineHeight: '17px',
+    color: 'rgba(255,255,255,0.98)',
   },
   bg: {
     backgroundColor: '#000008',
@@ -91,6 +99,7 @@ function App() {
     },
     [navigate],
   );
+  
   return (
     <div className={classes.bg}>
       <AppBar position="static" color="inherit" className={classes.appBar}>
@@ -107,23 +116,19 @@ function App() {
       <BrowserView>
         <div className={classes.content}>
           <Container>
-            <Tabs
-              value={pathname}
-              variant="fullWidth"
-              onChange={handleTabChange}
-              indicatorColor="primary"
-            >
-              <Tab className={classes.tab} label="Flexible Pool" value="/" />
-              <Tab
-                className={classes.tab}
-                label="Locked Pool"
-                value="/locked"
-              />
-            </Tabs>
+              <Tabs
+                value={pathname}
+                variant="fullWidth"
+                onChange={handleTabChange}
+                indicatorColor="primary"
+              >
+                <Tab className={classes.tab} label="Flexible Pool" value="/" />
+                <Tab className={classes.tab} label="Locked Pool" value="/locked" />
+              </Tabs>
           </Container>
         </div>
         <Routes>
-          <Route path="/" element={<FlexiblePoolView />} />
+          <Route path="" element={<FlexiblePoolView />} />
           <Route path="/locked" element={<LockedPoolView />} />
         </Routes>
         <div className={classes.spacer} />

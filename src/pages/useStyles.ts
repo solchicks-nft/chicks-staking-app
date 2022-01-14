@@ -41,16 +41,16 @@ export const useStyles = makeStyles((theme) => ({
   card: {
     marginBottom: '24px',
     borderRadius: '15px',
-    border: '1px solid rgba(119, 136, 152, 1)',
+    border: '1px solid rgba(119, 136, 152, 0.3)',
   },
   header: {
     padding: '20px 0px',
-    fontFamily: 'Bergern, Poppins, sans-serif',
+    fontFamily: 'Bergern-Bold, Poppins, sans-serif',
     display: 'flex',
     fontSize:'20px',
     alignItems: 'center',
     justifyContent: 'center',
-    borderBottom: '1px solid rgba(119, 136, 152, 1)',
+    borderBottom: '1px solid rgba(119, 136, 152, 0.3)',
   },
   content: {
     display: 'flex',
@@ -93,7 +93,7 @@ export const useStyles = makeStyles((theme) => ({
     width: '100%'
   },
   amount: {
-    border: '1px solid rgba(119, 136, 152, 1)',
+    border: '1px solid rgba(119, 136, 152, 0.3)',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -118,7 +118,7 @@ export const useStyles = makeStyles((theme) => ({
     padding: '20px 100px',
   },
   centerTab: {
-    border: '1px solid rgba(119, 136, 152, 1)',
+    border: '1px solid rgba(119, 136, 152, 0.3)',
     borderRadius: '15px',
   },
   mainleft: {

@@ -47,7 +47,7 @@ export const useStyles = makeStyles((theme) => ({
     padding: '20px 0px',
     fontFamily: 'Bergern-Bold, Poppins, sans-serif',
     display: 'flex',
-    fontSize:'20px',
+    fontSize: '20px',
     alignItems: 'center',
     justifyContent: 'center',
     borderBottom: '1px solid rgba(119, 136, 152, 0.3)',
@@ -64,6 +64,10 @@ export const useStyles = makeStyles((theme) => ({
     gap: '8px',
     padding: '11px 0px',
   },
+  contentflexible: {
+    display: 'flex',
+    height: '84px',
+  },
   contentlocked: {
     display: 'flex',
     flexDirection: 'column',
@@ -71,7 +75,6 @@ export const useStyles = makeStyles((theme) => ({
     justifyContent: 'center',
     width: '100%',
     gap: '8px',
-    padding: '11px 0px',
   },
   contentheading: {
     fontSize: '16px',
@@ -90,7 +93,7 @@ export const useStyles = makeStyles((theme) => ({
   balanceTab: {
     display: 'flex',
     padding: '20px 0px',
-    width: '100%'
+    width: '100%',
   },
   amount: {
     border: '1px solid rgba(119, 136, 152, 0.3)',
@@ -103,7 +106,8 @@ export const useStyles = makeStyles((theme) => ({
     margin: '0px 20px',
   },
   amountText: {
-    margin: '0px 20px',
+    width: '20%',
+    textAlign: 'right',
   },
   max: {
     backgroundColor: 'rgba(255,255,255,0.98)',
@@ -124,6 +128,7 @@ export const useStyles = makeStyles((theme) => ({
   mainleft: {
     display: 'flex',
     justifyContent: 'flex-start',
+    alignItems: 'center',
     width: '50%',
     flexDirection: 'column',
     marginBottom: '20px',
@@ -141,9 +146,27 @@ export const useStyles = makeStyles((theme) => ({
   wallet: {
     backgroundColor: 'rgba(255,255,255,0.98)',
     color: '#000000',
-    margin: '0px 60px',
+    borderRadius: '20px',
+    width: '200px',
+    height: '44px',
     '&:hover': {
       backgroundColor: 'rgba(255,255,255,0.98)',
     },
-  }
+  },
+  flexibleAlert: {
+    border: '1px solid rgba(23, 99, 192, 1)',
+    width: '100%',
+    display: 'flex',
+    padding: '15px 0px',
+    marginBottom: '20px',
+    borderRadius: '10px',
+  },
+  alertPara: {
+    marginLeft: '10px',
+  },
+  info: {
+    width: '20px',
+    marginTop: '1px',
+    padding: '0px 10px',
+  },
 }));

@@ -41,15 +41,16 @@ export const useStyles = makeStyles((theme) => ({
   card: {
     marginBottom: '24px',
     borderRadius: '15px',
-    border: '1px solid rgba(255,255,255,0.98)',
+    border: '1px solid rgba(119, 136, 152, 1)',
   },
   header: {
     padding: '20px 0px',
     fontFamily: 'Bergern, Poppins, sans-serif',
     display: 'flex',
+    fontSize:'20px',
     alignItems: 'center',
     justifyContent: 'center',
-    borderBottom: '1px solid rgba(255,255,255,0.98)',
+    borderBottom: '1px solid rgba(119, 136, 152, 1)',
   },
   content: {
     display: 'flex',
@@ -63,18 +64,27 @@ export const useStyles = makeStyles((theme) => ({
     gap: '8px',
     padding: '11px 0px',
   },
+  contentlocked: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '100%',
+    gap: '8px',
+    padding: '11px 0px',
+  },
   contentheading: {
-    fontSize: '12px',
+    fontSize: '16px',
     lineHeight: '15px',
   },
   contentpara: {
     fontWeight: 'bold',
-    fontSize: '12px',
+    fontSize: '14px',
     lineHeight: '15px',
   },
   textGreen: {
     color: 'rgb(58, 255, 111)',
-    fontSize: '12px',
+    fontSize: '14px',
     lineHeight: '15px',
   },
   balanceTab: {
@@ -83,7 +93,7 @@ export const useStyles = makeStyles((theme) => ({
     width: '100%'
   },
   amount: {
-    border: '1px solid rgba(255,255,255,0.98)',
+    border: '1px solid rgba(119, 136, 152, 1)',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -108,7 +118,7 @@ export const useStyles = makeStyles((theme) => ({
     padding: '20px 100px',
   },
   centerTab: {
-    border: '1px solid rgba(255,255,255,0.98)',
+    border: '1px solid rgba(119, 136, 152, 1)',
     borderRadius: '15px',
   },
   mainleft: {

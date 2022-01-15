@@ -1,6 +1,7 @@
 import React, { useCallback, useState } from 'react';
 import { Button, Tab, Tabs } from '@material-ui/core';
 import { useStyles } from './useStyles';
+import SolanaWalletKey from '../components/SolanaWalletKey';
 
 export const BalanceInfoContainer = () => {
   const [tab, setTab] = useState('1');
@@ -44,7 +45,8 @@ export const BalanceInfoContainer = () => {
                   </div>
                   <Button className={classes.max}>Max</Button>
                 </div>
-                <Button className={classes.wallet}>Connect Wallet</Button>
+                <SolanaWalletKey/>
+                {/* <Button className={classes.wallet}>Connect Wallet</Button> */}
               </div>
             ) : (
               <div className={classes.mainleft}>
@@ -55,7 +57,8 @@ export const BalanceInfoContainer = () => {
                   </div>
                   <Button className={classes.max}>Max</Button>
                 </div>
-                <Button className={classes.wallet}>Connect Wallet</Button>
+                <SolanaWalletKey/>
+                {/* <Button className={classes.wallet}>Connect Wallet</Button> */}
               </div>
             )}
           </div>

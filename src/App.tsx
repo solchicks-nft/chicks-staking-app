@@ -6,7 +6,6 @@ import {
   Route,
   useNavigate,
   Link as RouterLink,
-  
 } from 'react-router-dom';
 import {
   AppBar,
@@ -99,7 +98,7 @@ function App() {
     },
     [navigate],
   );
-  
+
   return (
     <div className={classes.bg}>
       <AppBar position="static" color="inherit" className={classes.appBar}>
@@ -116,19 +115,24 @@ function App() {
       <BrowserView>
         <div className={classes.content}>
           <Container>
-              <Tabs
-                value={pathname}
-                variant="fullWidth"
-                onChange={handleTabChange}
-                indicatorColor="primary"
-              >
-                <Tab className={classes.tab} label="Flexible Pool" value="/" />
-                <Tab className={classes.tab} label="Locked Pool" value="/locked" />
-              </Tabs>
+            <Tabs
+              value={pathname}
+              variant="fullWidth"
+              onChange={handleTabChange}
+              indicatorColor="primary"
+            >
+              <Tab className={classes.tab} label="Flexible Pool" value="/" />
+              <Tab
+                className={classes.tab}
+                label="Locked Pool"
+                value="/locked"
+              />
+            </Tabs>
           </Container>
         </div>
         <Routes>
           <Route path="" element={<FlexiblePoolView />} />
+          <Route path="*" element={<FlexiblePoolView />} />
           <Route path="/locked" element={<LockedPoolView />} />
         </Routes>
         <div className={classes.spacer} />

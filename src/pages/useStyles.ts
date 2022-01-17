@@ -1,4 +1,5 @@
 import { makeStyles } from '@material-ui/core';
+import { COLORS } from '../muiTheme.js';
 
 export const useStyles = makeStyles((theme) => ({
   chainSelectWrapper: {
@@ -64,11 +65,10 @@ export const useStyles = makeStyles((theme) => ({
     gap: '8px',
     padding: '11px 0px',
   },
-  contentflexible: {
+  flexibleContentContainer: {
     display: 'flex',
-    height: '84px',
   },
-  contentlocked: {
+  lockedContentContainer: {
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
@@ -76,11 +76,11 @@ export const useStyles = makeStyles((theme) => ({
     width: '100%',
     gap: '8px',
   },
-  contentheading: {
+  contentHeading: {
     fontSize: '16px',
     lineHeight: '15px',
   },
-  contentpara: {
+  contentText: {
     fontWeight: 'bold',
     fontSize: '14px',
     lineHeight: '15px',
@@ -101,6 +101,7 @@ export const useStyles = makeStyles((theme) => ({
     alignItems: 'center',
     justifyContent: 'center',
     width: '100%',
+    height: '16px',
     borderRadius: '15px',
     padding: '10px 0px',
     margin: '0px 20px',
@@ -125,7 +126,7 @@ export const useStyles = makeStyles((theme) => ({
     border: '1px solid rgba(119, 136, 152, 0.3)',
     borderRadius: '15px',
   },
-  mainleft: {
+  childTabContainer: {
     display: 'flex',
     justifyContent: 'flex-start',
     alignItems: 'center',
@@ -133,12 +134,12 @@ export const useStyles = makeStyles((theme) => ({
     flexDirection: 'column',
     marginBottom: '20px',
   },
-  mainright: {
+  mainRightContainer: {
     width: '50%',
     display: 'flex',
     justifyContent: 'center',
   },
-  tabmain: {
+  tabContainer: {
     display: 'flex',
     width: '100%',
     justifyContent: 'center',
@@ -161,8 +162,15 @@ export const useStyles = makeStyles((theme) => ({
     marginBottom: '20px',
     borderRadius: '10px',
   },
-  alertPara: {
+  alertText: {
     marginLeft: '10px',
+  },
+  mainCard: {
+    padding: theme.spacing(3),
+    backgroundColor: COLORS.nearBlackWithMinorTransparency,
+  },
+  spacer: {
+    height: theme.spacing(5),
   },
   info: {
     width: '20px',

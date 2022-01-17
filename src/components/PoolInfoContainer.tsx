@@ -1,5 +1,5 @@
 import React from 'react';
-import { useStyles } from './useStyles';
+import { useStyles } from '../pages/useStyles';
 
 export const PoolInfoContainer = () => {
   const classes = useStyles();
@@ -9,12 +9,12 @@ export const PoolInfoContainer = () => {
       <div className={classes.header}>POOL INFO</div>
       <div className={classes.content}>
         <div className={classes.mainContent}>
-          <div className={classes.contentheading}>Total CHICKS Staked</div>
-          <div className={classes.contentpara}>2,337,490</div>
+          <div className={classes.contentHeading}>Total CHICKS Staked</div>
+          <div className={classes.contentText}>2,337,490</div>
         </div>
         <div className={classes.mainContent}>
-          <div className={classes.contentheading}>Est APR</div>
-          <div className={classes.contentpara}>34%</div>
+          <div className={classes.contentHeading}>Est. APR</div>
+          <div className={classes.contentText}>34%</div>
         </div>
       </div>
     </div>

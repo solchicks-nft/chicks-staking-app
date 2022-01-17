@@ -6,7 +6,6 @@ import { ThemeProvider } from '@material-ui/core/styles';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { theme } from './muiTheme.js';
-import { EthereumProviderProvider } from './contexts/EthereumProviderContext';
 import { SolanaWalletProvider } from './contexts/SolanaWalletContext';
 
 ReactDOM.render(
@@ -14,9 +13,7 @@ ReactDOM.render(
     <BrowserRouter>
       <ThemeProvider theme={theme}>
         <SolanaWalletProvider>
-          <EthereumProviderProvider>
-            <App />
-          </EthereumProviderProvider>
+          <App />
         </SolanaWalletProvider>
       </ThemeProvider>
     </BrowserRouter>

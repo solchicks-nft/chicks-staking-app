@@ -37,12 +37,13 @@ export const pubkeyToString = (key: PublicKey | null | string = '') =>
 export const getAssociatedTokenAddress = async (
   mintKey: PublicKey | string,
   ownerKey: PublicKey | string,
-): Promise<PublicKey> => Token.getAssociatedTokenAddress(
-  ASSOCIATED_TOKEN_PROGRAM_ID,
-  TOKEN_PROGRAM_ID,
-  toPublicKey(mintKey),
-  toPublicKey(ownerKey),
-);
+): Promise<PublicKey> =>
+  Token.getAssociatedTokenAddress(
+    ASSOCIATED_TOKEN_PROGRAM_ID,
+    TOKEN_PROGRAM_ID,
+    toPublicKey(mintKey),
+    toPublicKey(ownerKey),
+  );
 
 export const getTokenObj = (
   connection: Connection,

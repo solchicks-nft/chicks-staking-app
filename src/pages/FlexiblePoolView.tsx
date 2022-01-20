@@ -6,14 +6,17 @@ import { RewardsInfoContainer } from '../components/RewardsInfoContainer';
 import { BalanceInfoContainer } from '../components/BalanceInfoContainer';
 import StakeAlert from '../components/StakeAlert';
 import { useStyles } from './useStyles';
+import { UNSTAKE_FEE } from '../utils/consts';
 
 export const FlexiblePoolView = () => {
   const classes = useStyles();
 
   return (
-    <Container className="container">
+    <Container className='container'>
       <Card className={classes.mainCard}>
-        <StakeAlert stakeAlertText="CHICKS deposited can be unlocked at any time." />
+        <StakeAlert
+          stakeAlertText={`Please note that unstaking your tokens before the 8 week window will incur 
+          a ${UNSTAKE_FEE}% charge.`} />
         <BalanceInfoContainer />
         <RewardsInfoContainer />
         <PoolInfoContainer />

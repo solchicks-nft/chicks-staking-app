@@ -10,11 +10,11 @@ export const PoolInfoContainer = () => {
       <div className={classes.content}>
         <div className={classes.mainContent}>
           <div className={classes.contentHeading}>Total CHICKS Staked</div>
-          <div className={classes.contentText}>2,337,490</div>
+          <div className={classes.contentText}>0</div>
         </div>
         <div className={classes.mainContent}>
           <div className={classes.contentHeading}>Est. APR</div>
-          <div className={classes.contentText}>34%</div>
+          <div className={classes.contentText}>0</div>
         </div>
       </div>
     </div>

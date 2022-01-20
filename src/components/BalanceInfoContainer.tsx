@@ -4,6 +4,7 @@ import { useStyles } from '../pages/useStyles';
 import { SOLCHICK_BALANCE_TAB_STATE } from '../utils/solchickConsts';
 import ButtonWithLoader from './ButtonWithLoader';
 import ConsoleHelper from '../helpers/ConsoleHelper';
+import SolanaWalletKey from './SolanaWalletKey';
 
 export const BalanceInfoContainer = () => {
   const [tab, setTab] = useState(SOLCHICK_BALANCE_TAB_STATE.STAKE);
@@ -23,11 +24,11 @@ export const BalanceInfoContainer = () => {
       <div className={classes.content}>
         <div className={classes.mainContent}>
           <div className={classes.contentHeading}>CHICKS Amount</div>
-          <div className={classes.contentText}>0.0000</div>
+          <div className={classes.contentText}>0</div>
         </div>
         <div className={classes.mainContent}>
           <div className={classes.contentHeading}>xCHICKS Amount</div>
-          <div className={classes.contentText}>0.000000000</div>
+          <div className={classes.contentText}>0</div>
         </div>
       </div>
       <div className={classes.mainTab}>
@@ -62,6 +63,7 @@ export const BalanceInfoContainer = () => {
                   Max
                 </ButtonWithLoader>
               </div>
+              <SolanaWalletKey/>
             </div>
           </div>
         </div>

@@ -146,3 +146,5 @@ export const SOLANA_HOST = process.env.REACT_APP_SOLANA_API_URL
   : CLUSTER === 'testnet'
   ? clusterApiUrl('devnet')
   : 'http://localhost:8899';
+
+export const UNSTAKE_FEE = 25;

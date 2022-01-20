@@ -10,11 +10,11 @@ export const RewardsInfoContainer = () => {
       <div className={classes.flexibleContentContainer}>
         <div className={classes.mainContent}>
           <div className={classes.contentHeading}>Current CHICKS Amount</div>
-          <div className={classes.contentText}>0.0000</div>
+          <div className={classes.contentText}>0</div>
         </div>
         <div className={classes.mainContent}>
           <div className={classes.contentHeading}>Est. CHICKS per day</div>
-          <div className={classes.contentText}>0.000000000</div>
+          <div className={classes.contentText}>0%</div>
         </div>
       </div>
     </div>

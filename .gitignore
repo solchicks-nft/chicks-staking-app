@@ -24,3 +24,5 @@ yarn-error.log*
 /.idea
 target
 /wChick/src/artifacts
+tmp
+tmp/lib.rs

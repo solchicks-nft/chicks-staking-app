@@ -1,5 +1,3 @@
-///A Solana version of the xSushi contract for STEP
-/// https://github.com/sushiswap/sushiswap/blob/master/contracts/SushiBar.sol
 use anchor_lang::prelude::*;
 use anchor_spl::token::{self, Mint, Token, TokenAccount};
 use std::convert::TryInto;
@@ -482,7 +480,6 @@ pub struct StakingAccount {
     pub initializer_key: Pubkey,
     pub lock_end_date: u64,
     pub total_x_token: u64,
-    pub fee: u64,
     pub freeze_program: bool,
 }
 

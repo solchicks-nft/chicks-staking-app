@@ -1,8 +1,13 @@
-[programs.localnet]
-chick_bridge = "6ziZRUoHY9DzLAwwJ7VbPWvWMPmwvvnya69m4Cnx8nuz"
+anchor_version = "0.18.0"
+
+[workspace]
+members = ["programs/chicks-staking"]
 
 [registry]
 url = "https://anchor.projectserum.com"
+
+[programs.localnet]
+chick_bridge = "6ziZRUoHY9DzLAwwJ7VbPWvWMPmwvvnya69m4Cnx8nuz"
 
 #[provider]
 #cluster = "localnet"
@@ -18,4 +23,6 @@ cluster = "devnet"
 wallet = "/home/bmstart/work/solana/keys/alice.json"
 
 [scripts]
-test = "yarn run ts-mocha -p ./tsconfig.json -t 1000000 tests/**/*.ts"
+test = "mocha -t 1000000 tests/"
+#[scripts]
+#test = "yarn run ts-mocha -p ./tsconfig.json -t 1000000 tests/**/*.ts"

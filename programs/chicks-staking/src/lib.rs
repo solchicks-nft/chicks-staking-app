@@ -7,7 +7,7 @@ use std::convert::TryInto;
 #[cfg(not(feature = "local-testing"))]
 declare_id!("StKLLTf7CQ9n5BgXPSDXENovLTCuNc7N2ehvTb6JZ5x");
 #[cfg(feature = "local-testing")]
-declare_id!("TesT35sGptoswsVkcLpUUe6U2iTJZE59on1Jno8Vdpg");
+declare_id!("5YbWH2No2FqX9g9SyigUhbLZWq4H3F3C2rfiQYHhWU3p");
 
 #[cfg(not(feature = "local-testing"))]
 pub mod constants {
@@ -22,7 +22,7 @@ pub mod constants {
 }
 
 #[program]
-pub mod step_staking {
+pub mod chicks_staking {
     use super::*;
 
     pub fn initialize(
@@ -30,9 +30,11 @@ pub mod step_staking {
         _nonce_vault: u8,
         _nonce_staking: u8,
         lock_end_date: u64,
+        fee_percent: u64
     ) -> ProgramResult {
         ctx.accounts.staking_account.initializer_key = *ctx.accounts.initializer.key;
         ctx.accounts.staking_account.lock_end_date = lock_end_date;
+        ctx.accounts.staking_account.fee_percent = fee_percent;
 
         Ok(())
     }
@@ -166,15 +168,27 @@ pub mod step_staking {
                 .try_into()
                 .unwrap();
 
-        //determine user share of vault
-        let what: u64 = (amount as u128)
-            .checked_mul(total_token as u128)
-            .unwrap()
-            .checked_div(total_x_token as u128)
-            .unwrap()
-            .try_into()
-            .unwrap();
+        let what:u64;
+        if (now_ts as u64) < lock_end_date {
+            let fee_amount: u64 = (amount as u128)
+                .checked_mul(ctx.accounts.staking_account.fee_percent as u128)
+                .unwrap()
+                .checked_div(1000 as u128)
+                .unwrap()
+                .try_into()
+                .unwrap();
 
+            what = amount - fee_amount;
+        } else {
+            //determine user share of vault
+            what = (amount as u128)
+                .checked_mul(total_token as u128)
+                .unwrap()
+                .checked_div(total_x_token as u128)
+                .unwrap()
+                .try_into()
+                .unwrap();
+        }
         //compute vault signer seeds
         let token_mint_key = ctx.accounts.token_mint.key();
         let seeds = &[token_mint_key.as_ref(), &[nonce_vault]];
@@ -255,7 +269,7 @@ pub mod step_staking {
     }
 }
 
-const E9: u128 = 1000000000;
+const E9: u128 = 1_000_000_000;
 
 pub fn get_price<'info>(
     vault: &Account<'info, TokenAccount>,
@@ -482,8 +496,8 @@ pub struct StakingAccount {
     pub initializer_key: Pubkey,
     pub lock_end_date: u64,
     pub total_x_token: u64,
-    pub fee: u64,
     pub freeze_program: bool,
+    pub fee_percent: u64,
 }
 
 #[account]

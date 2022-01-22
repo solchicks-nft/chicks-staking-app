@@ -1,4 +1,4 @@
-anchor_version = "0.18.0"
+anchor_version = "0.19.0"
 
 [workspace]
 members = ["programs/chicks-staking"]
@@ -7,20 +7,20 @@ members = ["programs/chicks-staking"]
 url = "https://anchor.projectserum.com"
 
 [programs.localnet]
-chick_bridge = "6ziZRUoHY9DzLAwwJ7VbPWvWMPmwvvnya69m4Cnx8nuz"
+chicks_staking = "5YbWH2No2FqX9g9SyigUhbLZWq4H3F3C2rfiQYHhWU3p"
 
-#[provider]
-#cluster = "localnet"
-#wallet = "/home/bmstart/work/solana/keys/alice.json"
+[provider]
+cluster = "localnet"
+wallet = "/home/bmstart/work/solana/keys/alice.json"
 
 #[provider]
 #cluster = "mainnet"
 #wallet = "/home/bmstart/work/solana/keys/alice.json"
 
 # for devnet
-[provider]
-cluster = "devnet"
-wallet = "/home/bmstart/work/solana/keys/alice.json"
+#[provider]
+#cluster = "devnet"
+#wallet = "/home/bmstart/work/solana/keys/alice.json"
 
 [scripts]
 test = "mocha -t 1000000 tests/"

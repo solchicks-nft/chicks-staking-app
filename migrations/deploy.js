@@ -1,4 +1,4 @@
-
+/* eslint-disable */
 // Migrations are an early feature. Currently, they're nothing more than this
 // single deploy script that's invoked from the CLI, injecting a provider
 // configured from the workspace's Anchor.toml.
@@ -28,9 +28,10 @@ module.exports = async function (provider) {
   console.log(vaultPubkey.toString(), vaultBump);
   console.log(stakingPubkey.toString(), stakingBump);
 
-  const lockEndDate = new anchor.BN("1653577200") //2022-05-26T23:00:00Z
+  const lockEndDate = new anchor.BN("1653577200") // 2022-05-26T23:00:00Z
+  const fee_percent = 250;
 
-  await program.rpc.initialize(vaultBump, stakingBump, lockEndDate, {
+  await program.rpc.initialize(vaultBump, stakingBump, lockEndDate, fee_percent, {
     accounts: {
       tokenMint: mintPubkey,
       tokenVault: vaultPubkey,

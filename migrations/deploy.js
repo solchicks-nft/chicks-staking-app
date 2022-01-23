@@ -11,9 +11,10 @@ module.exports = async function (provider) {
   // Configure client to use the provider.
   anchor.setProvider(provider);
 
-  let program = anchor.workspace.StepStaking;
+  let program = anchor.workspace.ChicksStaking;
 
-  let mintPubkey = new anchor.web3.PublicKey("AURYydfxJib1ZkTir1Jn1J9ECYUtjb6rKQVmtYaixWPP");
+  // let mintPubkey = new anchor.web3.PublicKey("AURYydfxJib1ZkTir1Jn1J9ECYUtjb6rKQVmtYaixWPP");
+  let mintPubkey = new anchor.web3.PublicKey("FUnRfJAJiTtpSGP9uP5RtFm4QPsYUPTVgSMoYrgVyNzQ");
 
   const [vaultPubkey, vaultBump] = await anchor.web3.PublicKey.findProgramAddress(
     [mintPubkey.toBuffer()],
@@ -25,21 +26,25 @@ module.exports = async function (provider) {
     [Buffer.from(anchor.utils.bytes.utf8.encode('staking'))],
     program.programId
   )
-  console.log(vaultPubkey.toString(), vaultBump);
-  console.log(stakingPubkey.toString(), stakingBump);
+  console.log('here1', vaultPubkey.toString(), vaultBump);
+  console.log('here2', stakingPubkey.toString(), stakingBump);
 
-  const lockEndDate = new anchor.BN("1653577200") // 2022-05-26T23:00:00Z
-  const fee_percent = 250;
+  const lockEndDate = new anchor.BN("1648569600") // 2022-03-30 00:00:00
+  const fee_percent = new anchor.BN(250);
 
-  await program.rpc.initialize(vaultBump, stakingBump, lockEndDate, fee_percent, {
-    accounts: {
-      tokenMint: mintPubkey,
-      tokenVault: vaultPubkey,
-      stakingAccount: stakingPubkey,
-      initializer: provider.wallet.publicKey,
-      systemProgram: anchor.web3.SystemProgram.programId,
-      tokenProgram: TOKEN_PROGRAM_ID,
-      rent: anchor.web3.SYSVAR_RENT_PUBKEY,
-    },
-  })
+  try {
+    await program.rpc.initialize(vaultBump, stakingBump, lockEndDate, fee_percent, {
+      accounts: {
+        tokenMint: mintPubkey,
+        tokenVault: vaultPubkey,
+        stakingAccount: stakingPubkey,
+        initializer: provider.wallet.publicKey,
+        systemProgram: anchor.web3.SystemProgram.programId,
+        tokenProgram: TOKEN_PROGRAM_ID,
+        rent: anchor.web3.SYSVAR_RENT_PUBKEY,
+      },
+    })
+  } catch(e) {
+    console.log(e);
+  }
 }

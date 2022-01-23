@@ -5,10 +5,12 @@ import { SOLCHICK_BALANCE_TAB_STATE } from '../utils/solchickConsts';
 import ButtonWithLoader from './ButtonWithLoader';
 import ConsoleHelper from '../helpers/ConsoleHelper';
 import SolanaWalletKey from './SolanaWalletKey';
+import useStake from "../hooks/useStake";
 
 export const BalanceInfoContainer = () => {
   const [tab, setTab] = useState(SOLCHICK_BALANCE_TAB_STATE.STAKE);
   const classes = useStyles();
+  const {stake} = useStake();
 
   const handleChange = useCallback((event, value) => {
     setTab(value);
@@ -17,6 +19,11 @@ export const BalanceInfoContainer = () => {
   const handleButtonClick = () => {
     ConsoleHelper(`BalanceInfoContainer => ${tab}`);
   };
+
+  const handleActionClick = () => {
+    ConsoleHelper(`BalanceInfoContainer => ${tab}`);
+    stake(tab, 10);
+  }
 
   return (
     <div className={classes.card}>
@@ -61,6 +68,9 @@ export const BalanceInfoContainer = () => {
                 </div>
                 <ButtonWithLoader onClick={handleButtonClick}>
                   Max
+                </ButtonWithLoader>
+                <ButtonWithLoader onClick={handleActionClick}>
+                  {tab === SOLCHICK_BALANCE_TAB_STATE.STAKE? 'Stake':'Unstake'}
                 </ButtonWithLoader>
               </div>
               <SolanaWalletKey/>

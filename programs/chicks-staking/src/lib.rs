@@ -146,10 +146,6 @@ pub mod chicks_staking {
         let now_ts = Clock::get().unwrap().unix_timestamp;
         let lock_end_date = ctx.accounts.staking_account.lock_end_date;
 
-        if (now_ts as u64) < lock_end_date {
-            return Err(ErrorCode::NotExceedLockEndDate.into());
-        }
-
         let total_token = ctx.accounts.token_vault.amount;
         let total_x_token = ctx.accounts.staking_account.total_x_token;
         let old_price = get_price(&ctx.accounts.token_vault, &ctx.accounts.staking_account);
@@ -215,16 +211,20 @@ pub mod chicks_staking {
         if new_total_token == 0 || new_total_x_token == 0 {
             ctx.accounts.user_staking_account.amount = 0;
         } else {
-            let new_what: u64 = (ctx.accounts.user_staking_account.x_token_amount as u128)
-                .checked_mul(new_total_token as u128)
-                .unwrap()
-                .checked_div(new_total_x_token as u128)
-                .unwrap()
-                .try_into()
-                .unwrap();
+            if (now_ts as u64) < lock_end_date {
+                ctx.accounts.user_staking_account.amount = ctx.accounts.user_staking_account.x_token_amount;
+            } else {
+                let new_what: u64 = (ctx.accounts.user_staking_account.x_token_amount as u128)
+                    .checked_mul(new_total_token as u128)
+                    .unwrap()
+                    .checked_div(new_total_x_token as u128)
+                    .unwrap()
+                    .try_into()
+                    .unwrap();
 
-            if new_what < ctx.accounts.user_staking_account.amount {
-                ctx.accounts.user_staking_account.amount = new_what;
+                if new_what < ctx.accounts.user_staking_account.amount {
+                    ctx.accounts.user_staking_account.amount = new_what;
+                }
             }
         }
 

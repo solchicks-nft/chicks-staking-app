@@ -7,11 +7,9 @@ import { BalanceInfoContainer } from '../components/BalanceInfoContainer';
 import StakeAlert from '../components/StakeAlert';
 import { useStyles } from './useStyles';
 import { UNSTAKE_FEE } from '../utils/consts';
-import usePoolInfo from "../hooks/usePoolInfo";
 
 export const FlexiblePoolView = () => {
   const classes = useStyles();
-  usePoolInfo();
 
   return (
     <Container className='container'>

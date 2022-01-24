@@ -20,8 +20,8 @@ export enum SOLCHICK_BALANCE_TAB_STATE {
 }
 
 export interface IStakeBalance {
-  chicks: number,
-  xChicks: number,
+  chicks: string,
+  xChicks: string,
 }
 
 export const URL_SERVER_INFO = () => `${URL_BACKEND_BASE}/api/status`;

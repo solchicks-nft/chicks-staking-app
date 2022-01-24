@@ -7,13 +7,16 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { theme } from './muiTheme.js';
 import { SolanaWalletProvider } from './contexts/SolanaWalletContext';
+import {StakePoolProvider} from "./contexts/StakePoolContext";
 
 ReactDOM.render(
   <React.StrictMode>
     <BrowserRouter>
       <ThemeProvider theme={theme}>
         <SolanaWalletProvider>
-          <App />
+          <StakePoolProvider>
+            <App />
+          </StakePoolProvider>
         </SolanaWalletProvider>
       </ThemeProvider>
     </BrowserRouter>

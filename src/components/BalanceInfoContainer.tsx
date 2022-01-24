@@ -6,6 +6,7 @@ import ButtonWithLoader from './ButtonWithLoader';
 import ConsoleHelper from '../helpers/ConsoleHelper';
 import SolanaWalletKey from './SolanaWalletKey';
 import useStake from "../hooks/useStake";
+import {useStakePool} from "../contexts/StakePoolContext";
 
 export const BalanceInfoContainer = () => {
   const [tab, setTab] = useState(SOLCHICK_BALANCE_TAB_STATE.STAKE);
@@ -25,17 +26,19 @@ export const BalanceInfoContainer = () => {
     stake(tab, 10);
   }
 
+  const {refresh, userInfo} = useStakePool();
+
   return (
     <div className={classes.card}>
       <div className={classes.header}>MY BALANCE</div>
       <div className={classes.content}>
         <div className={classes.mainContent}>
           <div className={classes.contentHeading}>CHICKS Amount</div>
-          <div className={classes.contentText}>0</div>
+          <div className={classes.contentText}>{userInfo? userInfo.chicks:''}</div>
         </div>
         <div className={classes.mainContent}>
           <div className={classes.contentHeading}>xCHICKS Amount</div>
-          <div className={classes.contentText}>0</div>
+          <div className={classes.contentText}>{userInfo? userInfo.xChicks:''}</div>
         </div>
       </div>
       <div className={classes.mainTab}>

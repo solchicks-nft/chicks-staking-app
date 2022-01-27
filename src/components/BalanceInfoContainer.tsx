@@ -5,13 +5,13 @@ import { SOLCHICK_BALANCE_TAB_STATE } from '../utils/solchickConsts';
 import ButtonWithLoader from './ButtonWithLoader';
 import ConsoleHelper from '../helpers/ConsoleHelper';
 import SolanaWalletKey from './SolanaWalletKey';
-import useStake from "../hooks/useStake";
+import useStakeFlexible from "../hooks/useStakeFlexible";
 import {useStakePool} from "../contexts/StakePoolContext";
 
 export const BalanceInfoContainer = () => {
   const [tab, setTab] = useState(SOLCHICK_BALANCE_TAB_STATE.STAKE);
   const classes = useStyles();
-  const {stake} = useStake();
+  const {stake} = useStakeFlexible();
 
   const handleChange = useCallback((event, value) => {
     setTab(value);

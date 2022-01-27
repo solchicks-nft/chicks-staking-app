@@ -8,11 +8,16 @@ export const SOLCHICK_STAKING_PROGRAM = process.env
 export const SOLCHICK_DECIMALS_ON_SOL = 9;
 const URL_BACKEND_BASE = process.env.REACT_APP_BACKEND_URL as string;
 
-const PROGRAM_IDL =
+const FLEXIBLE_PROGRAM_IDL =
   process.env.NODE_ENV === 'production' ?
-    require('../idl/chicks_staking_prod.json') : require('../idl/chicks_staking_dev.json');
+    require('../idl/chicks_staking_flexible_prod.json') : require('../idl/chicks_staking_flexible_dev.json');
 
-export const SOLCHICK_STAKING_PROGRAM_IDL = PROGRAM_IDL;
+const LOCKED_PROGRAM_IDL =
+  process.env.NODE_ENV === 'production' ?
+    require('../idl/chicks_staking_locked_prod.json') : require('../idl/chicks_staking_locked_dev.json');
+
+export const SOLCHICK_STAKING_FLEXIBLE_PROGRAM_IDL = FLEXIBLE_PROGRAM_IDL;
+export const SOLCHICK_STAKING_LOCKED_PROGRAM_IDL = LOCKED_PROGRAM_IDL;
 
 export enum SOLCHICK_BALANCE_TAB_STATE {
   STAKE = 1,
@@ -26,8 +31,9 @@ export interface IStakeBalance {
 
 export const URL_SERVER_INFO = () => `${URL_BACKEND_BASE}/api/status`;
 
-export const URL_SUBMIT_STAKE = (address: string, amount: number, txId: string) =>
-  `${URL_BACKEND_BASE}/api/stake/?address=${address}&amount=${amount}&tx_id=${txId}`;
+export const URL_SUBMIT_STAKE_FLEX = (address: string, amount: number, txId: string, handle: string, xTokenAmount: string) =>
+  // eslint-disable-next-line max-len
+  `${URL_BACKEND_BASE}/api/stake_flex/?address=${address}&amount=${amount}&tx_id=${txId}&handle=${handle}&x_token=${xTokenAmount}`;
 
-export const URL_SUBMIT_UNSTAKE = (address: string, amount: number, txId: string) =>
-  `${URL_BACKEND_BASE}/api/stake/?address=${address}&amount=${amount}&tx_id=${txId}`;
+export const URL_SUBMIT_UNSTAKE_FLEX = (address: string, amount: number, txId: string) =>
+  `${URL_BACKEND_BASE}/api/unstake_flex/?address=${address}&amount=${amount}&tx_id=${txId}`;

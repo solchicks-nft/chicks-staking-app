@@ -15,7 +15,7 @@ import * as anchor from "@project-serum/anchor";
 import {getTokenBalance, toPublicKey} from "../utils/solanaHelper";
 import {toTokenBalanceString} from "../utils/solchickHelper";
 import ConsoleHelper from "../helpers/ConsoleHelper";
-import {IStakeBalance, SOLCHICK_STAKING_PROGRAM_IDL, SOLCHICK_TOKEN_MINT_ON_SOL} from "../utils/solchickConsts";
+import {IStakeBalance, SOLCHICK_STAKING_FLEXIBLE_PROGRAM_IDL, SOLCHICK_TOKEN_MINT_ON_SOL} from "../utils/solchickConsts";
 import {useSolanaWallet} from "./SolanaWalletContext";
 import {SOLANA_HOST} from "../utils/consts";
 
@@ -68,7 +68,7 @@ export const StakePoolProvider = ({
       return;
     }
     const provider = await getAnchorProvider();
-    const programIdl = SOLCHICK_STAKING_PROGRAM_IDL;
+    const programIdl = SOLCHICK_STAKING_FLEXIBLE_PROGRAM_IDL;
     if (!provider) {
       return;
     }

@@ -14,7 +14,8 @@ import {
   SOLCHICK_BALANCE_TAB_STATE,
   SOLCHICK_DECIMALS_ON_SOL,
   SOLCHICK_STAKING_FLEXIBLE_PROGRAM_IDL,
-  SOLCHICK_STAKING_PROGRAM,
+  SOLCHICK_STAKING_FLEXIBLE,
+  SOLCHICK_STAKING_LOCKED,
   SOLCHICK_TOKEN_MINT_ON_SOL,
   URL_SERVER_INFO,
   URL_SUBMIT_STAKE_FLEX,
@@ -199,7 +200,7 @@ function useStakeFlexible(): IStakeStatus {
 
     const programIdl = SOLCHICK_STAKING_FLEXIBLE_PROGRAM_IDL;
 
-    if (programIdl.metadata.address !== SOLCHICK_STAKING_PROGRAM) {
+    if (programIdl.metadata.address !== SOLCHICK_STAKING_FLEXIBLE) {
       ConsoleHelper(`Invalid program id`);
       return false;
     }

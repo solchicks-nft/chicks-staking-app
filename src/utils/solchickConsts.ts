@@ -2,8 +2,11 @@
 export const SOLCHICK_TOKEN_MINT_ON_SOL = process.env
   .REACT_APP_SOLCHICK_TOKEN_MINT_ON_SOL as string;
 
-export const SOLCHICK_STAKING_PROGRAM = process.env
-  .REACT_APP_SOLCHICK_STAKING_PROGRAM as string;
+export const SOLCHICK_STAKING_FLEXIBLE = process.env
+  .REACT_APP_SOLCHICK_STAKING_FLEXIBLE as string;
+
+export const SOLCHICK_STAKING_LOCKED = process.env
+  .REACT_APP_SOLCHICK_STAKING_LOCKED as string;
 
 export const SOLCHICK_DECIMALS_ON_SOL = 9;
 const URL_BACKEND_BASE = process.env.REACT_APP_BACKEND_URL as string;

@@ -23,10 +23,10 @@ export const BalanceInfoContainer = () => {
 
   const handleActionClick = () => {
     ConsoleHelper(`BalanceInfoContainer => ${tab}`);
-    stake(tab, 10);
+    stake(10);
   }
 
-  const {refresh, userInfo} = useStakePool();
+  const {refreshLockedPool, flexibleUserInfo, flexibleTotalInfo, lockedTotalInfo, lockedUserInfo} = useStakePool();
 
   return (
     <div className={classes.card}>
@@ -34,11 +34,11 @@ export const BalanceInfoContainer = () => {
       <div className={classes.content}>
         <div className={classes.mainContent}>
           <div className={classes.contentHeading}>CHICKS Amount</div>
-          <div className={classes.contentText}>{userInfo? userInfo.chicks:''}</div>
+          <div className={classes.contentText}>{lockedUserInfo? lockedUserInfo.chicks:''}</div>
         </div>
         <div className={classes.mainContent}>
           <div className={classes.contentHeading}>xCHICKS Amount</div>
-          <div className={classes.contentText}>{userInfo? userInfo.xChicks:''}</div>
+          <div className={classes.contentText}>{lockedUserInfo? lockedUserInfo.xChicks:''}</div>
         </div>
       </div>
       <div className={classes.mainTab}>

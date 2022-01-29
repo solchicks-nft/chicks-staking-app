@@ -57,14 +57,13 @@ export const URL_SUBMIT_LOCKED_STAKE = (
   address: string,
   amount: number,
   txId: string,
-  handle: string,
   xTokenAmount: string
 ) =>
   // eslint-disable-next-line max-len
-  `${URL_BACKEND_BASE}/api/locked_stake/?address=${address}&amount=${amount}&tx_id=${txId}&handle=${handle}&x_token=${xTokenAmount}`;
+  `${URL_BACKEND_BASE}/api/locked_stake/?address=${address}&amount=${amount}&tx_id=${txId}&x_token=${xTokenAmount}`;
 
-export const URL_SUBMIT_LOCKED_UNSTAKE = (address: string, txId: string, handle: string, xAmount: string) =>
-  `${URL_BACKEND_BASE}/api/locked_unstake/?address=${address}&tx_id=${txId}&handle=${handle}&x_token=${xAmount}`;
+export const URL_SUBMIT_LOCKED_UNSTAKE = (address: string, txId: string, xAmount: string) =>
+  `${URL_BACKEND_BASE}/api/locked_unstake/?address=${address}&tx_id=${txId}&x_token=${xAmount}`;
 
 export const URL_SUBMIT_FLEX_LIST = (address: string) =>
   `${URL_BACKEND_BASE}/api/flex_list/?address=${address}`;

@@ -6,6 +6,11 @@ import ConsoleHelper from "../helpers/ConsoleHelper";
 import {getSolChicksAssociatedAddress} from "./solchickHelper";
 import {pubkeyToString} from "./solanaHelper";
 
+export enum StakeMode {
+  FLEXIBLE = 1,
+  LOCKED,
+}
+
 export enum StakeStatusCode {
   NONE = 0,
   START,

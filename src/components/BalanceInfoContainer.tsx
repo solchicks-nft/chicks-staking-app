@@ -1,17 +1,18 @@
-import React, { useCallback, useState } from 'react';
-import { Tab, Tabs } from '@material-ui/core';
-import { useStyles } from '../pages/useStyles';
-import { SOLCHICK_BALANCE_TAB_STATE } from '../utils/solchickConsts';
+import React, {useCallback, useState} from 'react';
+import {Tab, Tabs} from '@material-ui/core';
+import {useStyles} from '../pages/useStyles';
+import {SOLCHICK_BALANCE_TAB_STATE} from '../utils/solchickConsts';
 import ButtonWithLoader from './ButtonWithLoader';
 import ConsoleHelper from '../helpers/ConsoleHelper';
 import SolanaWalletKey from './SolanaWalletKey';
-import useStakeFlexible from "../hooks/useStakeFlexible";
+import useStake from "../hooks/useStake";
 import {useStakePool} from "../contexts/StakePoolContext";
+import {StakeMode} from "../utils/stakeHelper";
 
 export const BalanceInfoContainer = () => {
   const [tab, setTab] = useState(SOLCHICK_BALANCE_TAB_STATE.STAKE);
   const classes = useStyles();
-  const {stake} = useStakeFlexible();
+  const {stake} = useStake(StakeMode.FLEXIBLE);
 
   const handleChange = useCallback((event, value) => {
     setTab(value);

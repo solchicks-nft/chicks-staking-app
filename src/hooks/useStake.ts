@@ -1,41 +1,41 @@
-import {useMemo, useState} from 'react';
+import { useMemo, useState } from 'react';
 import axios from 'axios';
 import BN from 'bn.js';
-import {ConfirmOptions, Connection} from '@solana/web3.js';
+import { ConfirmOptions, Connection } from '@solana/web3.js';
 import * as anchor from '@project-serum/anchor';
-import {Idl, Program, Provider as AnchorProvider} from '@project-serum/anchor';
-import {TOKEN_PROGRAM_ID} from '@solana/spl-token';
-import {parseUnits} from 'ethers/lib/utils';
-import {AnchorWallet} from '@solana/wallet-adapter-react';
+import { Idl, Program, Provider as AnchorProvider } from '@project-serum/anchor';
+import { TOKEN_PROGRAM_ID } from '@solana/spl-token';
+import { parseUnits } from 'ethers/lib/utils';
+import { AnchorWallet } from '@solana/wallet-adapter-react';
 import { Md5 } from 'md5-typescript';
-import {BigNumber} from "ethers";
+import { BigNumber } from 'ethers';
 
-import {useSolanaWallet} from '../contexts/SolanaWalletContext';
-import {SOLANA_HOST} from '../utils/consts';
+import { useSolanaWallet } from '../contexts/SolanaWalletContext';
+import { SOLANA_HOST } from '../utils/consts';
 import {
   SOLCHICK_DECIMALS_ON_SOL,
-  SOLCHICK_STAKING_FLEXIBLE_PROGRAM_IDL,
   SOLCHICK_STAKING_FLEXIBLE,
-  SOLCHICK_STAKING_LOCKED_PROGRAM_IDL,
+  SOLCHICK_STAKING_FLEXIBLE_PROGRAM_IDL,
   SOLCHICK_STAKING_LOCKED,
+  SOLCHICK_STAKING_LOCKED_PROGRAM_IDL,
   SOLCHICK_TOKEN_MINT_ON_SOL,
   URL_SUBMIT_FLEX_STAKE,
   URL_SUBMIT_FLEX_UNSTAKE,
   URL_SUBMIT_LOCKED_STAKE,
   URL_SUBMIT_LOCKED_UNSTAKE,
 } from '../utils/solchickConsts';
-import {getTransactionInfoOnSol, pubkeyToString, toPublicKey} from '../utils/solanaHelper';
-import {getSolChicksAssociatedAddress} from '../utils/solchickHelper';
-import {sleep} from '../utils/helper';
+import { getTransactionInfoOnSol, pubkeyToString, toPublicKey } from '../utils/solanaHelper';
+import { getSolChicksAssociatedAddress } from '../utils/solchickHelper';
+import { sleep } from '../utils/helper';
 import ConsoleHelper from '../helpers/ConsoleHelper';
 import {
   createStakeStatus,
   getServerInfo,
   isEnoughTokenOnSolana,
-  StakeMode,
   IStakeStatus,
   StakeErrorCode,
-  StakeStatusCode
+  StakeMode,
+  StakeStatusCode, StakeStepMode,
 } from '../utils/stakeHelper';
 
 function useStake(mode: StakeMode): IStakeStatus {
@@ -72,19 +72,8 @@ function useStake(mode: StakeMode): IStakeStatus {
     setIsProcessing(false);
   };
 
-  const submitStakeResult = async (
-    address: string,
-    amount: number,
-    txId: string,
-    handle: string,
-    xTokenAmount: string
-  ) => {
-    const url = mode === StakeMode.FLEXIBLE?
-      URL_SUBMIT_FLEX_STAKE(address, amount, txId, handle, xTokenAmount)
-      :
-      URL_SUBMIT_LOCKED_STAKE(address, amount, txId, xTokenAmount);
-
-    ConsoleHelper(`submitStakeResult: ${url}`);
+  function processStakeResult(url: string, txId: string, stakeStepMode: StakeStepMode) {
+    ConsoleHelper(`${stakeStepMode === StakeStepMode.STAKE ? 'stake' : 'unstake'}Result: ${url}`);
     setSourceTxId(txId);
     axios.get(url).then(
       (results) => {
@@ -106,44 +95,37 @@ function useStake(mode: StakeMode): IStakeStatus {
         setError(StakeErrorCode.SUBMIT_FAILED);
       },
     );
+  }
+
+  const submitStakeResult = async (
+    address: string,
+    amount: number,
+    txId: string,
+    handle: string,
+    xTokenAmount: string,
+  ) => {
+    const url =
+      mode === StakeMode.FLEXIBLE
+        ? URL_SUBMIT_FLEX_STAKE(address, amount, txId, handle, xTokenAmount)
+        : URL_SUBMIT_LOCKED_STAKE(address, amount, txId, xTokenAmount);
+    processStakeResult(url, txId, StakeStepMode.STAKE);
   };
 
   const submitUnstakeResult = async (
     address: string,
     txId: string,
     handle: string,
-    xAmount: string
+    xAmount: string,
   ) => {
-    const url = mode === StakeMode.FLEXIBLE?
-      URL_SUBMIT_FLEX_UNSTAKE(address, txId, handle, xAmount)
-      :
-      URL_SUBMIT_LOCKED_UNSTAKE(address, txId, xAmount);
-    ConsoleHelper(`submitStakeResult: ${url}`);
-    setSourceTxId(txId);
-    axios.get(url).then(
-      (results) => {
-        ConsoleHelper(`submitStakeResult: ${results}`);
-        if (results.data.success) {
-          setStatusCode(StakeStatusCode.SUCCESS);
-          setIsProcessing(false);
-        } else {
-          const errorMessage = results.data.error_message || 'Unknown error';
-          setLastError(
-            `${errorMessage} (Error code: ${results.data.error_code})`,
-          );
-          setError(StakeErrorCode.SUBMIT_FAILED);
-        }
-      },
-      (error) => {
-        ConsoleHelper(`submitStakeResult: ${error}`);
-        setLastError(`Unknown error`);
-        setError(StakeErrorCode.SUBMIT_FAILED);
-      },
-    );
+    const url =
+      mode === StakeMode.FLEXIBLE
+        ? URL_SUBMIT_FLEX_UNSTAKE(address, txId, handle, xAmount)
+        : URL_SUBMIT_LOCKED_UNSTAKE(address, txId, xAmount);
+    processStakeResult(url, txId, StakeStepMode.UNSTAKE);
   };
 
   const stakeTokenOnSol = async (stakeAmount: number) => {
-    const { publicKey: walletPublicKey} = walletSolana;
+    const { publicKey: walletPublicKey } = walletSolana;
     if (!walletPublicKey || !solanaConnection) {
       return false;
     }
@@ -153,10 +135,15 @@ function useStake(mode: StakeMode): IStakeStatus {
       return false;
     }
 
-    const programIdl = mode === StakeMode.FLEXIBLE?
-      SOLCHICK_STAKING_FLEXIBLE_PROGRAM_IDL:SOLCHICK_STAKING_LOCKED_PROGRAM_IDL;
+    const programIdl =
+      mode === StakeMode.FLEXIBLE
+        ? SOLCHICK_STAKING_FLEXIBLE_PROGRAM_IDL
+        : SOLCHICK_STAKING_LOCKED_PROGRAM_IDL;
 
-    const envProgramId = mode === StakeMode.FLEXIBLE? SOLCHICK_STAKING_FLEXIBLE:SOLCHICK_STAKING_LOCKED;
+    const envProgramId =
+      mode === StakeMode.FLEXIBLE
+        ? SOLCHICK_STAKING_FLEXIBLE
+        : SOLCHICK_STAKING_LOCKED;
 
     if (programIdl.metadata.address !== envProgramId) {
       ConsoleHelper(`Invalid program id`);
@@ -201,46 +188,48 @@ function useStake(mode: StakeMode): IStakeStatus {
 
     const tokenMintPubkey = toPublicKey(SOLCHICK_TOKEN_MINT_ON_SOL);
 
-    const [vaultPubkey, vaultBump] = await anchor.web3.PublicKey.findProgramAddress(
-      [tokenMintPubkey.toBuffer()],
-      program.programId
-    );
+    const [vaultPubkey, vaultBump] =
+      await anchor.web3.PublicKey.findProgramAddress(
+        [tokenMintPubkey.toBuffer()],
+        program.programId,
+      );
 
     const [stakingPubkey, stakingBump] =
       await anchor.web3.PublicKey.findProgramAddress(
         [Buffer.from(anchor.utils.bytes.utf8.encode('staking'))],
-        program.programId
+        program.programId,
       );
 
     const hashString = `${new Date().getTime()}_${Math.random()}`;
     const handle = Md5.init(hashString).toLowerCase();
 
+    // noinspection TypeScriptValidateJSTypes
     const [userStakingPubkey, userStakingBump] =
-        mode === StakeMode.FLEXIBLE?
-          await anchor.web3.PublicKey.findProgramAddress(
+      mode === StakeMode.FLEXIBLE
+        ? await anchor.web3.PublicKey.findProgramAddress(
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore
             [walletPublicKey.toBuffer(), handle],
-            program.programId
+            program.programId,
           )
-          :
-          await anchor.web3.PublicKey.findProgramAddress(
+        : await anchor.web3.PublicKey.findProgramAddress(
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore
             [walletPublicKey.toBuffer()],
-            program.programId
+            program.programId,
           );
 
     let xTokenAmountPrev: BigNumber;
     if (mode === StakeMode.LOCKED) {
-      const userStakingAccountPrev = await program.account.userStakingAccount.fetch(
-        userStakingPubkey
+      const userStakingAccountPrev =
+        await program.account.userStakingAccount.fetch(userStakingPubkey);
+      xTokenAmountPrev = BigNumber.from(
+        userStakingAccountPrev.xTokenAmount.toString(),
       );
-      xTokenAmountPrev = BigNumber.from(userStakingAccountPrev.xTokenAmount.toString());
     }
 
     let txId = '';
-    let userStakingAccount: any;
+    let userStakingAccount;
     let xTokenAmountStr = '';
     let xTokenAmount: BigNumber;
 
@@ -293,17 +282,16 @@ function useStake(mode: StakeMode): IStakeStatus {
       }
 
       userStakingAccount = await program.account.userStakingAccount.fetch(
-        userStakingPubkey
+        userStakingPubkey,
       );
       if (mode === StakeMode.LOCKED) {
         xTokenAmount = BigNumber.from(userStakingAccount.xTokenAmount);
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
-        xTokenAmountStr = xTokenAmount.sub(xTokenAmountPrev).toString()
+        xTokenAmountStr = xTokenAmount.sub(xTokenAmountPrev).toString();
       } else {
         xTokenAmountStr = userStakingAccount.xTokenAmount.toString();
       }
-
     } catch (e) {
       ConsoleHelper(`error: `, e);
       setError(StakeErrorCode.STAKE_FAILED);
@@ -316,13 +304,13 @@ function useStake(mode: StakeMode): IStakeStatus {
       stakeAmount,
       txId,
       handle,
-      xTokenAmountStr
+      xTokenAmountStr,
     );
     return true;
   };
 
   const unstakeTokenOnSol = async (xAmount: string, handle: string) => {
-    const { publicKey: walletPublicKey} = walletSolana;
+    const { publicKey: walletPublicKey } = walletSolana;
     if (!walletPublicKey || !solanaConnection) {
       return false;
     }
@@ -332,10 +320,15 @@ function useStake(mode: StakeMode): IStakeStatus {
       return false;
     }
 
-    const programIdl = mode === StakeMode.FLEXIBLE?
-      SOLCHICK_STAKING_FLEXIBLE_PROGRAM_IDL:SOLCHICK_STAKING_LOCKED_PROGRAM_IDL;
+    const programIdl =
+      mode === StakeMode.FLEXIBLE
+        ? SOLCHICK_STAKING_FLEXIBLE_PROGRAM_IDL
+        : SOLCHICK_STAKING_LOCKED_PROGRAM_IDL;
 
-    const envProgramId = mode === StakeMode.FLEXIBLE? SOLCHICK_STAKING_FLEXIBLE:SOLCHICK_STAKING_LOCKED;
+    const envProgramId =
+      mode === StakeMode.FLEXIBLE
+        ? SOLCHICK_STAKING_FLEXIBLE
+        : SOLCHICK_STAKING_LOCKED;
 
     if (programIdl.metadata.address !== envProgramId) {
       ConsoleHelper(`Invalid program id`);
@@ -365,32 +358,33 @@ function useStake(mode: StakeMode): IStakeStatus {
 
     const tokenMintPubkey = toPublicKey(SOLCHICK_TOKEN_MINT_ON_SOL);
 
-    const [vaultPubkey, vaultBump] = await anchor.web3.PublicKey.findProgramAddress(
-      [tokenMintPubkey.toBuffer()],
-      program.programId
-    );
+    const [vaultPubkey, vaultBump] =
+      await anchor.web3.PublicKey.findProgramAddress(
+        [tokenMintPubkey.toBuffer()],
+        program.programId,
+      );
 
     const [stakingPubkey, stakingBump] =
       await anchor.web3.PublicKey.findProgramAddress(
         [Buffer.from(anchor.utils.bytes.utf8.encode('staking'))],
-        program.programId
+        program.programId,
       );
 
+    // noinspection TypeScriptValidateJSTypes
     const [userStakingPubkey, userStakingBump] =
-      mode === StakeMode.FLEXIBLE?
-        await anchor.web3.PublicKey.findProgramAddress(
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-ignore
-          [walletPublicKey.toBuffer(), handle],
-          program.programId
-        )
-        :
-        await anchor.web3.PublicKey.findProgramAddress(
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-ignore
-          [walletPublicKey.toBuffer()],
-          program.programId
-        );
+      mode === StakeMode.FLEXIBLE
+        ? await anchor.web3.PublicKey.findProgramAddress(
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            [walletPublicKey.toBuffer(), handle],
+            program.programId,
+          )
+        : await anchor.web3.PublicKey.findProgramAddress(
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            [walletPublicKey.toBuffer()],
+            program.programId,
+          );
 
     let txId = '';
     const accounts = {
@@ -401,7 +395,7 @@ function useStake(mode: StakeMode): IStakeStatus {
         stakingAccount: stakingPubkey,
         userStakingAccount: userStakingPubkey,
         tokenTo: associatedKey,
-        tokenProgram: TOKEN_PROGRAM_ID
+        tokenProgram: TOKEN_PROGRAM_ID,
       },
     };
     try {
@@ -448,7 +442,7 @@ function useStake(mode: StakeMode): IStakeStatus {
       pubkeyToString(walletPublicKey),
       txId,
       handle,
-      xAmount
+      xAmount,
     );
     return true;
   };

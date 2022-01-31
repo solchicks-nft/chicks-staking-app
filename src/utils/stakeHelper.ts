@@ -1,14 +1,19 @@
-import axios from "axios";
-import BN from "bn.js";
-import {Connection, ParsedAccountData,} from '@solana/web3.js';
-import {URL_SERVER_INFO} from "./solchickConsts";
-import ConsoleHelper from "../helpers/ConsoleHelper";
-import {getSolChicksAssociatedAddress} from "./solchickHelper";
-import {pubkeyToString} from "./solanaHelper";
+import axios from 'axios';
+import BN from 'bn.js';
+import { Connection, ParsedAccountData } from '@solana/web3.js';
+import { URL_SERVER_INFO } from './solchickConsts';
+import ConsoleHelper from '../helpers/ConsoleHelper';
+import { getSolChicksAssociatedAddress } from './solchickHelper';
+import { pubkeyToString } from './solanaHelper';
 
 export enum StakeMode {
   FLEXIBLE = 1,
   LOCKED,
+}
+
+export enum StakeStepMode {
+  STAKE = 1,
+  UNSTAKE,
 }
 
 export enum StakeStatusCode {
@@ -59,7 +64,6 @@ export const createStakeStatus = (
   sourceTxId,
 });
 
-
 export const getServerInfo = async () => {
   try {
     const result = await axios.get(URL_SERVER_INFO());
@@ -72,17 +76,18 @@ export const getServerInfo = async () => {
   return false;
 };
 
-
-export const isEnoughTokenOnSolana = async (solanaConnection: Connection, address: string, amount: string) => {
+export const isEnoughTokenOnSolana = async (
+  solanaConnection: Connection,
+  address: string,
+  amount: string,
+) => {
   if (!solanaConnection) {
     return false;
   }
   const bnStakeAmount = new BN(amount);
   const associatedKey = await getSolChicksAssociatedAddress(address);
   ConsoleHelper(
-    `isEnoughTokenOnSolana -> associatedKey: ${pubkeyToString(
-      associatedKey,
-    )}`,
+    `isEnoughTokenOnSolana -> associatedKey: ${pubkeyToString(associatedKey)}`,
   );
   let tokenAmount: BN = new BN(0);
   try {

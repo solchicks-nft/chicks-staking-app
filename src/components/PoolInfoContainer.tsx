@@ -1,10 +1,10 @@
 import React from 'react';
 import { useStyles } from '../pages/useStyles';
-import {useStakePool} from "../contexts/StakePoolContext";
+import { useStakePool } from '../contexts/StakePoolContext';
 
 export const PoolInfoContainer = () => {
   const classes = useStyles();
-  const {flexibleTotalInfo} = useStakePool();
+  const { flexibleTotalInfo } = useStakePool();
 
   return (
     <div className={classes.card}>
@@ -12,7 +12,9 @@ export const PoolInfoContainer = () => {
       <div className={classes.content}>
         <div className={classes.mainContent}>
           <div className={classes.contentHeading}>Total CHICKS Staked</div>
-          <div className={classes.contentText}>{flexibleTotalInfo? flexibleTotalInfo.chicks:0}</div>
+          <div className={classes.contentText}>
+            {flexibleTotalInfo ? flexibleTotalInfo.chicks : 0}
+          </div>
         </div>
         <div className={classes.mainContent}>
           <div className={classes.contentHeading}>Est. APR</div>

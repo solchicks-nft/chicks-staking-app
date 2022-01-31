@@ -38,7 +38,7 @@ export const toTokenBalanceString = (
     return '';
   }
   if (chainId === CHAIN_ID_SOLANA) {
-    let value:bigint;
+    let value: bigint;
     if (typeof balance === 'bigint') {
       value = balance;
     } else {

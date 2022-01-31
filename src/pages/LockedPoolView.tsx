@@ -8,7 +8,7 @@ export const LockedPoolView = () => {
 
   return (
     <Container className="container">
-      <Card className={classes.mainCard}/>
+      <Card className={classes.mainCard} />
     </Container>
   );
 };

@@ -12,11 +12,12 @@ export const FlexiblePoolView = () => {
   const classes = useStyles();
 
   return (
-    <Container className='container'>
+    <Container className="container">
       <Card className={classes.mainCard}>
         <StakeAlert
           stakeAlertText={`Please note that unstaking your tokens before the 8 week window will incur 
-          a ${UNSTAKE_FEE}% charge.`} />
+          a ${UNSTAKE_FEE}% charge.`}
+        />
         <BalanceInfoContainer />
         <RewardsInfoContainer />
         <PoolInfoContainer />

@@ -5,8 +5,8 @@ import {
   Token,
 } from '@solana/spl-token';
 import * as anchor from '@project-serum/anchor';
-import ConsoleHelper from "../helpers/ConsoleHelper";
-import {sleep} from "./helper";
+import ConsoleHelper from '../helpers/ConsoleHelper';
+import { sleep } from './helper';
 
 const PubKeysInternedMap = new Map<string, PublicKey>();
 
@@ -48,9 +48,13 @@ export const getAssociatedTokenAddress = async (
     toPublicKey(ownerKey),
   );
 
-export const getTokenBalance = async (connection: Connection, pubkey:PublicKey | string) => new anchor.BN(
-    (await connection.getTokenAccountBalance(toPublicKey(pubkey))).value.amount
-  )
+export const getTokenBalance = async (
+  connection: Connection,
+  pubkey: PublicKey | string,
+) =>
+  new anchor.BN(
+    (await connection.getTokenAccountBalance(toPublicKey(pubkey))).value.amount,
+  );
 
 export const getTokenObj = (
   connection: Connection,
@@ -70,9 +74,7 @@ export const getTransactionInfoOnSol = async (
     // eslint-disable-next-line no-await-in-loop
     txInfo = await connection.getTransaction(txId);
     if (!txInfo) {
-      ConsoleHelper(
-        `getTransactionInfoOnSol: txId: ${txId} - retry: ${retry}`,
-      );
+      ConsoleHelper(`getTransactionInfoOnSol: txId: ${txId} - retry: ${retry}`);
       // eslint-disable-next-line no-await-in-loop
       await sleep(5000);
     } else {

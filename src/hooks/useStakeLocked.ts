@@ -1,7 +1,7 @@
 import {useMemo, useState} from 'react';
 import axios from 'axios';
 import BN from 'bn.js';
-import {ConfirmOptions, Connection, ParsedAccountData,} from '@solana/web3.js';
+import {ConfirmOptions, Connection} from '@solana/web3.js';
 import * as anchor from '@project-serum/anchor';
 import {Idl, Program, Provider as AnchorProvider} from '@project-serum/anchor';
 import {TOKEN_PROGRAM_ID} from '@solana/spl-token';
@@ -15,7 +15,6 @@ import {
   SOLCHICK_STAKING_LOCKED_PROGRAM_IDL,
   SOLCHICK_STAKING_LOCKED,
   SOLCHICK_TOKEN_MINT_ON_SOL,
-  URL_SERVER_INFO,
   URL_SUBMIT_LOCKED_STAKE,
   URL_SUBMIT_LOCKED_UNSTAKE,
 } from '../utils/solchickConsts';
@@ -23,54 +22,14 @@ import {getTransactionInfoOnSol, pubkeyToString, toPublicKey} from '../utils/sol
 import {getSolChicksAssociatedAddress} from '../utils/solchickHelper';
 import {sleep} from '../utils/helper';
 import ConsoleHelper from '../helpers/ConsoleHelper';
-
-export enum StakeStatusCode {
-  NONE = 0,
-  START,
-  TOKEN_AMOUNT_CHECKING,
-  PROCESSING,
-  SUBMITTING,
-  SUCCESS,
-  FAILED = 101,
-}
-
-export enum StakeErrorCode {
-  NO_ERROR,
-  CANT_CONNECT_SOLANA,
-  TOKEN_AMOUNT_NOT_ENOUGH,
-  STAKE_FAILED,
-  SOLANA_NO_ASSOC_ACCOUNT,
-  SERVER_INVALID,
-  SUBMIT_FAILED,
-}
-
-interface IStakeStatus {
-  stake(amount: number): void;
-  unstake(handle: string, amount: string): void;
-  isProcessing: boolean;
-  statusCode: StakeStatusCode;
-  errorCode: StakeErrorCode;
-  lastError: string | null;
-  sourceTxId: string;
-}
-
-const createStakeStatus = (
-  stake: (amount: number) => void,
-  unstake: (handle: string, amount: string) => void,
-  isProcessing: boolean,
-  statusCode = StakeStatusCode.NONE,
-  errorCode: StakeErrorCode,
-  lastError: string | null,
-  sourceTxId: string,
-) => ({
-  stake,
-  unstake,
-  isProcessing,
-  statusCode,
-  errorCode,
-  lastError,
-  sourceTxId,
-});
+import {
+  createStakeStatus,
+  getServerInfo,
+  isEnoughTokenOnSolana,
+  IStakeStatus,
+  StakeErrorCode,
+  StakeStatusCode
+} from "../utils/stakeHelper";
 
 function useStakeLocked(): IStakeStatus {
   const [isProcessing, setIsProcessing] = useState(false);
@@ -104,18 +63,6 @@ function useStakeLocked(): IStakeStatus {
     setStatusCode(StakeStatusCode.FAILED);
     setErrorCode(error);
     setIsProcessing(false);
-  };
-
-  const getServerInfo = async () => {
-    try {
-      const result = await axios.get(URL_SERVER_INFO());
-      if (result && result.data && result.data.success) {
-        return true;
-      }
-    } catch (e) {
-      ConsoleHelper(`getServerInfo: ${e}`);
-    }
-    return false;
   };
 
   const submitStakeResult = async (
@@ -179,45 +126,6 @@ function useStakeLocked(): IStakeStatus {
     );
   };
 
-  const isEnoughTokenOnSolana = async (address: string, amount: string) => {
-    if (!solanaConnection) {
-      return false;
-    }
-    const bnStakeAmount = new BN(amount);
-    const associatedKey = await getSolChicksAssociatedAddress(address);
-    ConsoleHelper(
-      `isEnoughTokenOnSolana -> associatedKey: ${pubkeyToString(
-        associatedKey,
-      )}`,
-    );
-    let tokenAmount: BN = new BN(0);
-    try {
-      const parsedAccount = await solanaConnection.getParsedAccountInfo(
-        associatedKey,
-      );
-      if (parsedAccount.value) {
-        tokenAmount = new BN(
-          (
-            parsedAccount.value.data as ParsedAccountData
-          ).parsed.info.tokenAmount.amount,
-        );
-        ConsoleHelper(`isEnoughTokenOnSolana -> parsedAccount`, parsedAccount);
-        ConsoleHelper(
-          `isEnoughTokenOnSolana -> tokenAmount`,
-          tokenAmount.toString(),
-        );
-      }
-    } catch (e) {
-      ConsoleHelper(`isEnoughTokenOnSolana: ${e}`);
-    }
-
-    if (tokenAmount.cmp(bnStakeAmount) >= 0) {
-    } else {
-      return false;
-    }
-    return true;
-  };
-
   const stakeTokenOnSol = async (stakeAmount: number) => {
     const { publicKey: walletPublicKey} = walletSolana;
     if (!walletPublicKey || !solanaConnection) {
@@ -256,6 +164,7 @@ function useStakeLocked(): IStakeStatus {
     );
 
     const isEnough = await isEnoughTokenOnSolana(
+      solanaConnection,
       walletPublicKey.toString(),
       bnStakeAmount.toString(),
     );

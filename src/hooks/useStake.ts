@@ -27,7 +27,7 @@ import {
 import { getTransactionInfoOnSol, pubkeyToString, toPublicKey } from '../utils/solanaHelper';
 import { getSolChicksAssociatedAddress } from '../utils/solchickHelper';
 import { sleep } from '../utils/helper';
-import ConsoleHelper from '../helpers/ConsoleHelper';
+import ConsoleHelper from '../utils/consoleHelper';
 import {
   createStakeStatus,
   getServerInfo,
@@ -450,14 +450,12 @@ function useStake(mode: StakeMode): IStakeStatus {
   const stake = async (amount: number) => {
     setSourceTxId('');
     ConsoleHelper('stake -- start');
-
     await stakeTokenOnSol(amount);
   };
 
   const unstake = async (amount: string, handle = '') => {
     setSourceTxId('');
     ConsoleHelper('unstake -- start');
-
     await unstakeTokenOnSol(amount, handle);
   };
 

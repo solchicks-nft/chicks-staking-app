@@ -5,7 +5,7 @@ import {
   Token,
 } from '@solana/spl-token';
 import * as anchor from '@project-serum/anchor';
-import ConsoleHelper from '../helpers/ConsoleHelper';
+import ConsoleHelper from './consoleHelper';
 import { sleep } from './helper';
 
 const PubKeysInternedMap = new Map<string, PublicKey>();

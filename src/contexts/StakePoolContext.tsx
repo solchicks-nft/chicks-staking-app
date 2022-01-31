@@ -22,7 +22,7 @@ import { BigNumber } from 'ethers';
 import axios from 'axios';
 import { getTokenBalance, toPublicKey } from '../utils/solanaHelper';
 import { toTokenBalanceString } from '../utils/solchickHelper';
-import ConsoleHelper from '../helpers/ConsoleHelper';
+import ConsoleHelper from '../utils/consoleHelper';
 import {
   IStakeBalance,
   SOLCHICK_STAKING_LOCKED_PROGRAM_IDL,

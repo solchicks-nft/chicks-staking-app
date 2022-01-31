@@ -3,7 +3,7 @@ import { Tab, Tabs } from '@material-ui/core';
 import { useStyles } from '../pages/useStyles';
 import { SOLCHICK_BALANCE_TAB_STATE } from '../utils/solchickConsts';
 import ButtonWithLoader from './ButtonWithLoader';
-import ConsoleHelper from '../helpers/ConsoleHelper';
+import ConsoleHelper from '../utils/consoleHelper';
 import SolanaWalletKey from './SolanaWalletKey';
 import useStake from '../hooks/useStake';
 import { useStakePool } from '../contexts/StakePoolContext';

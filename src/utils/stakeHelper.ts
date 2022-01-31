@@ -2,7 +2,7 @@ import axios from 'axios';
 import BN from 'bn.js';
 import { Connection, ParsedAccountData } from '@solana/web3.js';
 import { URL_SERVER_INFO } from './solchickConsts';
-import ConsoleHelper from '../helpers/ConsoleHelper';
+import ConsoleHelper from './consoleHelper';
 import { getSolChicksAssociatedAddress } from './solchickHelper';
 import { pubkeyToString } from './solanaHelper';
 

@@ -76,7 +76,7 @@ export const StakePoolProvider = ({
 
   const { publicKey: walletPublicKey } = walletSolana;
 
-  async function getAnchorProvider() {
+  const getAnchorProvider = useCallback(async () => {
     const opts = {
       preflightCommitment: 'confirmed',
     };
@@ -86,14 +86,14 @@ export const StakePoolProvider = ({
       walletSolana as unknown as AnchorWallet,
       opts.preflightCommitment as unknown as ConfirmOptions,
     );
-  }
+  }, [solanaConnection, walletSolana]);
 
   const tokenMintPubkey = useMemo(
     () => toPublicKey(SOLCHICK_TOKEN_MINT_ON_SOL),
     [],
   );
 
-  const refreshLockedPool = async () => {
+  const refreshLockedPool = useCallback(async () => {
     if (!solanaConnection) {
       return;
     }
@@ -169,9 +169,9 @@ export const StakePoolProvider = ({
     } else {
       setLockedUserInfo({ chicks: '', xChicks: '' });
     }
-  };
+  }, [getAnchorProvider, solanaConnection, tokenMintPubkey, walletPublicKey]);
 
-  const refreshFlexiblePool = async () => {
+  const refreshFlexiblePool = useCallback(async () => {
     if (!solanaConnection) {
       return;
     }
@@ -261,12 +261,12 @@ export const StakePoolProvider = ({
     } else {
       setFlexibleUserInfo({ chicks: '', xChicks: '' });
     }
-  };
+  }, [getAnchorProvider, solanaConnection, tokenMintPubkey, walletPublicKey]);
 
   useEffect(() => {
     refreshLockedPool();
     refreshFlexiblePool();
-  }, [solanaConnection, walletPublicKey]);
+  }, [refreshFlexiblePool, refreshLockedPool, solanaConnection, walletPublicKey]);
 
   const contextValue = useMemo(
     () => ({

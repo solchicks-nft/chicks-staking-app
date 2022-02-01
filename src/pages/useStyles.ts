@@ -65,6 +65,15 @@ export const useStyles = makeStyles((theme) => ({
     gap: '8px',
     padding: '11px 0px',
   },
+  tabContent: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '100%',
+    gap: '8px',
+    padding: '11px 0px',
+  },
   flexibleContentContainer: {
     display: 'flex',
   },

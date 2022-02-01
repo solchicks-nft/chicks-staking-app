@@ -8,12 +8,12 @@ import { pubkeyToString } from './solanaHelper';
 
 export enum StakeMode {
   FLEXIBLE = 1,
-  LOCKED,
+  LOCKED = 2,
 }
 
 export enum StakeStepMode {
-  STAKE = 1,
-  UNSTAKE,
+  STAKE = 3,
+  UNSTAKE = 4,
 }
 
 export enum StakeStatusCode {

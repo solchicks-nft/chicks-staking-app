@@ -1,5 +1,5 @@
-import React, { useCallback, useState } from 'react';
-import { Tab, Tabs } from '@material-ui/core';
+import React, { ChangeEvent, useCallback, useState } from 'react';
+import { Tab, Tabs, TextField } from '@material-ui/core';
 import { useStyles } from '../pages/useStyles';
 import { SOLCHICK_BALANCE_TAB_STATE } from '../utils/solchickConsts';
 import ButtonWithLoader from './ButtonWithLoader';
@@ -8,11 +8,14 @@ import SolanaWalletKey from './SolanaWalletKey';
 import useStake from '../hooks/useStake';
 import { useStakePool } from '../contexts/StakePoolContext';
 import { StakeMode } from '../utils/stakeHelper';
+import { useSolanaWallet } from '../contexts/SolanaWalletContext';
 
-export const BalanceInfoContainer = () => {
+export const BalanceInfoContainer = ({ tabType }: { tabType: number }) => {
   const [tab, setTab] = useState(SOLCHICK_BALANCE_TAB_STATE.STAKE);
+  const [inputVal, setInput] = useState('');
   const classes = useStyles();
-  const { stake } = useStake(StakeMode.FLEXIBLE);
+  const wallet = useSolanaWallet();
+  const { stake } = useStake(tabType);
 
   const handleChange = useCallback((event, value) => {
     setTab(value);
@@ -23,8 +26,16 @@ export const BalanceInfoContainer = () => {
   };
 
   const handleActionClick = () => {
-    ConsoleHelper(`BalanceInfoContainer => ${tab}`);
-    stake(10);
+    if(wallet.connected && inputVal.length > 0 && parseFloat(inputVal) > 0) {
+      ConsoleHelper(`BalanceInfoContainer => ${tab}`);
+      stake(Number(inputVal));
+    } else {
+      ConsoleHelper(`error:`);
+    }
+  };
+
+  const changeInput = (e: ChangeEvent<HTMLInputElement>): void => {
+    setInput(e.target.value.toString());
   };
 
   const {
@@ -39,18 +50,21 @@ export const BalanceInfoContainer = () => {
     <div className={classes.card}>
       <div className={classes.header}>MY BALANCE</div>
       <div className={classes.content}>
-        <div className={classes.mainContent}>
+        <div className={tabType === StakeMode.FLEXIBLE ? classes.mainContent : classes.tabContent}>
           <div className={classes.contentHeading}>CHICKS Amount</div>
           <div className={classes.contentText}>
             {lockedUserInfo ? lockedUserInfo.chicks : ''}
           </div>
         </div>
-        <div className={classes.mainContent}>
-          <div className={classes.contentHeading}>xCHICKS Amount</div>
-          <div className={classes.contentText}>
-            {lockedUserInfo ? lockedUserInfo.xChicks : ''}
-          </div>
-        </div>
+        {
+          tabType === StakeMode.FLEXIBLE ?
+          <div className={classes.mainContent}>
+            <div className={classes.contentHeading}>xCHICKS Amount</div>
+            <div className={classes.contentText}>
+              {lockedUserInfo ? lockedUserInfo.xChicks : ''}
+            </div>
+          </div> : null
+        }
       </div>
       <div className={classes.mainTab}>
         <div className={classes.centerTab}>
@@ -75,10 +89,16 @@ export const BalanceInfoContainer = () => {
             <div className={classes.childTabContainer}>
               <div className={classes.balanceTab}>
                 <div className={classes.amount}>
-                  {' '}
-                  {tab === SOLCHICK_BALANCE_TAB_STATE.STAKE
-                    ? '0.00 CHICKS'
-                    : '0.00 xCHICKS'}
+                  <TextField 
+                    placeholder={tab === SOLCHICK_BALANCE_TAB_STATE.STAKE 
+                      ? '0.00 CHICKS' 
+                      : '0.00 xCHICKS'} 
+                    type="number"
+                    value={inputVal}
+                    onChange={changeInput}
+                    InputProps={{
+                      disableUnderline: true
+                    }} />
                 </div>
                 <ButtonWithLoader onClick={handleButtonClick}>
                   Max

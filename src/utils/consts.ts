@@ -102,7 +102,6 @@ export type ChainsById = { [key in ChainId]: ChainInfo };
 export const ETH_NETWORK_CHAIN_ID =
   // eslint-disable-next-line no-nested-ternary
   CLUSTER === 'mainnet' ? 1 : CLUSTER === 'testnet' ? 3 : 1337; // customized
-// CLUSTER === "mainnet" ? 1 : CLUSTER === "testnet" ? 5 : 1337;
 
 export const ROPSTEN_ETH_NETWORK_CHAIN_ID =
   // eslint-disable-next-line no-nested-ternary

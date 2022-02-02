@@ -5,7 +5,6 @@ import StakeAlert from '../components/StakeAlert';
 import { BalanceInfoContainer } from '../components/BalanceInfoContainer';
 import { RewardsInfoContainer } from '../components/RewardsInfoContainer';
 import { PoolInfoContainer } from '../components/PoolInfoContainer';
-import { UNSTAKE_FEE } from '../utils/consts';
 import { StakeMode } from '../utils/stakeHelper';
 import { useStyles } from './useStyles';
 
@@ -16,12 +15,12 @@ export const LockedPoolView = () => {
     <Container className="container">
       <Card className={classes.mainCard}>
         <StakeAlert
-          stakeAlertText={`Please note that unstaking your tokens before the 8 week window will incur 
-          a ${UNSTAKE_FEE}% charge.`}
+          stakeAlertText="Please note that you will not be able to unstake your tokens before the
+        end of the 8 week window."
         />
         <BalanceInfoContainer tabType={StakeMode.LOCKED} />
-        <RewardsInfoContainer />
-        <PoolInfoContainer />
+        <RewardsInfoContainer tabType={StakeMode.LOCKED} />
+        <PoolInfoContainer tabType={StakeMode.LOCKED} />
       </Card>
     </Container>
   );

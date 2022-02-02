@@ -20,8 +20,8 @@ export const FlexiblePoolView = () => {
           a ${UNSTAKE_FEE}% charge.`}
         />
         <BalanceInfoContainer tabType={StakeMode.FLEXIBLE} />
-        <RewardsInfoContainer />
-        <PoolInfoContainer />
+        <RewardsInfoContainer tabType={StakeMode.FLEXIBLE} />
+        <PoolInfoContainer tabType={StakeMode.FLEXIBLE} />
       </Card>
     </Container>
   );

@@ -22,20 +22,24 @@ export const BalanceInfoContainer = ({ tabType }: { tabType: number }) => {
   }, []);
 
   const handleButtonClick = () => {
-    ConsoleHelper(`BalanceInfoContainer => ${tab}`);
+    ConsoleHelper(`BalanceInfoContainer -> ${tab}`);
   };
 
   const handleActionClick = () => {
-    if(wallet.connected && inputVal.length > 0 && parseFloat(inputVal) > 0) {
-      ConsoleHelper(`BalanceInfoContainer => ${tab}`);
+    if (wallet.connected && inputVal.length > 0 && parseFloat(inputVal) > 0) {
+      ConsoleHelper(`BalanceInfoContainer -> ${tab}`);
       stake(Number(inputVal));
-    } else {
-      ConsoleHelper(`error:`);
     }
   };
 
-  const changeInput = (e: ChangeEvent<HTMLInputElement>): void => {
+  const handleStakeAmountChange = (e: ChangeEvent<HTMLInputElement>): void => {
     setInput(e.target.value.toString());
+  };
+
+  const handleKeyPress = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    if (event && event.key) {
+      event.preventDefault();
+    }
   };
 
   const {
@@ -50,21 +54,26 @@ export const BalanceInfoContainer = ({ tabType }: { tabType: number }) => {
     <div className={classes.card}>
       <div className={classes.header}>MY BALANCE</div>
       <div className={classes.content}>
-        <div className={tabType === StakeMode.FLEXIBLE ? classes.mainContent : classes.tabContent}>
+        <div
+          className={
+            tabType === StakeMode.FLEXIBLE
+              ? classes.mainContent
+              : classes.tabContent
+          }
+        >
           <div className={classes.contentHeading}>CHICKS Amount</div>
           <div className={classes.contentText}>
-            {lockedUserInfo ? lockedUserInfo.chicks : ''}
+            {lockedUserInfo ? lockedUserInfo.chicks : '0 CHICKS'}
           </div>
         </div>
-        {
-          tabType === StakeMode.FLEXIBLE ?
+        {tabType === StakeMode.FLEXIBLE ? (
           <div className={classes.mainContent}>
             <div className={classes.contentHeading}>xCHICKS Amount</div>
             <div className={classes.contentText}>
               {lockedUserInfo ? lockedUserInfo.xChicks : ''}
             </div>
-          </div> : null
-        }
+          </div>
+        ) : null}
       </div>
       <div className={classes.mainTab}>
         <div className={classes.centerTab}>
@@ -89,20 +98,28 @@ export const BalanceInfoContainer = ({ tabType }: { tabType: number }) => {
             <div className={classes.childTabContainer}>
               <div className={classes.balanceTab}>
                 <div className={classes.amount}>
-                  <TextField 
-                    placeholder={tab === SOLCHICK_BALANCE_TAB_STATE.STAKE 
-                      ? '0.00 CHICKS' 
-                      : '0.00 xCHICKS'} 
+                  <TextField
+                    placeholder={
+                      tab === SOLCHICK_BALANCE_TAB_STATE.STAKE
+                        ? '0.00 CHICKS'
+                        : '0.00 xCHICKS'
+                    }
                     type="number"
                     value={inputVal}
-                    onChange={changeInput}
-                    InputProps={{
-                      disableUnderline: true
-                    }} />
+                    onChange={handleStakeAmountChange}
+                    onKeyDown={(e) => handleKeyPress(e)}
+                    inputProps={{
+                      maxLength: 100,
+                      step: '1000',
+                      min: 1000,
+                      disableunderline: "true",
+                    }}
+                  />
                 </div>
                 <ButtonWithLoader onClick={handleButtonClick}>
                   Max
                 </ButtonWithLoader>
+                <div style={{ paddingLeft: '7px' }} />
                 <ButtonWithLoader onClick={handleActionClick}>
                   {tab === SOLCHICK_BALANCE_TAB_STATE.STAKE
                     ? 'Stake'

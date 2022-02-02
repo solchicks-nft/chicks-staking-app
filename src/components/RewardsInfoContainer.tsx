@@ -1,7 +1,7 @@
 import React from 'react';
 import { useStyles } from '../pages/useStyles';
 
-export const RewardsInfoContainer = () => {
+export const RewardsInfoContainer = ({ tabType }: { tabType: number }) => {
   const classes = useStyles();
 
   return (
@@ -13,8 +13,8 @@ export const RewardsInfoContainer = () => {
           <div className={classes.contentText}>0</div>
         </div>
         <div className={classes.mainContent}>
-          <div className={classes.contentHeading}>Est. CHICKS per day</div>
-          <div className={classes.contentText}>0%</div>
+          <div className={classes.contentHeading}>Est. CHICKS Per Day</div>
+          <div className={classes.contentText}>0</div>
         </div>
       </div>
     </div>

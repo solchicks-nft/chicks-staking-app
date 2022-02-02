@@ -112,7 +112,7 @@ export const useStyles = makeStyles((theme) => ({
     width: '100%',
     height: '16px',
     borderRadius: '15px',
-    padding: '10px 0px',
+    padding: '10px',
     margin: '0px 20px',
   },
   amountText: {

@@ -2,7 +2,7 @@ import React from 'react';
 import { useStyles } from '../pages/useStyles';
 import { useStakePool } from '../contexts/StakePoolContext';
 
-export const PoolInfoContainer = () => {
+export const PoolInfoContainer = ({ tabType }: { tabType: number }) => {
   const classes = useStyles();
   const { flexibleTotalInfo } = useStakePool();
 

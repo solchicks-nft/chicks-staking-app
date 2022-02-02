@@ -135,7 +135,10 @@ export const StakePoolProvider = ({
       if (totalBalance) {
         const totalToken = toTokenBalanceString(totalBalance);
         ConsoleHelper(`refreshLockedPool -> totalToken: ${totalToken}`);
-        setLockedTotalInfo({ chicksAmount: totalToken, xChicksAmount: totalXToken });
+        setLockedTotalInfo({
+          chicksAmount: totalToken,
+          xChicksAmount: totalXToken,
+        });
       }
     }
 
@@ -223,7 +226,10 @@ export const StakePoolProvider = ({
       if (totalBalance) {
         const totalToken = toTokenBalanceString(totalBalance);
         ConsoleHelper(`refreshFlexiblePool -> totalToken: ${totalToken}`);
-        setFlexibleTotalInfo({ chicksAmount: totalToken, xChicksAmount: totalXToken });
+        setFlexibleTotalInfo({
+          chicksAmount: totalToken,
+          xChicksAmount: totalXToken,
+        });
       }
     }
 
@@ -259,16 +265,23 @@ export const StakePoolProvider = ({
               stakeTxHash: item.stake_tx_hash,
               unStakeTxHash: item.unStake_tx_hash,
               stakeStartDate: item.stake_start_date,
+              stakeClaimDate: item.stake_claim_date,
               stakeEndDate: item.stake_end_date,
             });
           });
           ConsoleHelper(`stakeList -> ${JSON.stringify(stakeList)}`);
           ConsoleHelper(`userTotalChicks -> ${userTotalChicks}`);
-          ConsoleHelper(`userTotalXChicks -> ${JSON.stringify(userTotalXChicks)}`);
+          ConsoleHelper(
+            `userTotalXChicks -> ${JSON.stringify(userTotalXChicks)}`,
+          );
           setFlexibleStakeList(stakeList);
           setFlexibleUserInfo({
-            chicksAmount: (Math.round(userTotalChicks.toNumber()) / 1000000000).toFixed(1),
-            xChicksAmount: (Math.round(userTotalXChicks.toNumber()) / 1000000000).toFixed(1),
+            chicksAmount: (
+              Math.round(userTotalChicks.toNumber()) / 1000000000
+            ).toFixed(1),
+            xChicksAmount: (
+              Math.round(userTotalXChicks.toNumber()) / 1000000000
+            ).toFixed(1),
           });
         }
       } catch (e) {

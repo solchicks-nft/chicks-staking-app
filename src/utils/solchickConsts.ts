@@ -39,6 +39,7 @@ export interface IStakeInfo {
   stakeTxHash: string;
   unStakeTxHash: string;
   stakeStartDate: string;
+  stakeClaimDate: string;
   stakeEndDate: string;
   handle: string;
 }

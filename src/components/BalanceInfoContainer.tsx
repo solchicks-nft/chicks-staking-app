@@ -1,5 +1,6 @@
 import React, { ChangeEvent, useCallback, useState } from 'react';
 import {
+  Button,
   Tab,
   Table,
   TableBody,
@@ -57,8 +58,9 @@ export const BalanceInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
   };
 
   const handleUnstakeButtonClick = (xAmount: string, handle = ''): void => {
+    ConsoleHelper(`xAmount -> ${xAmount}`);
+    ConsoleHelper(`handle -> ${handle}`);
     if (wallet.connected && xAmount.length > 0 && handle.length > 0) {
-      ConsoleHelper(`BalanceInfoContainer -> ${tab}`);
       unstake(xAmount, handle);
     }
   };
@@ -271,29 +273,46 @@ export const BalanceInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
                                   <br />
                                 </TableCell>
                                 <TableCell>
-                                  <Moment format="YYYY-MM-DD">
-                                    {flexibleStakeListItem.stakeStartDate}
-                                  </Moment>{' '}
-                                  to{' '}
-                                  <Moment format="YYYY-MM-DD">
-                                    {flexibleStakeListItem.stakeEndDate}
-                                  </Moment>
-                                  <br />
-                                  <Moment
-                                    duration={
-                                      flexibleStakeListItem.stakeStartDate
-                                    }
-                                    date={flexibleStakeListItem.stakeEndDate}
-                                    format="d"
-                                  />{' '}
-                                  days to go
+                                  {!flexibleStakeListItem.stakeClaimDate ? (
+                                    <>
+                                      <Moment format="YYYY-MM-DD">
+                                        {flexibleStakeListItem.stakeStartDate}
+                                      </Moment>{' '}
+                                      to{' '}
+                                      <Moment format="YYYY-MM-DD">
+                                        {flexibleStakeListItem.stakeEndDate}
+                                      </Moment>
+                                      <br />
+                                      <Moment
+                                        duration={
+                                          flexibleStakeListItem.stakeStartDate
+                                        }
+                                        date={
+                                          flexibleStakeListItem.stakeEndDate
+                                        }
+                                        format="d"
+                                      />{' '}
+                                      days to go
+                                    </>
+                                  ) : null}
+                                  {flexibleStakeListItem.stakeClaimDate ? (
+                                    <>
+                                      Unstaked on{' '}
+                                      <Moment format="YYYY-MM-DD">
+                                        {flexibleStakeListItem.stakeStartDate}
+                                      </Moment>
+                                    </>
+                                  ) : null}
                                 </TableCell>
                                 <TableCell>
-                                  <ButtonWithLoader
-                                    onClick={() => handleUnstakeButtonClick(
-                                      flexibleStakeListItem.xChicksAmount,
-                                      flexibleStakeListItem.handle,
-                                    )}
+                                  <Button
+                                    variant="outlined"
+                                    onClick={() =>
+                                      handleUnstakeButtonClick(
+                                        flexibleStakeListItem.xChicksAmount,
+                                        flexibleStakeListItem.handle,
+                                      )
+                                    }
                                     disabled={
                                       !isAddress(
                                         solanaAddress as PublicKey | string,
@@ -301,11 +320,11 @@ export const BalanceInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
                                     }
                                   >
                                     Unstake
-                                  </ButtonWithLoader>
+                                  </Button>
                                   <div
                                     style={{
                                       color: '#D0393E',
-                                      paddingTop: '0.5rem',
+                                      paddingTop: '0.3rem',
                                     }}
                                   >
                                     25% unstake penalty

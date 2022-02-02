@@ -32,9 +32,9 @@ export const BalanceInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
   const [inputVal, setInput] = useState('');
   const classes = useStyles();
   const wallet = useSolanaWallet();
+
   const { stake, unstake } = useStake(tabType);
-  const { refreshFlexiblePool, refreshLockedPool, flexibleStakeList } =
-    useStakePool();
+  const { refreshFlexiblePool, refreshLockedPool, flexibleStakeList } = useStakePool();
   const { publicKey: solanaAddress } = useSolanaWallet();
 
   const handleChange = useCallback(
@@ -75,7 +75,7 @@ export const BalanceInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
     }
   };
 
-  const { flexibleUserInfo, lockedUserInfo } = useStakePool();
+  const { flexibleUserInfo, lockedUserInfo, flexibleTotalInfo } = useStakePool();
 
   return (
     <div className={classes.card}>

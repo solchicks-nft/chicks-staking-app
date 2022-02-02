@@ -377,6 +377,24 @@ export const BalanceInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
                           }}
                         >
                           <SolanaWalletKey />
+                          {!errorMessage && statusMessage && successMessage ? (
+                            <Typography
+                              variant="body2"
+                              color="primary"
+                              className={classes.statusMessage}
+                            >
+                              {statusMessage}
+                            </Typography>
+                          ) : null}
+                          {errorMessage ? (
+                            <Typography
+                              variant="body2"
+                              color="error"
+                              className={classes.statusMessage}
+                            >
+                              {errorMessage}
+                            </Typography>
+                          ) : null}
                         </div>
                       </div>
                       <TableContainer>
@@ -510,26 +528,6 @@ export const BalanceInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
                                         </div>
                                       ) : null}
                                     </>
-                                  ) : null}
-                                  {!errorMessage &&
-                                  statusMessage &&
-                                  successMessage ? (
-                                    <Typography
-                                      variant="body2"
-                                      color="primary"
-                                      className={classes.statusMessage}
-                                    >
-                                      {statusMessage}
-                                    </Typography>
-                                  ) : null}
-                                  {errorMessage ? (
-                                    <Typography
-                                      variant="body2"
-                                      color="error"
-                                      className={classes.statusMessage}
-                                    >
-                                      {errorMessage}
-                                    </Typography>
                                   ) : null}
                                 </TableCell>
                               </TableRow>

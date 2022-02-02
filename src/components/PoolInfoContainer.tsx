@@ -22,7 +22,7 @@ export const PoolInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
                     value={flexibleTotalInfo.chicksAmount}
                     displayType="text"
                     thousandSeparator
-                    decimalScale={10}
+                    decimalScale={4}
                   />
                 </>
               ) : (
@@ -30,7 +30,7 @@ export const PoolInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
                   value={0}
                   displayType="text"
                   thousandSeparator
-                  decimalScale={10}
+                  decimalScale={4}
                   fixedDecimalScale
                 />
               )
@@ -42,7 +42,7 @@ export const PoolInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
                     value={lockedTotalInfo.chicksAmount}
                     displayType="text"
                     thousandSeparator
-                    decimalScale={10}
+                    decimalScale={4}
                     fixedDecimalScale
                   />
                 </>
@@ -51,7 +51,7 @@ export const PoolInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
                   value={0}
                   displayType="text"
                   thousandSeparator
-                  decimalScale={10}
+                  decimalScale={4}
                   fixedDecimalScale
                 />
               )
@@ -75,7 +75,7 @@ export const PoolInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
                     }
                     displayType="text"
                     thousandSeparator
-                    decimalScale={10}
+                    decimalScale={4}
                   />
                   %
                 </>

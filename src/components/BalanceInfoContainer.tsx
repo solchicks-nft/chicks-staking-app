@@ -1,4 +1,10 @@
-import React, { ChangeEvent, useCallback, useState } from 'react';
+import React, {
+  ChangeEvent,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import {
   Button,
   Tab,
@@ -22,7 +28,11 @@ import ConsoleHelper from '../utils/consoleHelper';
 import SolanaWalletKey from './SolanaWalletKey';
 import useStake from '../hooks/useStake';
 import { useStakePool } from '../contexts/StakePoolContext';
-import { StakeMode } from '../utils/stakeHelper';
+import {
+  StakeErrorCode,
+  StakeMode,
+  StakeStatusCode,
+} from '../utils/stakeHelper';
 import { useSolanaWallet } from '../contexts/SolanaWalletContext';
 import { isAddress } from '../utils/solanaHelper';
 import { CHAIN_ID_SOLANA } from '../lib/consts';
@@ -33,8 +43,10 @@ export const BalanceInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
   const [inputVal, setInput] = useState('');
   const classes = useStyles();
   const wallet = useSolanaWallet();
-
-  const { stake, unstake } = useStake(tabType);
+  const [successMessage, setSuccessMessage] = React.useState('');
+  const [errorMessage, setErrorMessage] = React.useState('');
+  const { stake, isProcessing, statusCode, errorCode, lastError, unstake } =
+    useStake(tabType);
   const {
     refreshFlexiblePool,
     refreshLockedPool,
@@ -49,9 +61,59 @@ export const BalanceInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
       setTab(value);
       refreshFlexiblePool();
       refreshLockedPool();
+      setSuccessMessage('');
+      setErrorMessage('');
     },
     [refreshFlexiblePool, refreshLockedPool],
   );
+
+  const statusMessage = useMemo(() => {
+    if (isProcessing || statusCode !== StakeStatusCode.FAILED) {
+      switch (statusCode) {
+        case StakeStatusCode.START:
+          return 'Start';
+        case StakeStatusCode.TOKEN_AMOUNT_CHECKING:
+          return 'Checking token amount';
+        case StakeStatusCode.PROCESSING:
+          return 'Processing';
+        case StakeStatusCode.SUBMITTING:
+          return 'Submitting result';
+        case StakeStatusCode.SUCCESS:
+          return 'Success';
+        default:
+          return '';
+      }
+    } else {
+      switch (errorCode) {
+        case StakeErrorCode.NO_ERROR:
+          return 'No error message';
+        case StakeErrorCode.CANT_CONNECT_SOLANA:
+          return "Can't connect to the Solana network";
+        case StakeErrorCode.TOKEN_AMOUNT_NOT_ENOUGH:
+          return 'Token amount is not enough';
+        case StakeErrorCode.SERVER_INVALID:
+          return 'Service unavailable';
+        case StakeErrorCode.SOLANA_NO_ASSOC_ACCOUNT:
+          return 'There is no associated token account';
+        case StakeErrorCode.SUBMIT_FAILED:
+          return lastError && lastError > '' ? lastError : 'Unknown error';
+        default:
+          return '';
+      }
+    }
+  }, [isProcessing, statusCode, errorCode, lastError]);
+
+  useEffect(() => {
+    if (!isProcessing) {
+      if (statusCode === StakeStatusCode.SUCCESS) {
+        setSuccessMessage('Success');
+      } else if (statusCode === StakeStatusCode.FAILED) {
+        setErrorMessage(statusMessage);
+      }
+    }
+  }, [isProcessing, statusCode, statusMessage, errorCode]);
+
+  ConsoleHelper(`successMessage: ${successMessage}`);
 
   const handleMaxButtonClick = () => {
     if (wallet.connected) {
@@ -66,8 +128,10 @@ export const BalanceInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
 
   const handleStakeButtonClick = () => {
     if (wallet.connected && inputVal.length > 0 && parseFloat(inputVal) > 0) {
-      ConsoleHelper(`BalanceInfoContainer -> ${tab}`);
       stake(Number(inputVal));
+    } else {
+      setErrorMessage('handleStakeButtonClick -> invalid input');
+      ConsoleHelper(errorMessage);
     }
   };
 
@@ -77,8 +141,10 @@ export const BalanceInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
       xAmount.toString().length > 0 &&
       handle.length > 0
     ) {
-      ConsoleHelper(`BalanceInfoContainer -> ${tab}`);
       unstake(xAmount.toString(), handle);
+    } else {
+      setErrorMessage('handleUnstakeButtonClick -> invalid input');
+      ConsoleHelper(errorMessage);
     }
   };
 
@@ -111,7 +177,7 @@ export const BalanceInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
                   value={flexibleUserInfo.chicksAmount}
                   displayType="text"
                   thousandSeparator
-                  decimalScale={10}
+                  decimalScale={4}
                   fixedDecimalScale
                 />
               ) : (
@@ -119,7 +185,7 @@ export const BalanceInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
                   value={0}
                   displayType="text"
                   thousandSeparator
-                  decimalScale={10}
+                  decimalScale={4}
                   fixedDecimalScale
                 />
               )
@@ -130,7 +196,7 @@ export const BalanceInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
                   value={lockedUserInfo.chicksAmount}
                   displayType="text"
                   thousandSeparator
-                  decimalScale={10}
+                  decimalScale={4}
                   fixedDecimalScale
                 />
               ) : (
@@ -138,7 +204,7 @@ export const BalanceInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
                   value={0}
                   displayType="text"
                   thousandSeparator
-                  decimalScale={10}
+                  decimalScale={4}
                   fixedDecimalScale
                 />
               )
@@ -154,7 +220,7 @@ export const BalanceInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
                   value={flexibleUserInfo.xChicksAmount}
                   displayType="text"
                   thousandSeparator
-                  decimalScale={10}
+                  decimalScale={4}
                   fixedDecimalScale
                 />
               ) : (
@@ -162,7 +228,7 @@ export const BalanceInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
                   value={0}
                   displayType="text"
                   thousandSeparator
-                  decimalScale={10}
+                  decimalScale={4}
                   fixedDecimalScale
                 />
               )}
@@ -187,6 +253,7 @@ export const BalanceInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
               className={classes.tab}
               label="UNSTAKE"
               value={SOLCHICK_BALANCE_TAB_STATE.UNSTAKE}
+              disabled={isProcessing}
             />
           </Tabs>
           <div
@@ -232,19 +299,43 @@ export const BalanceInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
                     </div>
                     <ButtonWithLoader
                       onClick={handleMaxButtonClick}
-                      disabled={!isAddress(solanaAddress as PublicKey | string)}
+                      disabled={
+                        !isAddress(solanaAddress as PublicKey | string) ||
+                        isProcessing
+                      }
                     >
                       Max
                     </ButtonWithLoader>
                     <div style={{ paddingLeft: '7px' }} />
                     <ButtonWithLoader
                       onClick={handleStakeButtonClick}
-                      disabled={!isAddress(solanaAddress as PublicKey | string)}
+                      disabled={
+                        !isAddress(solanaAddress as PublicKey | string) ||
+                        isProcessing
+                      }
                     >
                       Stake
                     </ButtonWithLoader>
                   </div>
                   <SolanaWalletKey />
+                  {!errorMessage && statusMessage && successMessage ? (
+                    <Typography
+                      variant="body2"
+                      color="primary"
+                      className={classes.statusMessage}
+                    >
+                      {statusMessage}
+                    </Typography>
+                  ) : null}
+                  {errorMessage ? (
+                    <Typography
+                      variant="body2"
+                      color="error"
+                      className={classes.statusMessage}
+                    >
+                      {errorMessage}
+                    </Typography>
+                  ) : null}
                 </>
               ) : null}
               {tab === SOLCHICK_BALANCE_TAB_STATE.UNSTAKE ? (
@@ -365,7 +456,7 @@ export const BalanceInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
                                     }
                                     displayType="text"
                                     thousandSeparator
-                                    decimalScale={10}
+                                    decimalScale={4}
                                     fixedDecimalScale
                                   />{' '}
                                   CHICKS
@@ -378,7 +469,7 @@ export const BalanceInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
                                     }
                                     displayType="text"
                                     thousandSeparator
-                                    decimalScale={10}
+                                    decimalScale={4}
                                     fixedDecimalScale
                                   />{' '}
                                   xCHICKS
@@ -419,6 +510,26 @@ export const BalanceInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
                                         </div>
                                       ) : null}
                                     </>
+                                  ) : null}
+                                  {!errorMessage &&
+                                  statusMessage &&
+                                  successMessage ? (
+                                    <Typography
+                                      variant="body2"
+                                      color="primary"
+                                      className={classes.statusMessage}
+                                    >
+                                      {statusMessage}
+                                    </Typography>
+                                  ) : null}
+                                  {errorMessage ? (
+                                    <Typography
+                                      variant="body2"
+                                      color="error"
+                                      className={classes.statusMessage}
+                                    >
+                                      {errorMessage}
+                                    </Typography>
                                   ) : null}
                                 </TableCell>
                               </TableRow>

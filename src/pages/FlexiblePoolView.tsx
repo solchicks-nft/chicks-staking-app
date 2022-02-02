@@ -2,7 +2,6 @@
 import React from 'react';
 import { Card, Container } from '@material-ui/core';
 import { PoolInfoContainer } from '../components/PoolInfoContainer';
-import { RewardsInfoContainer } from '../components/RewardsInfoContainer';
 import { BalanceInfoContainer } from '../components/BalanceInfoContainer';
 import StakeAlert from '../components/StakeAlert';
 import { useStyles } from './useStyles';
@@ -19,9 +18,8 @@ export const FlexiblePoolView = () => {
           stakeAlertText={`Please note that unstaking your tokens before the 8 week window will incur 
           a ${UNSTAKE_FEE}% charge.`}
         />
-        <BalanceInfoContainer tabType={StakeMode.FLEXIBLE} />
-        <RewardsInfoContainer tabType={StakeMode.FLEXIBLE} />
         <PoolInfoContainer tabType={StakeMode.FLEXIBLE} />
+        <BalanceInfoContainer tabType={StakeMode.FLEXIBLE} />
       </Card>
     </Container>
   );

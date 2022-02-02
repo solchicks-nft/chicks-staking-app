@@ -1,5 +1,15 @@
 import React, { ChangeEvent, useCallback, useMemo, useState } from 'react';
-import { Tab, Tabs, TextField } from '@material-ui/core';
+import {
+  Tab,
+  Table,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Tabs,
+  TextField,
+  Typography,
+} from '@material-ui/core';
 import { Connection, PublicKey } from '@solana/web3.js';
 import { useStyles } from '../pages/useStyles';
 import { SOLCHICK_BALANCE_TAB_STATE } from '../utils/solchickConsts';
@@ -19,10 +29,6 @@ export const BalanceInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
   const classes = useStyles();
   const wallet = useSolanaWallet();
   const { stake } = useStake(tabType);
-  const solanaConnection = useMemo(
-    () => new Connection(SOLANA_HOST, 'confirmed'),
-    [],
-  );
   const { publicKey: solanaAddress } = useSolanaWallet();
 
   const handleChange = useCallback((event, value) => {
@@ -50,8 +56,7 @@ export const BalanceInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
     }
   };
 
-  const { refreshLockedPool, flexibleUserInfo, lockedUserInfo } =
-    useStakePool();
+  const { flexibleUserInfo, lockedUserInfo } = useStakePool();
 
   return (
     <div className={classes.card}>
@@ -66,13 +71,11 @@ export const BalanceInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
         >
           <div className={classes.contentHeading}>CHICKS Amount</div>
           <div className={classes.contentText}>
-            {/* eslint-disable-next-line no-nested-ternary */}
             {tabType === StakeMode.FLEXIBLE
               ? flexibleUserInfo && flexibleUserInfo.chicks.length > 0
                 ? `${flexibleUserInfo.chicks} CHICKS`
                 : '0 CHICKS'
               : null}
-            {/* eslint-disable-next-line no-nested-ternary */}
             {tabType === StakeMode.LOCKED
               ? lockedUserInfo && lockedUserInfo.chicks.length > 0
                 ? `${lockedUserInfo.chicks} CHICKS`
@@ -85,8 +88,8 @@ export const BalanceInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
             <div className={classes.contentHeading}>xCHICKS Amount</div>
             <div className={classes.contentText}>
               {flexibleUserInfo && flexibleUserInfo.chicks.length > 0
-                ? `${flexibleUserInfo.xChicks} xCHICKS`
-                : '0 xCHICKS'}
+                ? `${flexibleUserInfo.xChicks}`
+                : '0'}
             </div>
           </div>
         ) : null}
@@ -110,46 +113,106 @@ export const BalanceInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
               value={SOLCHICK_BALANCE_TAB_STATE.UNSTAKE}
             />
           </Tabs>
-          <div className={classes.tabContainer}>
-            <div className={classes.childTabContainer}>
-              <div className={classes.balanceTab}>
-                <div className={classes.amount}>
-                  <TextField
-                    placeholder={
-                      tab === SOLCHICK_BALANCE_TAB_STATE.STAKE
-                        ? '0.00 CHICKS'
-                        : '0.00 xCHICKS'
-                    }
-                    type="number"
-                    value={inputVal}
-                    onChange={handleStakeAmountChange}
-                    onKeyDown={(e) => handleKeyPress(e)}
-                    inputProps={{
-                      maxLength: 100,
-                      step: '1000',
-                      min: 2000,
-                      disableunderline: 'true',
-                    }}
-                    disabled={!isAddress(solanaAddress as PublicKey | string)}
-                  />
+          <div
+            className={classes.tabContainer}
+            style={{
+              justifyContent:
+                tab === SOLCHICK_BALANCE_TAB_STATE.STAKE ? 'center' : '',
+            }}
+          >
+            <div
+              className={classes.childTabContainer}
+              style={{
+                width:
+                  tab === SOLCHICK_BALANCE_TAB_STATE.STAKE ? '50%' : '100%',
+              }}
+            >
+              {tab === SOLCHICK_BALANCE_TAB_STATE.STAKE ? (
+                <>
+                  <div className={classes.stakeBalanceTab}>
+                    <div className={classes.amount}>
+                      <TextField
+                        placeholder="0.00"
+                        type="number"
+                        value={inputVal}
+                        onChange={handleStakeAmountChange}
+                        onKeyDown={(e) => handleKeyPress(e)}
+                        inputProps={{
+                          maxLength: 100,
+                          step: '1000',
+                          min: 2000,
+                          disableunderline: 'true',
+                        }}
+                        disabled={
+                          !isAddress(solanaAddress as PublicKey | string)
+                        }
+                      />
+                    </div>
+                    <ButtonWithLoader
+                      onClick={handleButtonClick}
+                      disabled={!isAddress(solanaAddress as PublicKey | string)}
+                    >
+                      Max
+                    </ButtonWithLoader>
+                    <div style={{ paddingLeft: '7px' }} />
+                    <ButtonWithLoader
+                      onClick={handleActionClick}
+                      disabled={!isAddress(solanaAddress as PublicKey | string)}
+                    >
+                      Stake
+                    </ButtonWithLoader>
+                  </div>
+                  <SolanaWalletKey />
+                </>
+              ) : null}
+              {tab === SOLCHICK_BALANCE_TAB_STATE.UNSTAKE ? (
+                <div
+                  style={{
+                    paddingTop: '1.5rem',
+                    paddingLeft: '4rem',
+                    width: '100%',
+                  }}
+                >
+                  {!isAddress(solanaAddress as PublicKey | string) ? (
+                    <div>
+                      Please connect your wallet to check your staked tokens.
+                      <div
+                        style={{
+                          paddingTop: '1rem',
+                        }}
+                      >
+                        <SolanaWalletKey />
+                      </div>
+                    </div>
+                  ) : null}
+                  {isAddress(solanaAddress as PublicKey | string) ? (
+                    <div>
+                      <Typography variant="h6">Staked Tokens</Typography>
+                      <div
+                        style={{
+                          paddingTop: '1rem',
+                          paddingBottom: '1rem',
+                        }}
+                      >
+                        <SolanaWalletKey />
+                      </div>
+                      <TableContainer>
+                        <Table>
+                          <TableHead>
+                            <TableRow>
+                              <TableCell>Tx Hash</TableCell>
+                              <TableCell>Amount</TableCell>
+                              <TableCell>Start Date</TableCell>
+                              <TableCell>End Date</TableCell>
+                              <TableCell>Rewards</TableCell>
+                            </TableRow>
+                          </TableHead>
+                        </Table>
+                      </TableContainer>
+                    </div>
+                  ) : null}
                 </div>
-                <ButtonWithLoader
-                  onClick={handleButtonClick}
-                  disabled={!isAddress(solanaAddress as PublicKey | string)}
-                >
-                  Max
-                </ButtonWithLoader>
-                <div style={{ paddingLeft: '7px' }} />
-                <ButtonWithLoader
-                  onClick={handleActionClick}
-                  disabled={!isAddress(solanaAddress as PublicKey | string)}
-                >
-                  {tab === SOLCHICK_BALANCE_TAB_STATE.STAKE
-                    ? 'Stake'
-                    : 'Unstake'}
-                </ButtonWithLoader>
-              </div>
-              <SolanaWalletKey />
+              ) : null}
             </div>
           </div>
         </div>

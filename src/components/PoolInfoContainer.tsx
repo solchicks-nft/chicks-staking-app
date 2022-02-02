@@ -5,7 +5,7 @@ import { StakeMode } from '../utils/stakeHelper';
 
 export const PoolInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
   const classes = useStyles();
-  const { flexibleTotalInfo } = useStakePool();
+  const { flexibleTotalInfo, lockedTotalInfo } = useStakePool();
 
   return (
     <div className={classes.card}>
@@ -14,7 +14,16 @@ export const PoolInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
         <div className={classes.mainContent}>
           <div className={classes.contentHeading}>Total CHICKS Staked</div>
           <div className={classes.contentText}>
-            {flexibleTotalInfo ? flexibleTotalInfo.chicks : 0}
+            {tabType === StakeMode.FLEXIBLE
+              ? flexibleTotalInfo && flexibleTotalInfo.chicks.length > 0
+                ? `${flexibleTotalInfo.chicks}`
+                : '0'
+              : null}
+            {tabType === StakeMode.LOCKED
+              ? lockedTotalInfo && lockedTotalInfo.chicks.length > 0
+                ? `${lockedTotalInfo.chicks}`
+                : '0'
+              : null}
           </div>
         </div>
         <div className={classes.mainContent}>

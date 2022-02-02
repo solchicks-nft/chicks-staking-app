@@ -15,20 +15,33 @@ export const PoolInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
           <div className={classes.contentHeading}>Total CHICKS Staked</div>
           <div className={classes.contentText}>
             {tabType === StakeMode.FLEXIBLE
-              ? flexibleTotalInfo && flexibleTotalInfo.chicks.length > 0
-                ? `${flexibleTotalInfo.chicks}`
+              ? flexibleTotalInfo && flexibleTotalInfo.chicksAmount.length > 0
+                ? `${flexibleTotalInfo.chicksAmount}`
                 : '0'
               : null}
             {tabType === StakeMode.LOCKED
-              ? lockedTotalInfo && lockedTotalInfo.chicks.length > 0
-                ? `${lockedTotalInfo.chicks}`
+              ? lockedTotalInfo && lockedTotalInfo.chicksAmount.length > 0
+                ? `${lockedTotalInfo.chicksAmount}`
                 : '0'
               : null}
           </div>
         </div>
         <div className={classes.mainContent}>
           <div className={classes.contentHeading}>Est. APR</div>
-          <div className={classes.contentText}>0%</div>
+          <div className={classes.contentText}>
+            {tabType === StakeMode.FLEXIBLE
+              ? flexibleTotalInfo && flexibleTotalInfo.chicksAmount.length > 0
+                ? `${(
+                    ((((flexibleTotalInfo.chicksAmount as unknown as number) /
+                      (flexibleTotalInfo.xChicksAmount as unknown as number)) *
+                      100 -
+                      100) *
+                      365) /
+                    56
+                  ).toFixed(1)}%`
+                : '0'
+              : null}
+          </div>
         </div>
       </div>
     </div>

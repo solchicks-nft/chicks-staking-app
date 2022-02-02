@@ -57,9 +57,9 @@ export const BalanceInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
   };
 
   const handleUnstakeButtonClick = (xAmount: string, handle = ''): void => {
-    if (wallet.connected && xAmount.length > 0 && handle.length > 0) {
+    if (wallet.connected && xAmount.toString().length > 0 && handle.length > 0) {
       ConsoleHelper(`BalanceInfoContainer -> ${tab}`);
-      unstake(xAmount, handle);
+      unstake(xAmount.toString(), handle);
     }
   };
 

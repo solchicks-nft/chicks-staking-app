@@ -401,7 +401,7 @@ function useStake(mode: StakeMode): IStakeStatus {
   const unstake = async (xAmount: string, handle = '') => {
     setSourceTxId('');
     ConsoleHelper('unstake -> start');
-    await processTokenStake(StakeStepMode.UNSTAKE, 0, '', handle);
+    await processTokenStake(StakeStepMode.UNSTAKE, 0, xAmount, handle);
   };
 
   return createStakeStatus(

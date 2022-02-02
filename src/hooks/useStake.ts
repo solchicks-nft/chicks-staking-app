@@ -141,7 +141,7 @@ function useStake(mode: StakeMode): IStakeStatus {
     processStakeResult(url, txId, StakeStepMode.UNSTAKE);
   };
 
-  const processTokenStake = async (
+  const processTokenOnSol = async (
     stakeStepMode: StakeStepMode,
     stakeAmount = 0,
     xAmount = '',
@@ -395,13 +395,13 @@ function useStake(mode: StakeMode): IStakeStatus {
   const stake = async (stakeAmount: number) => {
     setSourceTxId('');
     ConsoleHelper('stake -> start');
-    await processTokenStake(StakeStepMode.STAKE, stakeAmount, '', '');
+    await processTokenOnSol(StakeStepMode.STAKE, stakeAmount, '', '');
   };
 
   const unstake = async (xAmount: string, handle = '') => {
     setSourceTxId('');
     ConsoleHelper('unstake -> start');
-    await processTokenStake(StakeStepMode.UNSTAKE, 0, xAmount, handle);
+    await processTokenOnSol(StakeStepMode.UNSTAKE, 0, xAmount, handle);
   };
 
   return createStakeStatus(

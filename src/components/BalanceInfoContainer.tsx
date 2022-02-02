@@ -34,7 +34,13 @@ export const BalanceInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
   const wallet = useSolanaWallet();
 
   const { stake, unstake } = useStake(tabType);
-  const { refreshFlexiblePool, refreshLockedPool, flexibleStakeList } = useStakePool();
+  const { 
+    refreshFlexiblePool, 
+    refreshLockedPool, 
+    flexibleStakeList, 
+    flexibleUserInfo, 
+    lockedUserInfo 
+  } = useStakePool();
   const { publicKey: solanaAddress } = useSolanaWallet();
 
   const handleChange = useCallback(
@@ -47,7 +53,12 @@ export const BalanceInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
   );
 
   const handleMaxButtonClick = () => {
-    ConsoleHelper(`BalanceInfoContainer -> ${tab}`);
+    if(wallet.connected) {
+      const maxAmount: string = flexibleUserInfo ? flexibleUserInfo.chicksAmount : '';
+      setInput(maxAmount);
+    } else {
+      setInput('');
+    }
   };
 
   const handleStakeButtonClick = () => {
@@ -73,8 +84,6 @@ export const BalanceInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
       event.preventDefault();
     }
   };
-
-  const { flexibleUserInfo, lockedUserInfo, flexibleTotalInfo } = useStakePool();
 
   return (
     <div className={classes.card}>

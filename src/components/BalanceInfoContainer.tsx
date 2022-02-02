@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useCallback, useMemo, useState } from 'react';
+import React, { ChangeEvent, useCallback, useState } from 'react';
 import {
   Tab,
   Table,
@@ -10,7 +10,7 @@ import {
   TextField,
   Typography,
 } from '@material-ui/core';
-import { Connection, PublicKey } from '@solana/web3.js';
+import { PublicKey } from '@solana/web3.js';
 import { useStyles } from '../pages/useStyles';
 import { SOLCHICK_BALANCE_TAB_STATE } from '../utils/solchickConsts';
 import ButtonWithLoader from './ButtonWithLoader';
@@ -20,7 +20,6 @@ import useStake from '../hooks/useStake';
 import { useStakePool } from '../contexts/StakePoolContext';
 import { StakeMode } from '../utils/stakeHelper';
 import { useSolanaWallet } from '../contexts/SolanaWalletContext';
-import { SOLANA_HOST } from '../utils/consts';
 import { isAddress } from '../utils/solanaHelper';
 
 export const BalanceInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
@@ -56,7 +55,9 @@ export const BalanceInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
     }
   };
 
-  const { flexibleUserInfo, lockedUserInfo } = useStakePool();
+  const { flexibleUserInfo, lockedUserInfo, flexibleTotalInfo } = useStakePool();
+
+  ConsoleHelper(flexibleUserInfo, lockedUserInfo, flexibleTotalInfo);
 
   return (
     <div className={classes.card}>
@@ -136,7 +137,7 @@ export const BalanceInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
                         type="number"
                         value={inputVal}
                         onChange={handleStakeAmountChange}
-                        onKeyDown={(e) => handleKeyPress(e)}
+                        // onKeyDown={(e) => handleKeyPress(e)}
                         inputProps={{
                           maxLength: 100,
                           step: '1000',

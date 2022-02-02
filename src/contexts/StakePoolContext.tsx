@@ -113,8 +113,8 @@ export const StakePoolProvider = ({
         [Buffer.from(anchor.utils.bytes.utf8.encode('staking'))],
         program.programId,
       );
-    ConsoleHelper(`stakingPubkey: ${stakingBump}`);
-    ConsoleHelper(`stakingBump: ${stakingBump}`);
+    ConsoleHelper(`refreshLockedPool -> stakingPubkey: ${stakingBump}`);
+    ConsoleHelper(`refreshLockedPool -> stakingBump: ${stakingBump}`);
     const stakingAccount = await program.account.stakingAccount.fetch(
       stakingPubkey,
     );
@@ -124,17 +124,17 @@ export const StakePoolProvider = ({
         [tokenMintPubkey.toBuffer()],
         program.programId,
       );
-    ConsoleHelper(`vaultPubkey: ${vaultPubkey}`);
-    ConsoleHelper(`vaultBump: ${vaultBump}`);
+    ConsoleHelper(`refreshLockedPool -> vaultPubkey: ${vaultPubkey}`);
+    ConsoleHelper(`refreshLockedPool -> vaultBump: ${vaultBump}`);
 
     if (stakingAccount) {
       const totalXToken = toTokenBalanceString(stakingAccount.totalXToken);
-      ConsoleHelper(`totalXToken: ${totalXToken}`);
+      ConsoleHelper(`refreshLockedPool -> totalXToken: ${totalXToken}`);
 
       const totalBalance = await getTokenBalance(solanaConnection, vaultPubkey);
       if (totalBalance) {
         const totalToken = toTokenBalanceString(totalBalance);
-        ConsoleHelper(`totalToken: ${totalToken}`);
+        ConsoleHelper(`refreshLockedPool -> totalToken: ${totalToken}`);
         setLockedTotalInfo({ chicks: totalToken, xChicks: totalXToken });
       }
     }
@@ -148,8 +148,8 @@ export const StakePoolProvider = ({
           );
         const userStakingAccount =
           await program.account.userStakingAccount.fetch(userStakingPubkey);
-        ConsoleHelper(`userStakingPubkey: ${userStakingPubkey}`);
-        ConsoleHelper(`userStakingBump: ${userStakingBump}`);
+        ConsoleHelper(`refreshLockedPool -> userStakingPubkey: ${userStakingPubkey}`);
+        ConsoleHelper(`refreshLockedPool -> userStakingBump: ${userStakingBump}`);
 
         if (userStakingAccount) {
           const userTokenAmount = toTokenBalanceString(
@@ -158,7 +158,7 @@ export const StakePoolProvider = ({
           const userXTokenAmount = toTokenBalanceString(
             userStakingAccount.xTokenAmount,
           );
-          ConsoleHelper(`userTokenAmount: ${userTokenAmount}`);
+          ConsoleHelper(`refreshLockedPool -> userTokenAmount: ${userTokenAmount}`);
           setLockedUserInfo({
             chicks: userTokenAmount,
             xChicks: userXTokenAmount,
@@ -198,25 +198,25 @@ export const StakePoolProvider = ({
     const stakingAccount = await program.account.stakingAccount.fetch(
       stakingPubkey,
     );
-    ConsoleHelper(`stakingPubkey: ${stakingBump}`);
-    ConsoleHelper(`stakingBump: ${stakingBump}`);
+    ConsoleHelper(`refreshFlexiblePool -> stakingPubkey: ${stakingBump}`);
+    ConsoleHelper(`refreshFlexiblePool -> stakingBump: ${stakingBump}`);
 
     const [vaultPubkey, vaultBump] =
       await anchor.web3.PublicKey.findProgramAddress(
         [tokenMintPubkey.toBuffer()],
         program.programId,
       );
-    ConsoleHelper(`vaultPubkey: ${vaultPubkey}`);
-    ConsoleHelper(`vaultBump: ${vaultBump}`);
+    ConsoleHelper(`refreshFlexiblePool -> vaultPubkey: ${vaultPubkey}`);
+    ConsoleHelper(`refreshFlexiblePool -> vaultBump: ${vaultBump}`);
 
     if (stakingAccount) {
       const totalXToken = toTokenBalanceString(stakingAccount.totalXToken);
-      ConsoleHelper(`totalXToken: ${totalXToken}`);
+      ConsoleHelper(`refreshFlexiblePool -> totalXToken: ${totalXToken}`);
 
       const totalBalance = await getTokenBalance(solanaConnection, vaultPubkey);
       if (totalBalance) {
         const totalToken = toTokenBalanceString(totalBalance);
-        ConsoleHelper(`totalToken: ${totalToken}`);
+        ConsoleHelper(`refreshFlexiblePool -> totalToken: ${totalToken}`);
         setFlexibleTotalInfo({ chicks: totalToken, xChicks: totalXToken });
       }
     }
@@ -225,7 +225,7 @@ export const StakePoolProvider = ({
       try {
         const url = URL_SUBMIT_FLEX_LIST(walletPublicKey.toString());
         const results = await axios.get(url);
-        ConsoleHelper(`flexList: ${JSON.stringify(results.data.data)}`);
+        ConsoleHelper(`refreshFlexiblePool -> flexList: ${JSON.stringify(results.data.data)}`);
 
         if (results.data.data) {
           let userTotalChicks = BigNumber.from(0);
@@ -261,7 +261,7 @@ export const StakePoolProvider = ({
           });
         }
       } catch (e) {
-        ConsoleHelper(`refreshLockedPool -> error: ${JSON.stringify(e)}`);
+        ConsoleHelper(`refreshFlexiblePool -> error: ${JSON.stringify(e)}`);
       }
     } else {
       setFlexibleUserInfo({ chicks: '', xChicks: '' });

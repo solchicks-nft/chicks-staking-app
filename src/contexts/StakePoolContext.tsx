@@ -263,7 +263,7 @@ export const StakePoolProvider = ({
               xChicksAmount: item.x_token,
               handle: item.handle,
               stakeTxHash: item.stake_tx_hash,
-              unStakeTxHash: item.unStake_tx_hash,
+              unstakeTxHash: item.unstake_tx_hash,
               stakeStartDate: item.stake_start_date,
               stakeClaimDate: item.stake_claim_date,
               stakeEndDate: item.stake_end_date,

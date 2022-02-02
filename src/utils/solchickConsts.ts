@@ -37,7 +37,7 @@ export interface IStakeInfo {
   chicksAmount: string;
   xChicksAmount: string;
   stakeTxHash: string;
-  unStakeTxHash: string;
+  unstakeTxHash: string;
   stakeStartDate: string;
   stakeClaimDate: string;
   stakeEndDate: string;

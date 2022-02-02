@@ -14,6 +14,7 @@ import {
 } from '@material-ui/core';
 import { PublicKey } from '@solana/web3.js';
 import Moment from 'react-moment';
+import NumberFormat from 'react-number-format';
 import { useStyles } from '../pages/useStyles';
 import { SOLCHICK_BALANCE_TAB_STATE } from '../utils/solchickConsts';
 import ButtonWithLoader from './ButtonWithLoader';
@@ -34,12 +35,12 @@ export const BalanceInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
   const wallet = useSolanaWallet();
 
   const { stake, unstake } = useStake(tabType);
-  const { 
-    refreshFlexiblePool, 
-    refreshLockedPool, 
-    flexibleStakeList, 
-    flexibleUserInfo, 
-    lockedUserInfo 
+  const {
+    refreshFlexiblePool,
+    refreshLockedPool,
+    flexibleStakeList,
+    flexibleUserInfo,
+    lockedUserInfo,
   } = useStakePool();
   const { publicKey: solanaAddress } = useSolanaWallet();
 
@@ -53,8 +54,10 @@ export const BalanceInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
   );
 
   const handleMaxButtonClick = () => {
-    if(wallet.connected) {
-      const maxAmount: string = flexibleUserInfo ? flexibleUserInfo.chicksAmount : '';
+    if (wallet.connected) {
+      const maxAmount: string = flexibleUserInfo
+        ? flexibleUserInfo.chicksAmount
+        : '';
       setInput(maxAmount);
     } else {
       setInput('');
@@ -69,7 +72,11 @@ export const BalanceInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
   };
 
   const handleUnstakeButtonClick = (xAmount: string, handle = ''): void => {
-    if (wallet.connected && xAmount.toString().length > 0 && handle.length > 0) {
+    if (
+      wallet.connected &&
+      xAmount.toString().length > 0 &&
+      handle.length > 0
+    ) {
       ConsoleHelper(`BalanceInfoContainer -> ${tab}`);
       unstake(xAmount.toString(), handle);
     }
@@ -98,25 +105,67 @@ export const BalanceInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
         >
           <div className={classes.contentHeading}>CHICKS Amount</div>
           <div className={classes.contentText}>
-            {tabType === StakeMode.FLEXIBLE
-              ? flexibleUserInfo && flexibleUserInfo.chicksAmount.length > 0
-                ? `${flexibleUserInfo.chicksAmount}`
-                : '0'
-              : null}
-            {tabType === StakeMode.LOCKED
-              ? lockedUserInfo && lockedUserInfo.chicksAmount.length > 0
-                ? `${lockedUserInfo.chicksAmount}`
-                : '0'
-              : null}
+            {tabType === StakeMode.FLEXIBLE ? (
+              flexibleUserInfo && flexibleUserInfo.chicksAmount.length > 0 ? (
+                <NumberFormat
+                  value={flexibleUserInfo.chicksAmount}
+                  displayType="text"
+                  thousandSeparator
+                  decimalScale={10}
+                  fixedDecimalScale
+                />
+              ) : (
+                <NumberFormat
+                  value={0}
+                  displayType="text"
+                  thousandSeparator
+                  decimalScale={10}
+                  fixedDecimalScale
+                />
+              )
+            ) : null}
+            {tabType === StakeMode.LOCKED ? (
+              lockedUserInfo && lockedUserInfo.chicksAmount.length > 0 ? (
+                <NumberFormat
+                  value={lockedUserInfo.chicksAmount}
+                  displayType="text"
+                  thousandSeparator
+                  decimalScale={10}
+                  fixedDecimalScale
+                />
+              ) : (
+                <NumberFormat
+                  value={0}
+                  displayType="text"
+                  thousandSeparator
+                  decimalScale={10}
+                  fixedDecimalScale
+                />
+              )
+            ) : null}
           </div>
         </div>
         {tabType === StakeMode.FLEXIBLE ? (
           <div className={classes.mainContent}>
             <div className={classes.contentHeading}>xCHICKS Amount</div>
             <div className={classes.contentText}>
-              {flexibleUserInfo && flexibleUserInfo.chicksAmount.length > 0
-                ? `${flexibleUserInfo.xChicksAmount}`
-                : '0'}
+              {flexibleUserInfo && flexibleUserInfo.chicksAmount.length > 0 ? (
+                <NumberFormat
+                  value={flexibleUserInfo.xChicksAmount}
+                  displayType="text"
+                  thousandSeparator
+                  decimalScale={10}
+                  fixedDecimalScale
+                />
+              ) : (
+                <NumberFormat
+                  value={0}
+                  displayType="text"
+                  thousandSeparator
+                  decimalScale={10}
+                  fixedDecimalScale
+                />
+              )}
             </div>
           </div>
         ) : null}
@@ -243,9 +292,9 @@ export const BalanceInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
                         <Table>
                           <TableHead>
                             <TableRow>
-                              <TableCell>Tx Hash</TableCell>
+                              <TableCell>Stake Tx Hash</TableCell>
+                              <TableCell>Stake Period</TableCell>
                               <TableCell>Amount</TableCell>
-                              <TableCell>Staking Period</TableCell>
                               <TableCell />
                             </TableRow>
                           </TableHead>
@@ -263,22 +312,6 @@ export const BalanceInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
                                     chainId={CHAIN_ID_SOLANA}
                                     txId={flexibleStakeListItem.stakeTxHash}
                                   />
-                                </TableCell>
-                                <TableCell>
-                                  {(
-                                    Math.round(
-                                      flexibleStakeListItem.chicksAmount as unknown as number,
-                                    ) / 1000000000
-                                  ).toFixed(2)}{' '}
-                                  CHICKS
-                                  <br />
-                                  {(
-                                    Math.round(
-                                      flexibleStakeListItem.xChicksAmount as unknown as number,
-                                    ) / 1000000000
-                                  ).toFixed(2)}{' '}
-                                  xCHICKS
-                                  <br />
                                 </TableCell>
                                 <TableCell>
                                   {!flexibleStakeListItem.stakeClaimDate ? (
@@ -300,7 +333,12 @@ export const BalanceInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
                                         }
                                         format="d"
                                       />{' '}
-                                      days to go
+                                      {new Date() >=
+                                      new Date(
+                                        flexibleStakeListItem.stakeEndDate,
+                                      )
+                                        ? 'days to go'
+                                        : 'days to go'}
                                     </>
                                   ) : null}
                                   {flexibleStakeListItem.stakeClaimDate ? (
@@ -309,34 +347,79 @@ export const BalanceInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
                                       <Moment format="YYYY-MM-DD">
                                         {flexibleStakeListItem.stakeStartDate}
                                       </Moment>
+                                      <ShowTxButton
+                                        chainId={CHAIN_ID_SOLANA}
+                                        txId={
+                                          flexibleStakeListItem.unstakeTxHash
+                                        }
+                                      />
                                     </>
                                   ) : null}
                                 </TableCell>
                                 <TableCell>
-                                  <Button
-                                    variant="outlined"
-                                    onClick={() =>
-                                      handleUnstakeButtonClick(
-                                        flexibleStakeListItem.xChicksAmount,
-                                        flexibleStakeListItem.handle,
-                                      )
+                                  <NumberFormat
+                                    value={
+                                      Math.round(
+                                        flexibleStakeListItem.chicksAmount as unknown as number,
+                                      ) / 1000000000
                                     }
-                                    disabled={
-                                      !isAddress(
-                                        solanaAddress as PublicKey | string,
-                                      )
+                                    displayType="text"
+                                    thousandSeparator
+                                    decimalScale={10}
+                                    fixedDecimalScale
+                                  />{' '}
+                                  CHICKS
+                                  <br />
+                                  <NumberFormat
+                                    value={
+                                      Math.round(
+                                        flexibleStakeListItem.xChicksAmount as unknown as number,
+                                      ) / 1000000000
                                     }
-                                  >
-                                    Unstake
-                                  </Button>
-                                  <div
-                                    style={{
-                                      color: '#D0393E',
-                                      paddingTop: '0.3rem',
-                                    }}
-                                  >
-                                    25% unstake penalty
-                                  </div>
+                                    displayType="text"
+                                    thousandSeparator
+                                    decimalScale={10}
+                                    fixedDecimalScale
+                                  />{' '}
+                                  xCHICKS
+                                  <br />
+                                </TableCell>
+                                <TableCell>
+                                  {!flexibleStakeListItem.stakeClaimDate ||
+                                  !flexibleStakeListItem.unstakeTxHash ? (
+                                    <>
+                                      <Button
+                                        variant="outlined"
+                                        onClick={() =>
+                                          handleUnstakeButtonClick(
+                                            flexibleStakeListItem.xChicksAmount,
+                                            flexibleStakeListItem.handle,
+                                          )
+                                        }
+                                        disabled={
+                                          !isAddress(
+                                            solanaAddress as PublicKey | string,
+                                          )
+                                        }
+                                      >
+                                        Unstake
+                                      </Button>
+
+                                      {new Date() <
+                                      new Date(
+                                        flexibleStakeListItem.stakeEndDate,
+                                      ) ? (
+                                        <div
+                                          style={{
+                                            color: '#D0393E',
+                                            paddingTop: '0.3rem',
+                                          }}
+                                        >
+                                          25% unstake penalty
+                                        </div>
+                                      ) : null}
+                                    </>
+                                  ) : null}
                                 </TableCell>
                               </TableRow>
                             ))}

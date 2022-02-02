@@ -2,10 +2,10 @@ import './App.scss';
 import React, { useCallback } from 'react';
 import { useLocation } from 'react-router';
 import {
-  Routes,
-  Route,
-  useNavigate,
   Link as RouterLink,
+  Route,
+  Routes,
+  useNavigate,
 } from 'react-router-dom';
 import {
   AppBar,
@@ -20,7 +20,6 @@ import { BrowserView, MobileView } from 'react-device-detect';
 import SolChicksLogo from './icons/chicks.svg';
 import { COLORS, theme } from './muiTheme.js';
 import { FlexiblePoolView } from './pages/FlexiblePoolView';
-import { LockedPoolView } from './pages/LockedPoolView';
 
 const useStyles = makeStyles(() => ({
   appBar: {
@@ -122,13 +121,11 @@ function App() {
               indicatorColor="primary"
             >
               <Tab className={classes.tab} label="Flexible Pool" value="/" />
-              <Tab className={classes.tab} label="Locked Pool" value="/locked" />
             </Tabs>
           </Container>
         </div>
         <Routes>
           <Route path="" element={<FlexiblePoolView />} />
-          <Route path="/locked" element={<LockedPoolView />} />
           <Route path="*" element={<FlexiblePoolView />} />
         </Routes>
         <div className={classes.spacer} />

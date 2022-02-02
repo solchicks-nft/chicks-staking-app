@@ -94,7 +94,7 @@ function useStake(mode: StakeMode): IStakeStatus {
     setSourceTxId(txId);
     axios.get(url).then(
       (results) => {
-        ConsoleHelper(`processStakeResult: ${results}`);
+        ConsoleHelper(`processStakeResult: ${JSON.stringify(results)}`);
         if (results.data.success) {
           setStatusCode(StakeStatusCode.SUCCESS);
           setIsProcessing(false);

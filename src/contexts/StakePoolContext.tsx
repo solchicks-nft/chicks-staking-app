@@ -10,13 +10,13 @@ import React, {
   useState,
 } from 'react';
 import { ConfirmOptions, Connection } from '@solana/web3.js';
+import * as anchor from '@project-serum/anchor';
 import {
   Idl,
   Program,
   Provider as AnchorProvider,
 } from '@project-serum/anchor';
 import { AnchorWallet } from '@solana/wallet-adapter-react';
-import * as anchor from '@project-serum/anchor';
 import { parseUnits } from 'ethers/lib/utils';
 import { BigNumber } from 'ethers';
 import axios from 'axios';
@@ -25,12 +25,12 @@ import { toTokenBalanceString } from '../utils/solchickHelper';
 import ConsoleHelper from '../utils/consoleHelper';
 import {
   IStakeBalance,
-  SOLCHICK_STAKING_LOCKED_PROGRAM_IDL,
-  SOLCHICK_STAKING_FLEXIBLE_PROGRAM_IDL,
-  SOLCHICK_TOKEN_MINT_ON_SOL,
-  URL_SUBMIT_FLEX_LIST,
   IStakeInfo,
   SOLCHICK_DECIMALS_ON_SOL,
+  SOLCHICK_STAKING_FLEXIBLE_PROGRAM_IDL,
+  SOLCHICK_STAKING_LOCKED_PROGRAM_IDL,
+  SOLCHICK_TOKEN_MINT_ON_SOL,
+  URL_SUBMIT_FLEX_LIST,
 } from '../utils/solchickConsts';
 import { useSolanaWallet } from './SolanaWalletContext';
 import { SOLANA_HOST } from '../utils/consts';
@@ -135,7 +135,7 @@ export const StakePoolProvider = ({
       if (totalBalance) {
         const totalToken = toTokenBalanceString(totalBalance);
         ConsoleHelper(`refreshLockedPool -> totalToken: ${totalToken}`);
-        setLockedTotalInfo({ chicks: totalToken, xChicks: totalXToken });
+        setLockedTotalInfo({ chicksAmount: totalToken, xChicksAmount: totalXToken });
       }
     }
 
@@ -148,8 +148,12 @@ export const StakePoolProvider = ({
           );
         const userStakingAccount =
           await program.account.userStakingAccount.fetch(userStakingPubkey);
-        ConsoleHelper(`refreshLockedPool -> userStakingPubkey: ${userStakingPubkey}`);
-        ConsoleHelper(`refreshLockedPool -> userStakingBump: ${userStakingBump}`);
+        ConsoleHelper(
+          `refreshLockedPool -> userStakingPubkey: ${userStakingPubkey}`,
+        );
+        ConsoleHelper(
+          `refreshLockedPool -> userStakingBump: ${userStakingBump}`,
+        );
 
         if (userStakingAccount) {
           const userTokenAmount = toTokenBalanceString(
@@ -158,10 +162,12 @@ export const StakePoolProvider = ({
           const userXTokenAmount = toTokenBalanceString(
             userStakingAccount.xTokenAmount,
           );
-          ConsoleHelper(`refreshLockedPool -> userTokenAmount: ${userTokenAmount}`);
+          ConsoleHelper(
+            `refreshLockedPool -> userTokenAmount: ${userTokenAmount}`,
+          );
           setLockedUserInfo({
-            chicks: userTokenAmount,
-            xChicks: userXTokenAmount,
+            chicksAmount: userTokenAmount,
+            xChicksAmount: userXTokenAmount,
           });
         }
         ConsoleHelper(
@@ -171,7 +177,7 @@ export const StakePoolProvider = ({
         ConsoleHelper(`refreshLockedPool -> error: ${JSON.stringify(e)}`);
       }
     } else {
-      setLockedUserInfo({ chicks: '', xChicks: '' });
+      setLockedUserInfo({ chicksAmount: '', xChicksAmount: '' });
     }
   }, [getAnchorProvider, solanaConnection, tokenMintPubkey, walletPublicKey]);
 
@@ -217,7 +223,7 @@ export const StakePoolProvider = ({
       if (totalBalance) {
         const totalToken = toTokenBalanceString(totalBalance);
         ConsoleHelper(`refreshFlexiblePool -> totalToken: ${totalToken}`);
-        setFlexibleTotalInfo({ chicks: totalToken, xChicks: totalXToken });
+        setFlexibleTotalInfo({ chicksAmount: totalToken, xChicksAmount: totalXToken });
       }
     }
 
@@ -225,7 +231,11 @@ export const StakePoolProvider = ({
       try {
         const url = URL_SUBMIT_FLEX_LIST(walletPublicKey.toString());
         const results = await axios.get(url);
-        ConsoleHelper(`refreshFlexiblePool -> flexList: ${JSON.stringify(results.data.data)}`);
+        ConsoleHelper(
+          `refreshFlexiblePool -> flexList: ${JSON.stringify(
+            results.data.data,
+          )}`,
+        );
 
         if (results.data.data) {
           let userTotalChicks = BigNumber.from(0);
@@ -243,28 +253,29 @@ export const StakePoolProvider = ({
               BigNumber.from(item.x_token),
             );
             stakeList.push({
-              chicks: amount.toString(),
-              xChicks: item.x_token,
+              chicksAmount: amount.toString(),
+              xChicksAmount: item.x_token,
               handle: item.handle,
+              stakeTxHash: item.stake_tx_hash,
+              unStakeTxHash: item.unStake_tx_hash,
+              stakeStartDate: item.stake_start_date,
+              stakeEndDate: item.stake_end_date,
             });
           });
-          ConsoleHelper(
-            'stakeList',
-            stakeList,
-            userTotalChicks.toString(),
-            userTotalXChicks.toString(),
-          );
+          ConsoleHelper(`stakeList -> ${JSON.stringify(stakeList)}`);
+          ConsoleHelper(`userTotalChicks -> ${userTotalChicks}`);
+          ConsoleHelper(`userTotalXChicks -> ${JSON.stringify(userTotalXChicks)}`);
           setFlexibleStakeList(stakeList);
           setFlexibleUserInfo({
-            chicks: userTotalChicks.toString(),
-            xChicks: userTotalXChicks.toString(),
+            chicksAmount: (Math.round(userTotalChicks.toNumber()) / 1000000000).toFixed(1),
+            xChicksAmount: (Math.round(userTotalXChicks.toNumber()) / 1000000000).toFixed(1),
           });
         }
       } catch (e) {
         ConsoleHelper(`refreshFlexiblePool -> error: ${JSON.stringify(e)}`);
       }
     } else {
-      setFlexibleUserInfo({ chicks: '', xChicks: '' });
+      setFlexibleUserInfo({ chicksAmount: '', xChicksAmount: '' });
     }
   }, [getAnchorProvider, solanaConnection, tokenMintPubkey, walletPublicKey]);
 

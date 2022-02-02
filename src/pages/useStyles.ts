@@ -99,7 +99,7 @@ export const useStyles = makeStyles((theme) => ({
     fontSize: '14px',
     lineHeight: '15px',
   },
-  balanceTab: {
+  stakeBalanceTab: {
     display: 'flex',
     padding: '20px 0px',
     width: '100%',
@@ -139,7 +139,6 @@ export const useStyles = makeStyles((theme) => ({
     display: 'flex',
     justifyContent: 'flex-start',
     alignItems: 'center',
-    width: '50%',
     flexDirection: 'column',
     marginBottom: '20px',
   },
@@ -151,7 +150,6 @@ export const useStyles = makeStyles((theme) => ({
   tabContainer: {
     display: 'flex',
     width: '100%',
-    justifyContent: 'center',
   },
   wallet: {
     backgroundColor: 'rgba(255,255,255,0.98)',

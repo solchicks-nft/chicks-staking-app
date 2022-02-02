@@ -5,7 +5,7 @@ import { StakeMode } from '../utils/stakeHelper';
 
 export const PoolInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
   const classes = useStyles();
-  const { flexibleTotalInfo } = useStakePool();
+  const { flexibleTotalInfo, lockedTotalInfo } = useStakePool();
 
   return (
     <div className={classes.card}>
@@ -14,12 +14,34 @@ export const PoolInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
         <div className={classes.mainContent}>
           <div className={classes.contentHeading}>Total CHICKS Staked</div>
           <div className={classes.contentText}>
-            {flexibleTotalInfo ? flexibleTotalInfo.chicks : 0}
+            {tabType === StakeMode.FLEXIBLE
+              ? flexibleTotalInfo && flexibleTotalInfo.chicksAmount.length > 0
+                ? `${flexibleTotalInfo.chicksAmount}`
+                : '0'
+              : null}
+            {tabType === StakeMode.LOCKED
+              ? lockedTotalInfo && lockedTotalInfo.chicksAmount.length > 0
+                ? `${lockedTotalInfo.chicksAmount}`
+                : '0'
+              : null}
           </div>
         </div>
         <div className={classes.mainContent}>
           <div className={classes.contentHeading}>Est. APR</div>
-          <div className={classes.contentText}>0%</div>
+          <div className={classes.contentText}>
+            {tabType === StakeMode.FLEXIBLE
+              ? flexibleTotalInfo && flexibleTotalInfo.chicksAmount.length > 0
+                ? `${(
+                    ((((flexibleTotalInfo.chicksAmount as unknown as number) /
+                      (flexibleTotalInfo.xChicksAmount as unknown as number)) *
+                      100 -
+                      100) *
+                      365) /
+                    56
+                  ).toFixed(1)}%`
+                : '0'
+              : null}
+          </div>
         </div>
       </div>
     </div>

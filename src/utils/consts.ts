@@ -146,4 +146,32 @@ export const SOLANA_HOST = process.env.REACT_APP_SOLANA_API_URL
   ? clusterApiUrl('devnet')
   : 'http://localhost:8899';
 
+export const getExplorerName = (chainId: ChainId) =>
+  // eslint-disable-next-line no-nested-ternary
+  chainId === CHAIN_ID_ETH || chainId === CHAIN_ID_ETHEREUM_ROPSTEN
+    ? 'Etherscan'
+    : // eslint-disable-next-line no-nested-ternary
+    chainId === CHAIN_ID_BSC
+      ? 'BscScan'
+      : 'Explorer';
+
+export const getExplorerAddress = (chainId: ChainId, txId: string) => {
+  if (chainId === CHAIN_ID_ETH) {
+    return `https://${
+      CLUSTER === 'testnet' ? 'ropsten.' : ''
+    }etherscan.io/tx/${txId}`;
+  }
+  if (chainId === CHAIN_ID_BSC) {
+    return `https://${
+      CLUSTER === 'testnet' ? 'testnet.' : ''
+    }bscscan.com/tx/${txId}`;
+  }
+  if (chainId === CHAIN_ID_SOLANA) {
+    return `https://explorer.solana.com/tx/${txId}${
+      CLUSTER === 'testnet' ? '?cluster=devnet' : ''
+    }`;
+  }
+  return '';
+};
+
 export const UNSTAKE_FEE = 25;

@@ -1,5 +1,6 @@
-import React, { ChangeEvent, useCallback, useState } from 'react';
+import React, { ChangeEvent, useCallback, useMemo, useState } from 'react';
 import { Tab, Tabs, TextField } from '@material-ui/core';
+import { Connection, PublicKey } from '@solana/web3.js';
 import { useStyles } from '../pages/useStyles';
 import { SOLCHICK_BALANCE_TAB_STATE } from '../utils/solchickConsts';
 import ButtonWithLoader from './ButtonWithLoader';
@@ -9,13 +10,20 @@ import useStake from '../hooks/useStake';
 import { useStakePool } from '../contexts/StakePoolContext';
 import { StakeMode } from '../utils/stakeHelper';
 import { useSolanaWallet } from '../contexts/SolanaWalletContext';
+import { SOLANA_HOST } from '../utils/consts';
+import { isAddress } from '../utils/solanaHelper';
 
-export const BalanceInfoContainer = ({ tabType }: { tabType: number }) => {
+export const BalanceInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
   const [tab, setTab] = useState(SOLCHICK_BALANCE_TAB_STATE.STAKE);
   const [inputVal, setInput] = useState('');
   const classes = useStyles();
   const wallet = useSolanaWallet();
   const { stake } = useStake(tabType);
+  const solanaConnection = useMemo(
+    () => new Connection(SOLANA_HOST, 'confirmed'),
+    [],
+  );
+  const { publicKey: solanaAddress } = useSolanaWallet();
 
   const handleChange = useCallback((event, value) => {
     setTab(value);
@@ -42,13 +50,8 @@ export const BalanceInfoContainer = ({ tabType }: { tabType: number }) => {
     }
   };
 
-  const {
-    refreshLockedPool,
-    flexibleUserInfo,
-    flexibleTotalInfo,
-    lockedTotalInfo,
-    lockedUserInfo,
-  } = useStakePool();
+  const { refreshLockedPool, flexibleUserInfo, lockedUserInfo } =
+    useStakePool();
 
   return (
     <div className={classes.card}>
@@ -63,14 +66,27 @@ export const BalanceInfoContainer = ({ tabType }: { tabType: number }) => {
         >
           <div className={classes.contentHeading}>CHICKS Amount</div>
           <div className={classes.contentText}>
-            {lockedUserInfo ? lockedUserInfo.chicks : '0 CHICKS'}
+            {/* eslint-disable-next-line no-nested-ternary */}
+            {tabType === StakeMode.FLEXIBLE
+              ? flexibleUserInfo && flexibleUserInfo.chicks.length > 0
+                ? `${flexibleUserInfo.chicks} CHICKS`
+                : '0 CHICKS'
+              : null}
+            {/* eslint-disable-next-line no-nested-ternary */}
+            {tabType === StakeMode.LOCKED
+              ? lockedUserInfo && lockedUserInfo.chicks.length > 0
+                ? `${lockedUserInfo.chicks} CHICKS`
+                : '0 CHICKS'
+              : null}
           </div>
         </div>
         {tabType === StakeMode.FLEXIBLE ? (
           <div className={classes.mainContent}>
             <div className={classes.contentHeading}>xCHICKS Amount</div>
             <div className={classes.contentText}>
-              {lockedUserInfo ? lockedUserInfo.xChicks : ''}
+              {flexibleUserInfo && flexibleUserInfo.chicks.length > 0
+                ? `${flexibleUserInfo.xChicks} xCHICKS`
+                : '0 xCHICKS'}
             </div>
           </div>
         ) : null}
@@ -111,16 +127,23 @@ export const BalanceInfoContainer = ({ tabType }: { tabType: number }) => {
                     inputProps={{
                       maxLength: 100,
                       step: '1000',
-                      min: 1000,
-                      disableunderline: "true",
+                      min: 2000,
+                      disableunderline: 'true',
                     }}
+                    disabled={!isAddress(solanaAddress as PublicKey | string)}
                   />
                 </div>
-                <ButtonWithLoader onClick={handleButtonClick}>
+                <ButtonWithLoader
+                  onClick={handleButtonClick}
+                  disabled={!isAddress(solanaAddress as PublicKey | string)}
+                >
                   Max
                 </ButtonWithLoader>
                 <div style={{ paddingLeft: '7px' }} />
-                <ButtonWithLoader onClick={handleActionClick}>
+                <ButtonWithLoader
+                  onClick={handleActionClick}
+                  disabled={!isAddress(solanaAddress as PublicKey | string)}
+                >
                   {tab === SOLCHICK_BALANCE_TAB_STATE.STAKE
                     ? 'Stake'
                     : 'Unstake'}

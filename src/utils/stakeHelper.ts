@@ -7,13 +7,13 @@ import { getSolChicksAssociatedAddress } from './solchickHelper';
 import { pubkeyToString } from './solanaHelper';
 
 export enum StakeMode {
-  FLEXIBLE = 1,
-  LOCKED = 2,
+  FLEXIBLE = 'flexible',
+  LOCKED = 'locked',
 }
 
 export enum StakeStepMode {
-  STAKE = 3,
-  UNSTAKE = 4,
+  STAKE = 'stake',
+  UNSTAKE = 'unstake',
 }
 
 export enum StakeStatusCode {

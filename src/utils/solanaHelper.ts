@@ -56,7 +56,7 @@ export const getTokenBalance = async (
     (await connection.getTokenAccountBalance(toPublicKey(pubkey))).value.amount,
   );
 
-export const getTokenObj = (
+export const getTokenObject = (
   connection: Connection,
   mintKey: PublicKey | string,
   payer: Signer,
@@ -83,3 +83,4 @@ export const getTransactionInfoOnSol = async (
   }
   return txInfo;
 };
+

@@ -4,6 +4,9 @@ import {
   ASSOCIATED_TOKEN_PROGRAM_ID,
   Token,
 } from '@solana/spl-token';
+import * as anchor from '@project-serum/anchor';
+import ConsoleHelper from './consoleHelper';
+import { sleep } from './helper';
 
 const PubKeysInternedMap = new Map<string, PublicKey>();
 
@@ -37,15 +40,47 @@ export const pubkeyToString = (key: PublicKey | null | string = '') =>
 export const getAssociatedTokenAddress = async (
   mintKey: PublicKey | string,
   ownerKey: PublicKey | string,
-): Promise<PublicKey> => Token.getAssociatedTokenAddress(
-  ASSOCIATED_TOKEN_PROGRAM_ID,
-  TOKEN_PROGRAM_ID,
-  toPublicKey(mintKey),
-  toPublicKey(ownerKey),
-);
+): Promise<PublicKey> =>
+  Token.getAssociatedTokenAddress(
+    ASSOCIATED_TOKEN_PROGRAM_ID,
+    TOKEN_PROGRAM_ID,
+    toPublicKey(mintKey),
+    toPublicKey(ownerKey),
+  );
 
-export const getTokenObj = (
+export const getTokenBalance = async (
+  connection: Connection,
+  pubkey: PublicKey | string,
+) =>
+  new anchor.BN(
+    (await connection.getTokenAccountBalance(toPublicKey(pubkey))).value.amount,
+  );
+
+export const getTokenObject = (
   connection: Connection,
   mintKey: PublicKey | string,
   payer: Signer,
 ) => new Token(connection, toPublicKey(mintKey), TOKEN_PROGRAM_ID, payer);
+
+export const getTransactionInfoOnSol = async (
+  connection: Connection,
+  txId: string,
+  retryCount = 3,
+) => {
+  let txInfo = null;
+  let retry = 0;
+  while (retry < retryCount) {
+    retry += 1;
+    // eslint-disable-next-line no-await-in-loop
+    txInfo = await connection.getTransaction(txId);
+    if (!txInfo) {
+      ConsoleHelper(`getTransactionInfoOnSol: txId: ${txId} - retry: ${retry}`);
+      // eslint-disable-next-line no-await-in-loop
+      await sleep(5000);
+    } else {
+      break;
+    }
+  }
+  return txInfo;
+};
+

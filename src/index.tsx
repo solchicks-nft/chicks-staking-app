@@ -6,17 +6,17 @@ import { ThemeProvider } from '@material-ui/core/styles';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { theme } from './muiTheme.js';
-import { EthereumProviderProvider } from './contexts/EthereumProviderContext';
 import { SolanaWalletProvider } from './contexts/SolanaWalletContext';
+import { StakePoolProvider } from './contexts/StakePoolContext';
 
 ReactDOM.render(
   <React.StrictMode>
     <BrowserRouter>
       <ThemeProvider theme={theme}>
         <SolanaWalletProvider>
-          <EthereumProviderProvider>
+          <StakePoolProvider>
             <App />
-          </EthereumProviderProvider>
+          </StakePoolProvider>
         </SolanaWalletProvider>
       </ThemeProvider>
     </BrowserRouter>

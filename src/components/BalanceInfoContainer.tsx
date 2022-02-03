@@ -135,6 +135,7 @@ export const BalanceInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
   const handleMaxButtonClick = async () => {
     if (wallet.connected) {
       getBalance();
+      setInput(tokenBalance);
     } else {
       setInput('');
     }
@@ -144,7 +145,7 @@ export const BalanceInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
     if (wallet.connected && inputVal.length > 0 && parseFloat(inputVal) > 0) {
       stake(Number(inputVal));
     } else {
-      setErrorMessage('handleStakeButtonClick -> invalid input');
+      setErrorMessage('You cannot stake at this moment in time.');
       ConsoleHelper(errorMessage);
     }
   };
@@ -158,7 +159,7 @@ export const BalanceInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
       setCurrentHandle(handle);
       unstake(xAmount.toString(), handle);
     } else {
-      setErrorMessage('handleUnstakeButtonClick -> invalid input');
+      setErrorMessage('You cannot unstake at this moment in time.');
       ConsoleHelper(errorMessage);
     }
   };

@@ -12,24 +12,24 @@ export const HelpView = () => {
         <div style={{ padding: '2rem' }}>
           <Typography variant="h6">How do I start staking?</Typography>
           <p>
-            To start staking, you will initially need some CHICKS tokens and a
+            To start staking, you will need some CHICKS tokens and a
             compatible wallet such as Solana and Solflare. You will also need to
             have some Solana (SOL) in your wallet to cover the transaction fees.
-            The amount needed is 0.1 SOL.
+            The recommended amount is 0.1 SOL.
           </p>
           <p>
             Once you have everything in place, log onto our staking application
             at <strong>https://staking.solchicks.io/</strong> and connect your
             wallet. You’ll see your CHICKS token balance in your wallet in the
-            <strong>My Balance</strong> section and can now decide how many of
+            {' '}<strong>My Balance</strong> section and can now decide how many of
             those you want to stake. You have the option of staking all of your
             tokens or a minimum of 2000 CHICKS with 1000 CHICKS increments.
           </p>
           <p>
-            Once you click on <strong>Stake</strong> , you will have to confirm
-            the transaction in your wallet as below. It is the same process when
-            you <strong>Unstake</strong> to collect your CHICKS. After the
-            approval, the amount you staked will be displayed in the{' '}
+            Once you click on <strong>Stake</strong>, you will have to confirm
+            the transaction in your wallet as below. You can also click on
+            <strong>Unstake</strong> to collect your CHICKS. After approving the
+            transaction, the amount you staked will be displayed in the{' '}
             <strong>My Balance</strong> section.
           </p>
           <br />
@@ -90,8 +90,8 @@ export const HelpView = () => {
           </p>
           <p>
             When you unstake n CHICKS tokens, you receive an amount of CHICKS
-            tokens equal to <em>N * (CHICKS_pool_amount / xCHICKS_supply)</em>.
-            Your xCHICKS allocation is subsequenly destroyed.
+            tokens equal to <em>n * (CHICKS_pool_amount / xCHICKS_supply)</em>.
+            Your xCHICKS allocation is subsequently destroyed.
           </p>
           <p>
             For example, let’s say you decide to stake 1k CHICKS tokens when the

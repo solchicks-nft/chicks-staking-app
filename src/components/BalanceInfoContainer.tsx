@@ -185,7 +185,7 @@ export const BalanceInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
                   value={flexibleUserInfo.chicksAmount}
                   displayType="text"
                   thousandSeparator
-                  decimalScale={4}
+                  decimalScale={1}
                   fixedDecimalScale
                 />
               ) : (
@@ -193,7 +193,7 @@ export const BalanceInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
                   value={0}
                   displayType="text"
                   thousandSeparator
-                  decimalScale={4}
+                  decimalScale={1}
                   fixedDecimalScale
                 />
               )
@@ -204,7 +204,7 @@ export const BalanceInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
                   value={lockedUserInfo.chicksAmount}
                   displayType="text"
                   thousandSeparator
-                  decimalScale={4}
+                  decimalScale={1}
                   fixedDecimalScale
                 />
               ) : (
@@ -212,7 +212,7 @@ export const BalanceInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
                   value={0}
                   displayType="text"
                   thousandSeparator
-                  decimalScale={4}
+                  decimalScale={1}
                   fixedDecimalScale
                 />
               )
@@ -228,7 +228,7 @@ export const BalanceInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
                   value={flexibleUserInfo.xChicksAmount}
                   displayType="text"
                   thousandSeparator
-                  decimalScale={4}
+                  decimalScale={1}
                   fixedDecimalScale
                 />
               ) : (
@@ -236,7 +236,7 @@ export const BalanceInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
                   value={0}
                   displayType="text"
                   thousandSeparator
-                  decimalScale={4}
+                  decimalScale={1}
                   fixedDecimalScale
                 />
               )}
@@ -335,7 +335,7 @@ export const BalanceInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
                       {statusMessage}
                     </Typography>
                   ) : null}
-                  {!sourceTxId ? (
+                  {sourceTxId ? (
                     <div style={{ marginTop: '16px' }}>
                       <ShowTx chainId={CHAIN_ID_SOLANA} txId={sourceTxId} />
                     </div>
@@ -370,8 +370,9 @@ export const BalanceInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
                       </div>
                     </div>
                   ) : null}
-                  {isAddress(solanaAddress as PublicKey | string) &&
-                  !flexibleStakeList ? (
+                  {(isAddress(solanaAddress as PublicKey | string) &&
+                    !flexibleStakeList) ||
+                  (flexibleStakeList && flexibleStakeList.length === 0) ? (
                     <div style={{ paddingLeft: '1rem' }}>
                       We could not retrieve any details about your staked tokens
                       at this moment in time. Please try again later.
@@ -495,7 +496,7 @@ export const BalanceInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
                                     }
                                     displayType="text"
                                     thousandSeparator
-                                    decimalScale={4}
+                                    decimalScale={1}
                                     fixedDecimalScale
                                   />{' '}
                                   CHICKS
@@ -508,7 +509,7 @@ export const BalanceInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
                                     }
                                     displayType="text"
                                     thousandSeparator
-                                    decimalScale={4}
+                                    decimalScale={1}
                                     fixedDecimalScale
                                   />{' '}
                                   xCHICKS

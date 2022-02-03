@@ -508,7 +508,7 @@ export const BalanceInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
                                         disabled={
                                           !isAddress(
                                             solanaAddress as PublicKey | string,
-                                          )
+                                          ) || isProcessing
                                         }
                                       >
                                         Unstake

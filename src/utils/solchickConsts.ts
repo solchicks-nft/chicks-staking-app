@@ -11,12 +11,12 @@ export const SOLCHICK_DECIMALS_ON_SOL = 9;
 const URL_BACKEND_BASE = process.env.REACT_APP_BACKEND_URL as string;
 
 const FLEXIBLE_PROGRAM_IDL =
-  process.env.NODE_ENV === 'production'
+  process.env.REACT_APP_CLUSTER === 'mainnet'
     ? require('../idl/chicks_staking_flexible_prod.json')
     : require('../idl/chicks_staking_flexible_dev.json');
 
 const LOCKED_PROGRAM_IDL =
-  process.env.NODE_ENV === 'production'
+    process.env.REACT_APP_CLUSTER === 'mainnet'
     ? require('../idl/chicks_staking_locked_prod.json')
     : require('../idl/chicks_staking_locked_dev.json');
 

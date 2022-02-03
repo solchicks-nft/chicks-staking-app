@@ -1,21 +1,16 @@
-import { useMemo, useState } from 'react';
+import {useEffect, useMemo, useState} from 'react';
 import axios from 'axios';
 import BN from 'bn.js';
-import { ConfirmOptions, Connection } from '@solana/web3.js';
+import {ConfirmOptions, Connection} from '@solana/web3.js';
 import * as anchor from '@project-serum/anchor';
-import {
-  Context,
-  Idl,
-  Program,
-  Provider as AnchorProvider,
-} from '@project-serum/anchor';
-import { parseUnits } from 'ethers/lib/utils';
-import { AnchorWallet } from '@solana/wallet-adapter-react';
-import { Md5 } from 'md5-typescript';
-import { BigNumber } from 'ethers';
-import { TOKEN_PROGRAM_ID } from '@solana/spl-token';
-import { useSolanaWallet } from '../contexts/SolanaWalletContext';
-import { SOLANA_HOST } from '../utils/consts';
+import {Context, Idl, Program, Provider as AnchorProvider} from '@project-serum/anchor';
+import {parseUnits} from 'ethers/lib/utils';
+import {AnchorWallet} from '@solana/wallet-adapter-react';
+import {Md5} from 'md5-typescript';
+import {BigNumber} from 'ethers';
+import {TOKEN_PROGRAM_ID} from '@solana/spl-token';
+import {useSolanaWallet} from '../contexts/SolanaWalletContext';
+import {SOLANA_HOST} from '../utils/consts';
 import {
   SOLCHICK_DECIMALS_ON_SOL,
   SOLCHICK_STAKING_FLEXIBLE,
@@ -28,12 +23,8 @@ import {
   URL_SUBMIT_LOCKED_STAKE,
   URL_SUBMIT_LOCKED_UNSTAKE,
 } from '../utils/solchickConsts';
-import {
-  getTransactionInfoOnSol,
-  pubkeyToString,
-  toPublicKey,
-} from '../utils/solanaHelper';
-import { getSolChicksAssociatedAddress } from '../utils/solchickHelper';
+import {getTransactionInfoOnSol, pubkeyToString, toPublicKey,} from '../utils/solanaHelper';
+import {getSolChicksAssociatedAddress} from '../utils/solchickHelper';
 import ConsoleHelper from '../utils/consoleHelper';
 import {
   createStakeStatus,
@@ -45,20 +36,41 @@ import {
   StakeStatusCode,
   StakeStepMode,
 } from '../utils/stakeHelper';
-import { sleep } from '../utils/helper';
+import {sleep} from '../utils/helper';
+import {useStakePool} from "../contexts/StakePoolContext";
 
-function useStake(mode: StakeMode): IStakeStatus {
+function useStake(mode: StakeMode, tab: StakeStepMode): IStakeStatus {
   const [isProcessing, setIsProcessing] = useState(false);
   const [sourceTxId, setSourceTxId] = useState('');
+  const [currentMode, setCurrentMode] = useState<StakeMode>(StakeMode.FLEXIBLE);
+  const [currentTab, setCurrentTab] = useState<StakeStepMode>(StakeStepMode.STAKE);
   const [statusCode, setStatusCode] = useState(StakeStatusCode.NONE);
   const [errorCode, setErrorCode] = useState(StakeErrorCode.NO_ERROR);
   const [lastError, setLastError] = useState('');
   const walletSolana = useSolanaWallet();
 
+  const {
+    refreshFlexiblePool,
+    refreshLockedPool,
+  } = useStakePool();
+
   const solanaConnection = useMemo(
     () => new Connection(SOLANA_HOST, 'confirmed'),
     [],
   );
+
+  useEffect(() => {
+    if (mode !== currentMode) {
+      setCurrentMode(mode);
+      setSourceTxId('');
+      setStatusCode(StakeStatusCode.NONE);
+    }
+    if (tab !== currentTab) {
+      setCurrentTab(tab);
+      setSourceTxId('');
+      setStatusCode(StakeStatusCode.NONE);
+    }
+  }, [mode, tab]);
 
   async function getAnchorProvider() {
     const opts = {
@@ -98,6 +110,11 @@ function useStake(mode: StakeMode): IStakeStatus {
         if (results.data.success) {
           setStatusCode(StakeStatusCode.SUCCESS);
           setIsProcessing(false);
+          if (currentMode === StakeMode.FLEXIBLE) {
+            refreshFlexiblePool();
+          } else {
+            refreshLockedPool();
+          }
         } else {
           const errorMessage = results.data.error_message || 'Unknown error';
           setLastError(
@@ -372,7 +389,6 @@ function useStake(mode: StakeMode): IStakeStatus {
     }
 
     setStatusCode(StakeStatusCode.SUBMITTING);
-    await sleep(5000);
     if (stakeStepMode === StakeStepMode.STAKE) {
       await submitStakeResult(
         pubkeyToString(walletPublicKey),

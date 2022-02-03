@@ -9,7 +9,7 @@ import React, {
   useMemo,
   useState,
 } from 'react';
-import { ConfirmOptions, Connection } from '@solana/web3.js';
+import { ConfirmOptions, Connection, PublicKey } from '@solana/web3.js';
 import * as anchor from '@project-serum/anchor';
 import {
   Idl,
@@ -37,8 +37,10 @@ import { SOLANA_HOST } from '../utils/consts';
 import { STATUS_STAKED } from '../utils/stakeHelper';
 
 interface IStakePoolContext {
+  getBalance(): void;
   refreshLockedPool(): void;
   refreshFlexiblePool(): void;
+  tokenBalance: string;
   lockedTotalInfo: IStakeBalance | undefined;
   lockedUserInfo: IStakeBalance | undefined;
   flexibleTotalInfo: IStakeBalance | undefined;
@@ -47,8 +49,10 @@ interface IStakePoolContext {
 }
 
 const StackPoolContext = React.createContext<IStakePoolContext>({
+  getBalance: () => {},
   refreshLockedPool: () => {},
   refreshFlexiblePool: () => {},
+  tokenBalance: "",
   lockedTotalInfo: undefined,
   lockedUserInfo: undefined,
   flexibleTotalInfo: undefined,
@@ -64,6 +68,7 @@ export const StakePoolProvider = ({
   >;
 }) => {
   const walletSolana = useSolanaWallet();
+  const [tokenBalance, setTokenBalance] = useState('');
   const [lockedTotalInfo, setLockedTotalInfo] = useState<IStakeBalance>();
   const [lockedUserInfo, setLockedUserInfo] = useState<IStakeBalance>();
   const [flexibleTotalInfo, setFlexibleTotalInfo] = useState<IStakeBalance>();
@@ -93,6 +98,24 @@ export const StakePoolProvider = ({
     () => toPublicKey(SOLCHICK_TOKEN_MINT_ON_SOL),
     [],
   );
+
+  const getBalance = useCallback(async() => {
+    let returnVal = "";
+    if(walletPublicKey) {
+      const mintPubkey = new PublicKey(SOLCHICK_TOKEN_MINT_ON_SOL);
+      const splBalance = await solanaConnection.getParsedTokenAccountsByOwner(
+        walletPublicKey, 
+        {
+          mint: mintPubkey
+        }
+      );
+      
+      returnVal = (Number(splBalance.value[0].account.data.parsed.info.tokenAmount.uiAmountString) / 1).toString();
+    }
+
+    ConsoleHelper(returnVal);
+    setTokenBalance(returnVal);
+  }, [solanaConnection, walletPublicKey]);
 
   const refreshLockedPool = useCallback(async () => {
     if (!solanaConnection) {
@@ -315,22 +338,26 @@ export const StakePoolProvider = ({
 
   const contextValue = useMemo(
     () => ({
+      getBalance,
       refreshLockedPool,
       refreshFlexiblePool,
+      tokenBalance,
       lockedTotalInfo,
       lockedUserInfo,
       flexibleTotalInfo,
       flexibleUserInfo,
-      flexibleStakeList,
+      flexibleStakeList
     }),
     [
+      getBalance,
       refreshLockedPool,
       refreshFlexiblePool,
+      tokenBalance,
       lockedTotalInfo,
       lockedUserInfo,
       flexibleTotalInfo,
       flexibleUserInfo,
-      flexibleStakeList,
+      flexibleStakeList
     ],
   );
   return (

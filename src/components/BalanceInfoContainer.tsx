@@ -56,11 +56,13 @@ export const BalanceInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
     sourceTxId,
   } = useStake(tabType);
   const {
+    getBalance,
     refreshFlexiblePool,
     refreshLockedPool,
     flexibleStakeList,
     flexibleUserInfo,
     lockedUserInfo,
+    tokenBalance
   } = useStakePool();
   const { publicKey: solanaAddress } = useSolanaWallet();
 
@@ -123,12 +125,13 @@ export const BalanceInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
 
   ConsoleHelper(`successMessage: ${successMessage}`);
 
-  const handleMaxButtonClick = () => {
+  useEffect(() => {
+    setInput(tokenBalance);
+  }, [tokenBalance]);
+
+  const handleMaxButtonClick = async() => {
     if (wallet.connected) {
-      const maxAmount: string = flexibleUserInfo
-        ? flexibleUserInfo.chicksAmount
-        : '';
-      setInput(maxAmount);
+      getBalance();
     } else {
       setInput('');
     }

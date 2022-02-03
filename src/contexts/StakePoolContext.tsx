@@ -34,7 +34,7 @@ import {
 } from '../utils/solchickConsts';
 import { useSolanaWallet } from './SolanaWalletContext';
 import { SOLANA_HOST } from '../utils/consts';
-import {STATUS_STAKED} from "../utils/stakeHelper";
+import { STATUS_STAKED } from '../utils/stakeHelper';
 
 interface IStakePoolContext {
   refreshLockedPool(): void;
@@ -114,7 +114,9 @@ export const StakePoolProvider = ({
         [Buffer.from(anchor.utils.bytes.utf8.encode('staking'))],
         program.programId,
       );
-    ConsoleHelper(`refreshLockedPool -> stakingPubkey: ${stakingPubkey.toString()}`);
+    ConsoleHelper(
+      `refreshLockedPool -> stakingPubkey: ${stakingPubkey.toString()}`,
+    );
     ConsoleHelper(`refreshLockedPool -> stakingBump: ${stakingBump}`);
     const stakingAccount = await program.account.stakingAccount.fetch(
       stakingPubkey,
@@ -125,7 +127,9 @@ export const StakePoolProvider = ({
         [tokenMintPubkey.toBuffer()],
         program.programId,
       );
-    ConsoleHelper(`refreshLockedPool -> vaultPubkey: ${vaultPubkey.toString()}`);
+    ConsoleHelper(
+      `refreshLockedPool -> vaultPubkey: ${vaultPubkey.toString()}`,
+    );
     ConsoleHelper(`refreshLockedPool -> vaultBump: ${vaultBump}`);
 
     if (stakingAccount) {
@@ -208,7 +212,9 @@ export const StakePoolProvider = ({
     const stakingAccount = await program.account.stakingAccount.fetch(
       stakingPubkey,
     );
-    ConsoleHelper(`refreshFlexiblePool -> stakingPubkey: ${stakingPubkey.toString()}`);
+    ConsoleHelper(
+      `refreshFlexiblePool -> stakingPubkey: ${stakingPubkey.toString()}`,
+    );
     ConsoleHelper(`refreshFlexiblePool -> stakingBump: ${stakingBump}`);
 
     const [vaultPubkey, vaultBump] =
@@ -216,7 +222,9 @@ export const StakePoolProvider = ({
         [tokenMintPubkey.toBuffer()],
         program.programId,
       );
-    ConsoleHelper(`refreshFlexiblePool -> vaultPubkey: ${vaultPubkey.toString()}`);
+    ConsoleHelper(
+      `refreshFlexiblePool -> vaultPubkey: ${vaultPubkey.toString()}`,
+    );
     ConsoleHelper(`refreshFlexiblePool -> vaultBump: ${vaultBump}`);
 
     if (stakingAccount) {

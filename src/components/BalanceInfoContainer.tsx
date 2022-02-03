@@ -37,7 +37,7 @@ import { useSolanaWallet } from '../contexts/SolanaWalletContext';
 import { isAddress } from '../utils/solanaHelper';
 import { CHAIN_ID_SOLANA } from '../lib/consts';
 import ShowTxButton from './ShowTxButton';
-import ShowTx from "./ShowTx";
+import ShowTx from './ShowTx';
 
 export const BalanceInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
   const [tab, setTab] = useState(SOLCHICK_BALANCE_TAB_STATE.STAKE);
@@ -46,8 +46,15 @@ export const BalanceInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
   const wallet = useSolanaWallet();
   const [successMessage, setSuccessMessage] = React.useState('');
   const [errorMessage, setErrorMessage] = React.useState('');
-  const { stake, isProcessing, statusCode, errorCode, lastError, unstake, sourceTxId } =
-    useStake(tabType);
+  const {
+    stake,
+    isProcessing,
+    statusCode,
+    errorCode,
+    lastError,
+    unstake,
+    sourceTxId,
+  } = useStake(tabType);
   const {
     refreshFlexiblePool,
     refreshLockedPool,
@@ -328,7 +335,7 @@ export const BalanceInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
                       {statusMessage}
                     </Typography>
                   ) : null}
-                  {sourceTxId > '' ? (
+                  {!sourceTxId ? (
                     <div style={{ marginTop: '16px' }}>
                       <ShowTx chainId={CHAIN_ID_SOLANA} txId={sourceTxId} />
                     </div>
@@ -394,7 +401,10 @@ export const BalanceInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
                           ) : null}
                           {sourceTxId > '' ? (
                             <div style={{ marginTop: '16px' }}>
-                              <ShowTx chainId={CHAIN_ID_SOLANA} txId={sourceTxId} />
+                              <ShowTx
+                                chainId={CHAIN_ID_SOLANA}
+                                txId={sourceTxId}
+                              />
                             </div>
                           ) : null}
                           {errorMessage ? (
@@ -524,7 +534,6 @@ export const BalanceInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
                                       >
                                         Unstake
                                       </Button>
-
                                       {new Date() <
                                       new Date(
                                         flexibleStakeListItem.stakeEndDate,

@@ -10,6 +10,7 @@ import {
 import {
   AppBar,
   Container,
+  IconButton,
   Link,
   makeStyles,
   Tab,
@@ -17,9 +18,11 @@ import {
   Toolbar,
 } from '@material-ui/core';
 import { BrowserView, MobileView } from 'react-device-detect';
+import { HelpOutline } from '@material-ui/icons';
 import SolChicksLogo from './icons/chicks.svg';
 import { COLORS, theme } from './muiTheme.js';
 import { FlexiblePoolView } from './pages/FlexiblePoolView';
+import { HelpView } from './pages/HelpView';
 
 const useStyles = makeStyles(() => ({
   appBar: {
@@ -109,6 +112,15 @@ function App() {
               className={classes.solChicksIcon}
             />
           </Link>
+          <div style={{ marginLeft: 'auto' }}>
+            <IconButton
+              href="/help"
+              rel="noopener noreferrer"
+              size="small"
+            >
+              <HelpOutline />
+            </IconButton>
+          </div>
         </Toolbar>
       </AppBar>
       <BrowserView>
@@ -121,12 +133,14 @@ function App() {
               indicatorColor="primary"
             >
               <Tab className={classes.tab} label="Flexible Pool" value="/" />
+              <Tab className={classes.tab} label="Help" value="/help" />
             </Tabs>
           </Container>
         </div>
         <Routes>
           <Route path="" element={<FlexiblePoolView />} />
           <Route path="*" element={<FlexiblePoolView />} />
+          <Route path="help" element={<HelpView />} />
         </Routes>
         <div className={classes.spacer} />
       </BrowserView>

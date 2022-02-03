@@ -110,7 +110,7 @@ export const StakePoolProvider = ({
         }
       );
       
-      returnVal = (Number(splBalance.value[0].account.data.parsed.info.tokenAmount.uiAmountString) / 1).toString();
+      returnVal = splBalance.value[0].account.data.parsed.info.tokenAmount.uiAmountString;
     }
 
     ConsoleHelper(returnVal);

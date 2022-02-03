@@ -23,11 +23,6 @@ const LOCKED_PROGRAM_IDL =
 export const SOLCHICK_STAKING_FLEXIBLE_PROGRAM_IDL = FLEXIBLE_PROGRAM_IDL;
 export const SOLCHICK_STAKING_LOCKED_PROGRAM_IDL = LOCKED_PROGRAM_IDL;
 
-export enum SOLCHICK_BALANCE_TAB_STATE {
-  STAKE = 'stake',
-  UNSTAKE = 'unstake',
-}
-
 export interface IStakeBalance {
   chicksAmount: string;
   xChicksAmount: string;

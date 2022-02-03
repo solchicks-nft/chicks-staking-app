@@ -22,7 +22,6 @@ import { PublicKey } from '@solana/web3.js';
 import Moment from 'react-moment';
 import NumberFormat from 'react-number-format';
 import { useStyles } from '../pages/useStyles';
-import { SOLCHICK_BALANCE_TAB_STATE } from '../utils/solchickConsts';
 import ButtonWithLoader from './ButtonWithLoader';
 import ConsoleHelper from '../utils/consoleHelper';
 import SolanaWalletKey from './SolanaWalletKey';
@@ -31,7 +30,7 @@ import { useStakePool } from '../contexts/StakePoolContext';
 import {
   StakeErrorCode,
   StakeMode,
-  StakeStatusCode,
+  StakeStatusCode, StakeStepMode,
 } from '../utils/stakeHelper';
 import { useSolanaWallet } from '../contexts/SolanaWalletContext';
 import { isAddress } from '../utils/solanaHelper';
@@ -40,21 +39,22 @@ import ShowTxButton from './ShowTxButton';
 import ShowTx from './ShowTx';
 
 export const BalanceInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
-  const [tab, setTab] = useState(SOLCHICK_BALANCE_TAB_STATE.STAKE);
+  const [tab, setTab] = useState(StakeStepMode.STAKE);
   const [inputVal, setInput] = useState('');
   const classes = useStyles();
   const wallet = useSolanaWallet();
+  const [currentHandle, setCurrentHandle] = React.useState('');
   const [successMessage, setSuccessMessage] = React.useState('');
   const [errorMessage, setErrorMessage] = React.useState('');
   const {
     stake,
+    unstake,
     isProcessing,
     statusCode,
     errorCode,
     lastError,
-    unstake,
     sourceTxId,
-  } = useStake(tabType);
+  } = useStake(tabType, tab);
   const {
     refreshFlexiblePool,
     refreshLockedPool,
@@ -78,6 +78,8 @@ export const BalanceInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
   const statusMessage = useMemo(() => {
     if (isProcessing || statusCode !== StakeStatusCode.FAILED) {
       switch (statusCode) {
+        case StakeStatusCode.NONE:
+          return '';
         case StakeStatusCode.START:
           return 'Start';
         case StakeStatusCode.TOKEN_AMOUNT_CHECKING:
@@ -89,7 +91,7 @@ export const BalanceInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
         case StakeStatusCode.SUCCESS:
           return 'Success';
         default:
-          return '';
+          return 'Unknown';
       }
     } else {
       switch (errorCode) {
@@ -149,6 +151,7 @@ export const BalanceInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
       xAmount.toString().length > 0 &&
       handle.length > 0
     ) {
+      setCurrentHandle(handle);
       unstake(xAmount.toString(), handle);
     } else {
       setErrorMessage('handleUnstakeButtonClick -> invalid input');
@@ -255,12 +258,12 @@ export const BalanceInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
             <Tab
               className={classes.tab}
               label="STAKE"
-              value={SOLCHICK_BALANCE_TAB_STATE.STAKE}
+              value={StakeStepMode.STAKE}
             />
             <Tab
               className={classes.tab}
               label="UNSTAKE"
-              value={SOLCHICK_BALANCE_TAB_STATE.UNSTAKE}
+              value={StakeStepMode.UNSTAKE}
               disabled={isProcessing}
             />
           </Tabs>
@@ -268,17 +271,17 @@ export const BalanceInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
             className={classes.tabContainer}
             style={{
               justifyContent:
-                tab === SOLCHICK_BALANCE_TAB_STATE.STAKE ? 'center' : '',
+                tab === StakeStepMode.STAKE ? 'center' : '',
             }}
           >
             <div
               className={classes.childTabContainer}
               style={{
                 width:
-                  tab === SOLCHICK_BALANCE_TAB_STATE.STAKE ? '50%' : '100%',
+                  tab === StakeStepMode.STAKE ? '50%' : '100%',
               }}
             >
-              {tab === SOLCHICK_BALANCE_TAB_STATE.STAKE ? (
+              {tab === StakeStepMode.STAKE ? (
                 <>
                   <div className={classes.stakeBalanceTab}>
                     <div className={classes.amount}>
@@ -326,7 +329,7 @@ export const BalanceInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
                     </ButtonWithLoader>
                   </div>
                   <SolanaWalletKey />
-                  {!errorMessage && statusMessage && successMessage ? (
+                  {!errorMessage && statusMessage ? (
                     <Typography
                       variant="body2"
                       color="primary"
@@ -351,7 +354,7 @@ export const BalanceInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
                   ) : null}
                 </>
               ) : null}
-              {tab === SOLCHICK_BALANCE_TAB_STATE.UNSTAKE ? (
+              {tab === StakeStepMode.UNSTAKE ? (
                 <div
                   style={{
                     paddingTop: '1.5rem',
@@ -391,32 +394,6 @@ export const BalanceInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
                           }}
                         >
                           <SolanaWalletKey />
-                          {!errorMessage && statusMessage && successMessage ? (
-                            <Typography
-                              variant="body2"
-                              color="primary"
-                              className={classes.statusMessage}
-                            >
-                              {statusMessage}
-                            </Typography>
-                          ) : null}
-                          {sourceTxId > '' ? (
-                            <div style={{ marginTop: '16px' }}>
-                              <ShowTx
-                                chainId={CHAIN_ID_SOLANA}
-                                txId={sourceTxId}
-                              />
-                            </div>
-                          ) : null}
-                          {errorMessage ? (
-                            <Typography
-                              variant="body2"
-                              color="error"
-                              className={classes.statusMessage}
-                            >
-                              {errorMessage}
-                            </Typography>
-                          ) : null}
                         </div>
                       </div>
                       <TableContainer>
@@ -530,7 +507,7 @@ export const BalanceInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
                                         disabled={
                                           !isAddress(
                                             solanaAddress as PublicKey | string,
-                                          ) || isProcessing
+                                          ) || isProcessing || sourceTxId > ''
                                         }
                                       >
                                         Unstake
@@ -550,6 +527,40 @@ export const BalanceInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
                                       ) : null}
                                     </>
                                   ) : null}
+                                  {currentHandle === flexibleStakeListItem.handle? <>
+                                  {!flexibleStakeListItem.unstakeTxHash && !errorMessage && statusMessage ? (
+                                      <Typography
+                                          variant="body2"
+                                          color="primary"
+                                          className={classes.statusMessage}
+                                      >
+                                        {statusMessage}
+                                      </Typography>
+                                  ) : null}
+                                  {!flexibleStakeListItem.unstakeTxHash && sourceTxId > '' ? (
+                                      <div style={{ marginTop: '16px' }}>
+                                        {sourceTxId.substring(
+                                            0,
+                                            10,
+                                        )}
+                                        {sourceTxId.length >=
+                                            10 && `...`}
+                                        <ShowTxButton
+                                            chainId={CHAIN_ID_SOLANA}
+                                            txId={sourceTxId}
+                                        />
+                                      </div>
+                                  ) : null}
+                                  {errorMessage ? (
+                                      <Typography
+                                          variant="body2"
+                                          color="error"
+                                          className={classes.statusMessage}
+                                      >
+                                        {errorMessage}
+                                      </Typography>
+                                  ) : null}
+                                </>:null}
                                 </TableCell>
                               </TableRow>
                             ))}

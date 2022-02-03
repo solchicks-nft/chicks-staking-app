@@ -26,7 +26,7 @@ export default function ShowTx({
   const explorerName = getExplorerName(chainId);
 
   return (
-    <div className={classes.tx}>
+    <div className={classes.tx} style={{textAlign: 'center'}}>
       <Typography noWrap component="div" variant="body2">
         {txId}
       </Typography>

@@ -6,6 +6,9 @@ import ConsoleHelper from './consoleHelper';
 import { getSolChicksAssociatedAddress } from './solchickHelper';
 import { pubkeyToString } from './solanaHelper';
 
+export const STATUS_STAKED = 0;
+export const STATUS_CLAIMED = 2;
+
 export enum StakeMode {
   FLEXIBLE = 'flexible',
   LOCKED = 'locked',

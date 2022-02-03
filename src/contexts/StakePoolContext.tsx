@@ -34,6 +34,7 @@ import {
 } from '../utils/solchickConsts';
 import { useSolanaWallet } from './SolanaWalletContext';
 import { SOLANA_HOST } from '../utils/consts';
+import {STATUS_STAKED} from "../utils/stakeHelper";
 
 interface IStakePoolContext {
   refreshLockedPool(): void;
@@ -113,7 +114,7 @@ export const StakePoolProvider = ({
         [Buffer.from(anchor.utils.bytes.utf8.encode('staking'))],
         program.programId,
       );
-    ConsoleHelper(`refreshLockedPool -> stakingPubkey: ${stakingBump}`);
+    ConsoleHelper(`refreshLockedPool -> stakingPubkey: ${stakingPubkey.toString()}`);
     ConsoleHelper(`refreshLockedPool -> stakingBump: ${stakingBump}`);
     const stakingAccount = await program.account.stakingAccount.fetch(
       stakingPubkey,
@@ -124,7 +125,7 @@ export const StakePoolProvider = ({
         [tokenMintPubkey.toBuffer()],
         program.programId,
       );
-    ConsoleHelper(`refreshLockedPool -> vaultPubkey: ${vaultPubkey}`);
+    ConsoleHelper(`refreshLockedPool -> vaultPubkey: ${vaultPubkey.toString()}`);
     ConsoleHelper(`refreshLockedPool -> vaultBump: ${vaultBump}`);
 
     if (stakingAccount) {
@@ -207,7 +208,7 @@ export const StakePoolProvider = ({
     const stakingAccount = await program.account.stakingAccount.fetch(
       stakingPubkey,
     );
-    ConsoleHelper(`refreshFlexiblePool -> stakingPubkey: ${stakingBump}`);
+    ConsoleHelper(`refreshFlexiblePool -> stakingPubkey: ${stakingPubkey.toString()}`);
     ConsoleHelper(`refreshFlexiblePool -> stakingBump: ${stakingBump}`);
 
     const [vaultPubkey, vaultBump] =
@@ -215,7 +216,7 @@ export const StakePoolProvider = ({
         [tokenMintPubkey.toBuffer()],
         program.programId,
       );
-    ConsoleHelper(`refreshFlexiblePool -> vaultPubkey: ${vaultPubkey}`);
+    ConsoleHelper(`refreshFlexiblePool -> vaultPubkey: ${vaultPubkey.toString()}`);
     ConsoleHelper(`refreshFlexiblePool -> vaultBump: ${vaultBump}`);
 
     if (stakingAccount) {
@@ -254,10 +255,12 @@ export const StakePoolProvider = ({
               item.amount.toString(),
               SOLCHICK_DECIMALS_ON_SOL,
             );
-            userTotalChicks = userTotalChicks.add(amount);
-            userTotalXChicks = userTotalXChicks.add(
-              BigNumber.from(item.x_token),
-            );
+            if (item.status === STATUS_STAKED) {
+              userTotalChicks = userTotalChicks.add(amount);
+              userTotalXChicks = userTotalXChicks.add(
+                BigNumber.from(item.x_token),
+              );
+            }
             stakeList.push({
               chicksAmount: amount.toString(),
               xChicksAmount: item.x_token,

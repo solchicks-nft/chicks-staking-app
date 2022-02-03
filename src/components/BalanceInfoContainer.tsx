@@ -30,7 +30,8 @@ import { useStakePool } from '../contexts/StakePoolContext';
 import {
   StakeErrorCode,
   StakeMode,
-  StakeStatusCode, StakeStepMode,
+  StakeStatusCode,
+  StakeStepMode,
 } from '../utils/stakeHelper';
 import { useSolanaWallet } from '../contexts/SolanaWalletContext';
 import { isAddress } from '../utils/solanaHelper';
@@ -62,7 +63,7 @@ export const BalanceInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
     flexibleStakeList,
     flexibleUserInfo,
     lockedUserInfo,
-    tokenBalance
+    tokenBalance,
   } = useStakePool();
   const { publicKey: solanaAddress } = useSolanaWallet();
 
@@ -131,7 +132,7 @@ export const BalanceInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
     setInput(tokenBalance);
   }, [tokenBalance]);
 
-  const handleMaxButtonClick = async() => {
+  const handleMaxButtonClick = async () => {
     if (wallet.connected) {
       getBalance();
     } else {
@@ -273,15 +274,13 @@ export const BalanceInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
           <div
             className={classes.tabContainer}
             style={{
-              justifyContent:
-                tab === StakeStepMode.STAKE ? 'center' : '',
+              justifyContent: tab === StakeStepMode.STAKE ? 'center' : '',
             }}
           >
             <div
               className={classes.childTabContainer}
               style={{
-                width:
-                  tab === StakeStepMode.STAKE ? '50%' : '100%',
+                width: tab === StakeStepMode.STAKE ? '50%' : '100%',
               }}
             >
               {tab === StakeStepMode.STAKE ? (
@@ -510,7 +509,9 @@ export const BalanceInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
                                         disabled={
                                           !isAddress(
                                             solanaAddress as PublicKey | string,
-                                          ) || isProcessing || sourceTxId > ''
+                                          ) ||
+                                          isProcessing ||
+                                          sourceTxId > ''
                                         }
                                       >
                                         Unstake
@@ -530,40 +531,42 @@ export const BalanceInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
                                       ) : null}
                                     </>
                                   ) : null}
-                                  {currentHandle === flexibleStakeListItem.handle? <>
-                                  {!flexibleStakeListItem.unstakeTxHash && !errorMessage && statusMessage ? (
-                                      <Typography
+                                  {currentHandle ===
+                                  flexibleStakeListItem.handle ? (
+                                    <>
+                                      {!flexibleStakeListItem.unstakeTxHash &&
+                                      !errorMessage &&
+                                      statusMessage ? (
+                                        <Typography
                                           variant="body2"
                                           color="primary"
                                           className={classes.statusMessage}
-                                      >
-                                        {statusMessage}
-                                      </Typography>
-                                  ) : null}
-                                  {!flexibleStakeListItem.unstakeTxHash && sourceTxId > '' ? (
-                                      <div style={{ marginTop: '16px' }}>
-                                        {sourceTxId.substring(
-                                            0,
-                                            10,
-                                        )}
-                                        {sourceTxId.length >=
-                                            10 && `...`}
-                                        <ShowTxButton
+                                        >
+                                          {statusMessage}
+                                        </Typography>
+                                      ) : null}
+                                      {!flexibleStakeListItem.unstakeTxHash &&
+                                      sourceTxId > '' ? (
+                                        <div style={{ marginTop: '16px' }}>
+                                          {sourceTxId.substring(0, 10)}
+                                          {sourceTxId.length >= 10 && `...`}
+                                          <ShowTxButton
                                             chainId={CHAIN_ID_SOLANA}
                                             txId={sourceTxId}
-                                        />
-                                      </div>
-                                  ) : null}
-                                  {errorMessage ? (
-                                      <Typography
+                                          />
+                                        </div>
+                                      ) : null}
+                                      {errorMessage ? (
+                                        <Typography
                                           variant="body2"
                                           color="error"
                                           className={classes.statusMessage}
-                                      >
-                                        {errorMessage}
-                                      </Typography>
+                                        >
+                                          {errorMessage}
+                                        </Typography>
+                                      ) : null}
+                                    </>
                                   ) : null}
-                                </>:null}
                                 </TableCell>
                               </TableRow>
                             ))}

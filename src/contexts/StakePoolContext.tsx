@@ -52,7 +52,7 @@ const StackPoolContext = React.createContext<IStakePoolContext>({
   getBalance: () => {},
   refreshLockedPool: () => {},
   refreshFlexiblePool: () => {},
-  tokenBalance: "",
+  tokenBalance: '',
   lockedTotalInfo: undefined,
   lockedUserInfo: undefined,
   flexibleTotalInfo: undefined,
@@ -99,18 +99,19 @@ export const StakePoolProvider = ({
     [],
   );
 
-  const getBalance = useCallback(async() => {
-    let returnVal = "";
-    if(walletPublicKey) {
+  const getBalance = useCallback(async () => {
+    let returnVal = '';
+    if (walletPublicKey) {
       const mintPubkey = new PublicKey(SOLCHICK_TOKEN_MINT_ON_SOL);
       const splBalance = await solanaConnection.getParsedTokenAccountsByOwner(
-        walletPublicKey, 
+        walletPublicKey,
         {
-          mint: mintPubkey
-        }
+          mint: mintPubkey,
+        },
       );
-      
-      returnVal = splBalance.value[0].account.data.parsed.info.tokenAmount.uiAmountString;
+
+      returnVal =
+        splBalance.value[0].account.data.parsed.info.tokenAmount.uiAmountString;
     }
 
     ConsoleHelper(returnVal);
@@ -346,7 +347,7 @@ export const StakePoolProvider = ({
       lockedUserInfo,
       flexibleTotalInfo,
       flexibleUserInfo,
-      flexibleStakeList
+      flexibleStakeList,
     }),
     [
       getBalance,
@@ -357,7 +358,7 @@ export const StakePoolProvider = ({
       lockedUserInfo,
       flexibleTotalInfo,
       flexibleUserInfo,
-      flexibleStakeList
+      flexibleStakeList,
     ],
   );
   return (

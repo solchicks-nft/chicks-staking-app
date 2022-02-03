@@ -134,6 +134,7 @@ export const BalanceInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
   const handleMaxButtonClick = async() => {
     if (wallet.connected) {
       getBalance();
+      setInput(tokenBalance);
     } else {
       setInput('');
     }

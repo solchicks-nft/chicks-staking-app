@@ -88,7 +88,7 @@ export const HelpView = () => {
             <em>n * (xCHICKS_supply / CHICKS_pool_amount)</em>.
           </p>
           <p>
-            When you unstake <em>n CHICKS tokens</em>, you receive an amount of
+            When you unstake <em>n xCHICKS tokens</em>, you receive an amount of
             CHICKS tokens equal to{' '}
             <em>n * (CHICKS_pool_amount / xCHICKS_supply)</em>. Your xCHICKS
             allocation is subsequently destroyed.

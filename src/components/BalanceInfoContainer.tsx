@@ -542,7 +542,7 @@ export const BalanceInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
                                             paddingTop: '0.3rem',
                                           }}
                                         >
-                                          ${UNSTAKE_FEE}% unstake penalty
+                                          {UNSTAKE_FEE}% unstake penalty
                                         </div>
                                       ) : null}
                                     </>

@@ -330,9 +330,7 @@ export const BalanceInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
                       onClick={handleStakeButtonClick}
                       disabled={
                         !isAddress(solanaAddress as PublicKey | string) ||
-                        isProcessing ||
-                        tokenBalance.length === 0 ||
-                        !tokenBalance
+                        isProcessing
                       }
                     >
                       Stake

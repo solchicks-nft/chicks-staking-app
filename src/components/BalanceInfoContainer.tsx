@@ -38,6 +38,7 @@ import { isAddress } from '../utils/solanaHelper';
 import { CHAIN_ID_SOLANA } from '../lib/consts';
 import ShowTxButton from './ShowTxButton';
 import ShowTx from './ShowTx';
+import { UNSTAKE_FEE } from '../utils/consts';
 
 export const BalanceInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
   const [tab, setTab] = useState(StakeStepMode.STAKE);
@@ -543,7 +544,7 @@ export const BalanceInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
                                             paddingTop: '0.3rem',
                                           }}
                                         >
-                                          25% unstake penalty
+                                          ${UNSTAKE_FEE}% unstake penalty
                                         </div>
                                       ) : null}
                                     </>

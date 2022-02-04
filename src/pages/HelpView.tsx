@@ -83,13 +83,15 @@ export const HelpView = () => {
             How do CHICKS and xCHICKS work during staking and unstaking?
           </Typography>
           <p>
-            When you stake n CHICKS tokens, you receive an amount of xCHICKS
-            tokens equal to <em>n * (xCHICKS_supply / CHICKS_pool_amount)</em>.
+            When you stake <em>n CHICKS tokens</em>, you receive an amount of
+            xCHICKS tokens equal to{' '}
+            <em>n * (xCHICKS_supply / CHICKS_pool_amount)</em>.
           </p>
           <p>
-            When you unstake n CHICKS tokens, you receive an amount of CHICKS
-            tokens equal to <em>n * (CHICKS_pool_amount / xCHICKS_supply)</em>.
-            Your xCHICKS allocation is subsequently destroyed.
+            When you unstake <em>n xCHICKS tokens</em>, you receive an amount of
+            CHICKS tokens equal to{' '}
+            <em>n * (CHICKS_pool_amount / xCHICKS_supply)</em>. Your xCHICKS
+            allocation is subsequently destroyed.
           </p>
           <p>
             For example, let’s say you decide to stake 1k CHICKS tokens when the

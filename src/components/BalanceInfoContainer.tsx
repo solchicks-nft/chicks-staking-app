@@ -311,8 +311,7 @@ export const BalanceInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
                           disableunderline: 'true',
                         }}
                         disabled={
-                          !isAddress(solanaAddress as PublicKey | string) ||
-                          tokenBalance.length === 0
+                          !isAddress(solanaAddress as PublicKey | string)
                         }
                       />
                     </div>
@@ -330,7 +329,9 @@ export const BalanceInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
                       onClick={handleStakeButtonClick}
                       disabled={
                         !isAddress(solanaAddress as PublicKey | string) ||
-                        isProcessing
+                        isProcessing ||
+                        tokenBalance.length === 0 ||
+                        !tokenBalance
                       }
                     >
                       Stake

@@ -13,9 +13,9 @@ export const HelpView = () => {
           <Typography variant="h6">How do I start staking?</Typography>
           <p>
             To start staking, you will initially need some CHICKS tokens and a
-            compatible wallet such as Solana and Solflare. You will also need to
-            have some Solana (SOL) in your wallet to cover the transaction fees.
-            The amount needed is 0.1 SOL.
+            compatible wallet such as Phantom and Solflare. You will also need
+            to have some Solana (SOL) in your wallet to cover the transaction
+            fees. The amount needed is 0.1 SOL.
           </p>
           <p>
             Once you have everything in place, log onto our staking application
@@ -26,10 +26,10 @@ export const HelpView = () => {
             tokens or a minimum of 2000 CHICKS with 1000 CHICKS increments.
           </p>
           <p>
-            Once you click on <strong>Stake</strong> , you will have to confirm
+            Once you click on <strong>Stake</strong>, you will have to confirm
             the transaction in your wallet as below. It is the same process when
-            you <strong>Unstake</strong> to collect your CHICKS. After the
-            approval, the amount you staked will be displayed in the{' '}
+            you click on <strong>Unstake</strong> to collect your CHICKS. After
+            the approval, the amount you staked will be displayed in the{' '}
             <strong>My Balance</strong> section.
           </p>
           <br />
@@ -67,9 +67,7 @@ export const HelpView = () => {
             starts sending yield rewards to the pool, the total CHICKS increases
             while the amount of xCHICKS stay the same. This means that xCHICKS
             appreciated in value, compared to CHICKS, which translates to more
-            CHICKS tokens when you unstake. However, this means if you were to
-            stake at a later date, then there is a chance that you would receive
-            less xCHICKS.
+            CHICKS tokens when you unstake.
           </p>
           <p>
             The value of xCHICKS is calculated by taking the total amount of

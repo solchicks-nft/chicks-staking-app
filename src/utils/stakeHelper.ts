@@ -122,7 +122,7 @@ export const isEnoughTokenOnSolana = async (
   return true;
 };
 
-export const calcAPR = (chicks: number, xChicks: number) => {
+export const calcuateFlexibleTotalAPR = (chicks: number, xChicks: number) => {
   if (xChicks < 1) {
     return 0;
   }

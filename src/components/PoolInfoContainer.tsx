@@ -2,11 +2,24 @@ import React from 'react';
 import NumberFormat from 'react-number-format';
 import { useStyles } from '../pages/useStyles';
 import { useStakePool } from '../contexts/StakePoolContext';
-import {calcAPR, StakeMode} from '../utils/stakeHelper';
+import { StakeMode } from '../utils/stakeHelper';
 
 export const PoolInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
   const classes = useStyles();
   const { flexibleTotalInfo, lockedTotalInfo } = useStakePool();
+  const getFlexibleTotalAPR = () => {
+    let flexibleTotalApr = 0;
+    if (flexibleTotalInfo && flexibleTotalInfo.chicksAmount) {
+      flexibleTotalApr =
+        ((((flexibleTotalInfo.chicksAmount as unknown as number) /
+          (flexibleTotalInfo.xChicksAmount as unknown as number)) *
+          100 -
+          100) *
+          365) /
+        56;
+    }
+    return flexibleTotalApr && flexibleTotalApr > 0 ? flexibleTotalApr : 0;
+  };
 
   return (
     <div className={classes.card}>
@@ -66,10 +79,7 @@ export const PoolInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
               flexibleTotalInfo && flexibleTotalInfo.chicksAmount.length > 0 ? (
                 <>
                   <NumberFormat
-                    value={calcAPR(
-                        (flexibleTotalInfo.chicksAmount as unknown as number),
-                        (flexibleTotalInfo.xChicksAmount as unknown as number))
-                    }
+                    value={getFlexibleTotalAPR()}
                     displayType="text"
                     thousandSeparator
                     decimalScale={1}

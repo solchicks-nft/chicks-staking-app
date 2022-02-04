@@ -150,6 +150,10 @@ export const BalanceInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
     }
   };
 
+  const handleClearButtonClick = () => {
+    setInput('');
+  };
+
   const handleUnstakeButtonClick = (xAmount: string, handle = ''): void => {
     if (
       wallet.connected &&
@@ -298,7 +302,7 @@ export const BalanceInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
                           maxLength: 100,
                           step:
                             process.env.REACT_APP_CLUSTER === 'mainnet'
-                              ? 1000
+                              ? 2000
                               : 2,
                           min:
                             process.env.REACT_APP_CLUSTER === 'mainnet'
@@ -307,7 +311,8 @@ export const BalanceInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
                           disableunderline: 'true',
                         }}
                         disabled={
-                          !isAddress(solanaAddress as PublicKey | string)
+                          !isAddress(solanaAddress as PublicKey | string) ||
+                          tokenBalance.length === 0
                         }
                       />
                     </div>
@@ -329,6 +334,16 @@ export const BalanceInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
                       }
                     >
                       Stake
+                    </ButtonWithLoader>
+                    <div style={{ paddingLeft: '7px' }} />
+                    <ButtonWithLoader
+                      onClick={handleClearButtonClick}
+                      disabled={
+                        !isAddress(solanaAddress as PublicKey | string) ||
+                        isProcessing
+                      }
+                    >
+                      Reset
                     </ButtonWithLoader>
                   </div>
                   <SolanaWalletKey />

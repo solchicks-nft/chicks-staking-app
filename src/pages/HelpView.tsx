@@ -12,24 +12,24 @@ export const HelpView = () => {
         <div style={{ padding: '2rem' }}>
           <Typography variant="h6">How do I start staking?</Typography>
           <p>
-            To start staking, you will need some CHICKS tokens and a
-            compatible wallet such as Solana and Solflare. You will also need to
-            have some Solana (SOL) in your wallet to cover the transaction fees.
-            The recommended amount is 0.1 SOL.
+            To start staking, you will need some CHICKS tokens and a compatible
+            wallet such as Phantom and Solflare. You will also need to have some
+            Solana (SOL) in your wallet to cover the transaction fees. The
+            recommended amount is 0.1 SOL.
           </p>
           <p>
             Once you have everything in place, log onto our staking application
             at <strong>https://staking.solchicks.io/</strong> and connect your
-            wallet. You’ll see your CHICKS token balance in your wallet in the
-            {' '}<strong>My Balance</strong> section and can now decide how many of
+            wallet. You’ll see your CHICKS token balance in your wallet in the{' '}
+            <strong>My Balance</strong> section and can now decide how many of
             those you want to stake. You have the option of staking all of your
-            tokens or a minimum of 2000 CHICKS with 1000 CHICKS increments.
+            tokens or a minimum of 2000 CHICKS.
           </p>
           <p>
             Once you click on <strong>Stake</strong>, you will have to confirm
-            the transaction in your wallet as below. You can also click on
-            <strong>Unstake</strong> to collect your CHICKS. After approving the
-            transaction, the amount you staked will be displayed in the{' '}
+            the transaction in your wallet. It is the same process when you
+            click on <strong>Unstake</strong> to collect your CHICKS. After the
+            approval, the amount you staked will be displayed in the{' '}
             <strong>My Balance</strong> section.
           </p>
           <br />
@@ -67,9 +67,7 @@ export const HelpView = () => {
             starts sending yield rewards to the pool, the total CHICKS increases
             while the amount of xCHICKS stay the same. This means that xCHICKS
             appreciated in value, compared to CHICKS, which translates to more
-            CHICKS tokens when you unstake. However, this means if you were to
-            stake at a later date, then there is a chance that you would receive
-            less xCHICKS.
+            CHICKS tokens when you unstake.
           </p>
           <p>
             The value of xCHICKS is calculated by taking the total amount of
@@ -107,9 +105,9 @@ export const HelpView = () => {
           <br />
           <Typography variant="h6">Why does the APR keep changing?</Typography>
           <p>
-            The amount staked in the pool is not always constant as with the
-            abovementioned examples. People are staking or unstaking over time.
-            This is why you will see the APR change regularly.
+            Please note that amount staked in the pool is not always constant as
+            with the abovementioned examples. People are staking or unstaking
+            over time. This is why you will see the APR change regularly.
           </p>
         </div>
       </Card>

@@ -2,7 +2,7 @@ import React from 'react';
 import NumberFormat from 'react-number-format';
 import { useStyles } from '../pages/useStyles';
 import { useStakePool } from '../contexts/StakePoolContext';
-import { StakeMode } from '../utils/stakeHelper';
+import { calcuateFlexibleTotalAPR, StakeMode } from '../utils/stakeHelper';
 
 export const PoolInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
   const classes = useStyles();
@@ -10,13 +10,10 @@ export const PoolInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
   const getFlexibleTotalAPR = () => {
     let flexibleTotalApr = 0;
     if (flexibleTotalInfo && flexibleTotalInfo.chicksAmount) {
-      flexibleTotalApr =
-        ((((flexibleTotalInfo.chicksAmount as unknown as number) /
-          (flexibleTotalInfo.xChicksAmount as unknown as number)) *
-          100 -
-          100) *
-          365) /
-        56;
+      flexibleTotalApr = calcuateFlexibleTotalAPR(
+        flexibleTotalInfo.chicksAmount as unknown as number,
+        flexibleTotalInfo.xChicksAmount as unknown as number,
+      );
     }
     return flexibleTotalApr && flexibleTotalApr > 0 ? flexibleTotalApr : 0;
   };

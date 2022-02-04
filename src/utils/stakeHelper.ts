@@ -9,6 +9,8 @@ import { pubkeyToString } from './solanaHelper';
 export const STATUS_STAKED = 0;
 export const STATUS_CLAIMED = 2;
 
+const LOCKED_PERIOD_DAYS = 56; // 8 weeks
+
 export enum StakeMode {
   FLEXIBLE = 'flexible',
   LOCKED = 'locked',
@@ -119,3 +121,10 @@ export const isEnoughTokenOnSolana = async (
   }
   return true;
 };
+
+export const calcuateFlexibleTotalAPR = (chicks: number, xChicks: number) => {
+  if (xChicks < 1) {
+    return 0;
+  }
+  return (((chicks / xChicks) * 100 - 100) * 365) / LOCKED_PERIOD_DAYS;
+}

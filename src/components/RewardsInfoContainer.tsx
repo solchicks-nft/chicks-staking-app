@@ -1,8 +1,7 @@
 import React from 'react';
 import { useStyles } from '../pages/useStyles';
-import { StakeMode } from '../utils/stakeHelper';
 
-export const RewardsInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
+export const RewardsInfoContainer = () => {
   const classes = useStyles();
 
   return (

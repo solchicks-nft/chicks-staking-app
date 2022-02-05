@@ -22,8 +22,11 @@ export const PoolInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
     <div className={classes.card}>
       <div className={classes.header}>POOL INFO</div>
       <div className={classes.content}>
-        <div className={classes.mainContent}>
-          <div className={classes.contentHeading}>Total CHICKS Staked</div>
+        <div
+          className={classes.mainContent}
+          style={{ width: tabType === StakeMode.FLEXIBLE ? '33%' : '50%' }}
+        >
+          <div className={classes.contentHeading}>Total CHICKS</div>
           <div className={classes.contentText}>
             {tabType === StakeMode.FLEXIBLE ? (
               flexibleTotalInfo && flexibleTotalInfo.chicksAmount.length > 0 ? (
@@ -69,7 +72,40 @@ export const PoolInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
             ) : null}
           </div>
         </div>
-        <div className={classes.mainContent}>
+        {tabType === StakeMode.FLEXIBLE ? (
+          <div
+            className={classes.mainContent}
+            style={{ width: tabType === StakeMode.FLEXIBLE ? '33%' : '50%' }}
+          >
+            <div className={classes.contentHeading}>Total xCHICKS</div>
+            <div className={classes.contentText}>
+              {flexibleTotalInfo &&
+              flexibleTotalInfo.xChicksAmount.length > 0 ? (
+                <>
+                  <NumberFormat
+                    value={flexibleTotalInfo.xChicksAmount}
+                    displayType="text"
+                    thousandSeparator
+                    decimalScale={1}
+                    fixedDecimalScale
+                  />
+                </>
+              ) : (
+                <NumberFormat
+                  value={0}
+                  displayType="text"
+                  thousandSeparator
+                  decimalScale={1}
+                  fixedDecimalScale
+                />
+              )}
+            </div>
+          </div>
+        ) : null}
+        <div
+          className={classes.mainContent}
+          style={{ width: tabType === StakeMode.FLEXIBLE ? '33%' : '50%' }}
+        >
           <div className={classes.contentHeading}>Est. APR</div>
           <div className={classes.contentText}>
             {tabType === StakeMode.FLEXIBLE ? (

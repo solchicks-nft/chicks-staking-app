@@ -10,7 +10,6 @@ import {
 import {
   AppBar,
   Container,
-  IconButton,
   Link,
   makeStyles,
   Tab,
@@ -18,7 +17,6 @@ import {
   Toolbar,
 } from '@material-ui/core';
 import { BrowserView, MobileView } from 'react-device-detect';
-import { HelpOutline } from '@material-ui/icons';
 import SolChicksLogo from './icons/chicks.svg';
 import { COLORS, theme } from './muiTheme.js';
 import { FlexiblePoolView } from './pages/FlexiblePoolView';
@@ -112,15 +110,6 @@ function App() {
               className={classes.solChicksIcon}
             />
           </Link>
-          <div style={{ marginLeft: 'auto' }}>
-            <IconButton
-              href="/help"
-              rel="noopener noreferrer"
-              size="small"
-            >
-              <HelpOutline />
-            </IconButton>
-          </div>
         </Toolbar>
       </AppBar>
       <BrowserView>

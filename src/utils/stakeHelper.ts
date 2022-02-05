@@ -9,7 +9,7 @@ import { pubkeyToString } from './solanaHelper';
 export const STATUS_STAKED = 0;
 export const STATUS_CLAIMED = 2;
 
-const LOCKED_PERIOD_DAYS = 84; // 12 weeks
+const LOCKED_PERIOD_DAYS = 56; // 8 weeks
 
 export enum StakeMode {
   FLEXIBLE = 'flexible',

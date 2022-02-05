@@ -38,7 +38,7 @@ import { isAddress } from '../utils/solanaHelper';
 import { CHAIN_ID_SOLANA } from '../lib/consts';
 import ShowTxButton from './ShowTxButton';
 import ShowTx from './ShowTx';
-import { UNSTAKE_FEE } from '../utils/consts';
+import { FLEX_UNSTAKE_ACTIVE, UNSTAKE_FEE } from '../utils/consts';
 
 export const BalanceInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
   const [tab, setTab] = useState(StakeStepMode.STAKE);
@@ -527,6 +527,7 @@ export const BalanceInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
                                             solanaAddress as PublicKey | string,
                                           ) ||
                                           isProcessing ||
+                                          !FLEX_UNSTAKE_ACTIVE ||
                                           sourceTxId > ''
                                         }
                                       >
@@ -542,7 +543,9 @@ export const BalanceInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
                                             paddingTop: '0.3rem',
                                           }}
                                         >
-                                          {UNSTAKE_FEE}% unstake penalty
+                                          {FLEX_UNSTAKE_ACTIVE
+                                            ? `${UNSTAKE_FEE}% unstake penalty`
+                                            : 'Unstaking paused'}
                                         </div>
                                       ) : null}
                                     </>

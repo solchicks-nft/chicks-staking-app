@@ -2,11 +2,20 @@ import React from 'react';
 import NumberFormat from 'react-number-format';
 import { useStyles } from '../pages/useStyles';
 import { useStakePool } from '../contexts/StakePoolContext';
-import { StakeMode } from '../utils/stakeHelper';
+import { calculateFlexibleTotalAPR, StakeMode } from '../utils/stakeHelper';
 
 export const PoolInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
   const classes = useStyles();
   const { flexibleTotalInfo, lockedTotalInfo } = useStakePool();
+  const getFlexibleTotalAPR = () => {
+    let flexibleTotalApr = 0;
+    if (flexibleTotalInfo && flexibleTotalInfo.chicksAmount) {
+      flexibleTotalApr = calculateFlexibleTotalAPR(
+        flexibleTotalInfo.chicksAmount as unknown as number,
+      );
+    }
+    return flexibleTotalApr && flexibleTotalApr > 0 ? flexibleTotalApr : 0;
+  };
 
   return (
     <div className={classes.card}>
@@ -102,7 +111,7 @@ export const PoolInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
               flexibleTotalInfo && flexibleTotalInfo.chicksAmount.length > 0 ? (
                 <>
                   <NumberFormat
-                    value={60}
+                    value={getFlexibleTotalAPR()}
                     displayType="text"
                     thousandSeparator
                     decimalScale={1}

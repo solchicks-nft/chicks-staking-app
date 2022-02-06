@@ -176,4 +176,4 @@ export const getExplorerAddress = (chainId: ChainId, txId: string) => {
 
 export const UNSTAKE_FEE = 20;
 export const FLEX_UNLOCK_WEEKS = 8;
-export const FLEX_UNSTAKE_ACTIVE = false;
+export const FLEX_UNSTAKE_ACTIVE = true;

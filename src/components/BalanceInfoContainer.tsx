@@ -450,24 +450,29 @@ export const BalanceInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
                                         {flexibleStakeListItem.stakeEndDate}
                                       </Moment>
                                       <br />
-                                      <Moment
-                                        duration={
-                                          flexibleStakeListItem.stakeStartDate
-                                        }
-                                        date={
-                                          flexibleStakeListItem.stakeEndDate
-                                        }
-                                        format="d"
-                                      />{' '}
-                                      {new Date() >=
+                                      {new Date() <
                                       new Date(
                                         flexibleStakeListItem.stakeEndDate,
-                                      )
-                                        ? 'days to go'
-                                        : 'days to go'}
+                                      ) ? (
+                                        <>
+                                          <Moment
+                                            duration={
+                                              flexibleStakeListItem.stakeStartDate
+                                            }
+                                            date={
+                                              flexibleStakeListItem.stakeEndDate
+                                            }
+                                            format="d"
+                                          />{' '}
+                                          days to go
+                                        </>
+                                      ) : (
+                                        ''
+                                      )}
                                     </>
                                   ) : null}
-                                  {flexibleStakeListItem.stakeClaimDate ? (
+                                  {flexibleStakeListItem.stakeClaimDate &&
+                                  flexibleStakeListItem.unstakeTxHash ? (
                                     <>
                                       Unstaked on{' '}
                                       <Moment format="YYYY-MM-DD">

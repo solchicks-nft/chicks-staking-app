@@ -457,7 +457,7 @@ export const BalanceInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
                                         <>
                                           <Moment
                                             duration={
-                                              flexibleStakeListItem.stakeStartDate
+                                              new Date()
                                             }
                                             date={
                                               flexibleStakeListItem.stakeEndDate

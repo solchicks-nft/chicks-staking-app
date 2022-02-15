@@ -36,11 +36,11 @@ import {
 import { getSolChicksAssociatedAddress } from '../utils/solchickHelper';
 import ConsoleHelper from '../utils/consoleHelper';
 import {
-  createStakeStatus,
+  createStakeStatus, getPoolHandle,
   getServerInfo,
   isEnoughTokenOnSolana,
   IStakeStatus,
-  StakeErrorCode,
+  StakeErrorCode, StakeLockedKind,
   StakeMode,
   StakeStatusCode,
   StakeStepMode,
@@ -48,13 +48,14 @@ import {
 import { sleep } from '../utils/helper';
 import { useStakePool } from '../contexts/StakePoolContext';
 
-function useStake(mode: StakeMode, tab: StakeStepMode): IStakeStatus {
+function useStake(mode: StakeMode, tab: StakeStepMode, pool: StakeLockedKind | null = null): IStakeStatus {
   const [isProcessing, setIsProcessing] = useState(false);
   const [sourceTxId, setSourceTxId] = useState('');
   const [currentMode, setCurrentMode] = useState<StakeMode>(StakeMode.FLEXIBLE);
   const [currentTab, setCurrentTab] = useState<StakeStepMode>(
     StakeStepMode.STAKE,
   );
+  const [currentPool, setCurrentPool] = useState<StakeLockedKind | null>(null);
   const [statusCode, setStatusCode] = useState(StakeStatusCode.NONE);
   const [errorCode, setErrorCode] = useState(StakeErrorCode.NO_ERROR);
   const [lastError, setLastError] = useState('');
@@ -78,7 +79,12 @@ function useStake(mode: StakeMode, tab: StakeStepMode): IStakeStatus {
       setSourceTxId('');
       setStatusCode(StakeStatusCode.NONE);
     }
-  }, [mode, currentMode, currentTab, tab]);
+    if (pool !== currentPool) {
+      setCurrentPool(pool);
+      setSourceTxId('');
+      setStatusCode(StakeStatusCode.NONE);
+    }
+  }, [mode, currentMode, currentTab, tab, pool, currentPool]);
 
   async function getAnchorProvider() {
     const opts = {
@@ -140,6 +146,7 @@ function useStake(mode: StakeMode, tab: StakeStepMode): IStakeStatus {
   }
 
   const submitStakeResult = async (
+    stakePool: StakeLockedKind | null,
     address: string,
     amount: number,
     txId: string,
@@ -149,11 +156,12 @@ function useStake(mode: StakeMode, tab: StakeStepMode): IStakeStatus {
     const url =
       mode === StakeMode.FLEXIBLE
         ? URL_SUBMIT_FLEX_STAKE(address, amount, txId, handle, xTokenAmount)
-        : URL_SUBMIT_LOCKED_STAKE(address, amount, txId, xTokenAmount);
+        : URL_SUBMIT_LOCKED_STAKE(stakePool, address, amount, txId, xTokenAmount);
     processStakeResult(url, txId, StakeStepMode.STAKE);
   };
 
   const submitUnstakeResult = async (
+    stakePool: StakeLockedKind | null,
     address: string,
     txId: string,
     handle: string,
@@ -162,7 +170,7 @@ function useStake(mode: StakeMode, tab: StakeStepMode): IStakeStatus {
     const url =
       mode === StakeMode.FLEXIBLE
         ? URL_SUBMIT_FLEX_UNSTAKE(address, txId, handle, xAmount)
-        : URL_SUBMIT_LOCKED_UNSTAKE(address, txId, xAmount);
+        : URL_SUBMIT_LOCKED_UNSTAKE(stakePool, address, txId, xAmount);
     processStakeResult(url, txId, StakeStepMode.UNSTAKE);
   };
 
@@ -242,16 +250,25 @@ function useStake(mode: StakeMode, tab: StakeStepMode): IStakeStatus {
     }
 
     const tokenMintPubkey = toPublicKey(SOLCHICK_TOKEN_MINT_ON_SOL);
+    const poolHandle = getPoolHandle(pool);
 
     const [vaultPubkey, vaultBump] =
       await anchor.web3.PublicKey.findProgramAddress(
-        [tokenMintPubkey.toBuffer()],
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        mode === StakeMode.FLEXIBLE
+          ? [tokenMintPubkey.toBuffer()]
+          : [tokenMintPubkey.toBuffer(), poolHandle],
         program.programId,
       );
 
     const [stakingPubkey, stakingBump] =
       await anchor.web3.PublicKey.findProgramAddress(
-        [Buffer.from(anchor.utils.bytes.utf8.encode('staking'))],
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        mode === StakeMode.FLEXIBLE
+          ? [Buffer.from(anchor.utils.bytes.utf8.encode('staking'))]
+          : [Buffer.from(anchor.utils.bytes.utf8.encode('staking')), poolHandle],
         program.programId,
       );
 
@@ -290,32 +307,19 @@ function useStake(mode: StakeMode, tab: StakeStepMode): IStakeStatus {
     let xTokenAmountStr;
     let xTokenAmount: BigNumber;
 
-    const accounts =
-      stakeStepMode === StakeStepMode.STAKE
-        ? {
-            accounts: {
-              tokenMint: tokenMintPubkey,
-              tokenFrom: associatedKey,
-              tokenFromAuthority: walletPublicKey,
-              tokenVault: vaultPubkey,
-              stakingAccount: stakingPubkey,
-              userStakingAccount: userStakingPubkey,
-              systemProgram: anchor.web3.SystemProgram.programId,
-              tokenProgram: TOKEN_PROGRAM_ID,
-              rent: anchor.web3.SYSVAR_RENT_PUBKEY,
-            },
-          }
-        : {
-            accounts: {
-              tokenMint: tokenMintPubkey,
-              xTokenFromAuthority: walletPublicKey,
-              tokenVault: vaultPubkey,
-              stakingAccount: stakingPubkey,
-              userStakingAccount: userStakingPubkey,
-              tokenTo: associatedKey,
-              tokenProgram: TOKEN_PROGRAM_ID,
-            },
-          };
+    const accounts = {
+      accounts: {
+        tokenMint: tokenMintPubkey,
+        tokenFrom: associatedKey,
+        tokenFromAuthority: walletPublicKey,
+        tokenVault: vaultPubkey,
+        stakingAccount: stakingPubkey,
+        userStakingAccount: userStakingPubkey,
+        systemProgram: anchor.web3.SystemProgram.programId,
+        tokenProgram: TOKEN_PROGRAM_ID,
+        rent: anchor.web3.SYSVAR_RENT_PUBKEY,
+      },
+    };
 
     let txId;
     try {
@@ -345,16 +349,20 @@ function useStake(mode: StakeMode, tab: StakeStepMode): IStakeStatus {
                 vaultBump,
                 stakingBump,
                 userStakingBump,
+                poolHandle,
+                handle,
                 new anchor.BN(bnStakeAmount as unknown as BN),
                 accounts as unknown as Context,
               )
             : await program.rpc.unstake(
-                vaultBump,
-                stakingBump,
-                userStakingBump,
-                new anchor.BN(xAmount as unknown as BN),
-                accounts as unknown as Context,
-              );
+              vaultBump,
+              stakingBump,
+              userStakingBump,
+              poolHandle,
+              handle,
+              new anchor.BN(xAmount as unknown as BN),
+              accounts as unknown as Context,
+            );
       }
 
       ConsoleHelper(`txId: ${txId}`);
@@ -399,6 +407,7 @@ function useStake(mode: StakeMode, tab: StakeStepMode): IStakeStatus {
     setStatusCode(StakeStatusCode.SUBMITTING);
     if (stakeStepMode === StakeStepMode.STAKE) {
       await submitStakeResult(
+        pool,
         pubkeyToString(walletPublicKey),
         stakeAmount,
         txId,
@@ -407,6 +416,7 @@ function useStake(mode: StakeMode, tab: StakeStepMode): IStakeStatus {
       );
     } else {
       await submitUnstakeResult(
+        pool,
         pubkeyToString(walletPublicKey),
         txId,
         handle,

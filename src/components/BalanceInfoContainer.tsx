@@ -61,9 +61,11 @@ export const BalanceInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
     getBalance,
     refreshFlexiblePool,
     refreshLockedPool,
-    flexibleStakeList,
-    flexibleUserInfo,
-    lockedUserInfo,
+    setStakeMode,
+    setLockedKind,
+    stakeList,
+    userInfo,
+    totalInfo,
     tokenBalance,
   } = useStakePool();
   const { publicKey: solanaAddress } = useSolanaWallet();
@@ -71,12 +73,10 @@ export const BalanceInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
   const handleChange = useCallback(
     (event, value) => {
       setTab(value);
-      refreshFlexiblePool();
-      refreshLockedPool();
       setSuccessMessage('');
       setErrorMessage('');
     },
-    [refreshFlexiblePool, refreshLockedPool],
+    [],
   );
 
   const statusMessage = useMemo(() => {
@@ -192,53 +192,9 @@ export const BalanceInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
         >
           <div className={classes.contentHeading}>CHICKS Amount</div>
           <div className={classes.contentText}>
-            {tabType === StakeMode.FLEXIBLE ? (
-              flexibleUserInfo && flexibleUserInfo.chicksAmount.length > 0 ? (
+            {userInfo && userInfo.chicksAmount.length > 0 ? (
                 <NumberFormat
-                  value={flexibleUserInfo.chicksAmount}
-                  displayType="text"
-                  thousandSeparator
-                  decimalScale={1}
-                  fixedDecimalScale
-                />
-              ) : (
-                <NumberFormat
-                  value={0}
-                  displayType="text"
-                  thousandSeparator
-                  decimalScale={1}
-                  fixedDecimalScale
-                />
-              )
-            ) : null}
-            {tabType === StakeMode.LOCKED ? (
-              lockedUserInfo && lockedUserInfo.chicksAmount.length > 0 ? (
-                <NumberFormat
-                  value={lockedUserInfo.chicksAmount}
-                  displayType="text"
-                  thousandSeparator
-                  decimalScale={1}
-                  fixedDecimalScale
-                />
-              ) : (
-                <NumberFormat
-                  value={0}
-                  displayType="text"
-                  thousandSeparator
-                  decimalScale={1}
-                  fixedDecimalScale
-                />
-              )
-            ) : null}
-          </div>
-        </div>
-        {tabType === StakeMode.FLEXIBLE ? (
-          <div className={classes.mainContent}>
-            <div className={classes.contentHeading}>xCHICKS Amount</div>
-            <div className={classes.contentText}>
-              {flexibleUserInfo && flexibleUserInfo.chicksAmount.length > 0 ? (
-                <NumberFormat
-                  value={flexibleUserInfo.xChicksAmount}
+                  value={userInfo.chicksAmount}
                   displayType="text"
                   thousandSeparator
                   decimalScale={1}
@@ -253,9 +209,30 @@ export const BalanceInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
                   fixedDecimalScale
                 />
               )}
-            </div>
           </div>
-        ) : null}
+        </div>
+        <div className={classes.mainContent}>
+          <div className={classes.contentHeading}>xCHICKS Amount</div>
+          <div className={classes.contentText}>
+            {userInfo && userInfo.chicksAmount.length > 0 ? (
+              <NumberFormat
+                value={userInfo.xChicksAmount}
+                displayType="text"
+                thousandSeparator
+                decimalScale={1}
+                fixedDecimalScale
+              />
+            ) : (
+              <NumberFormat
+                value={0}
+                displayType="text"
+                thousandSeparator
+                decimalScale={1}
+                fixedDecimalScale
+              />
+            )}
+          </div>
+        </div>
       </div>
       <div className={classes.mainTab}>
         <div className={classes.centerTab}>
@@ -392,16 +369,16 @@ export const BalanceInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
                     </div>
                   ) : null}
                   {(isAddress(solanaAddress as PublicKey | string) &&
-                    !flexibleStakeList) ||
-                  (flexibleStakeList && flexibleStakeList.length === 0) ? (
+                    !stakeList) ||
+                  (stakeList && stakeList.length === 0) ? (
                     <div style={{ paddingLeft: '1rem' }}>
                       We could not retrieve any details about your staked tokens
                       at this moment in time. Please try again later.
                     </div>
                   ) : null}
                   {isAddress(solanaAddress as PublicKey | string) &&
-                  flexibleStakeList &&
-                  flexibleStakeList.length > 0 ? (
+                  stakeList &&
+                  stakeList.length > 0 ? (
                     <div>
                       <div style={{ paddingLeft: '1rem' }}>
                         <Typography variant="h6">Staked Tokens</Typography>
@@ -425,34 +402,34 @@ export const BalanceInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
                             </TableRow>
                           </TableHead>
                           <TableBody>
-                            {flexibleStakeList.map((flexibleStakeListItem) => (
-                              <TableRow key={flexibleStakeListItem.stakeTxHash}>
+                            {stakeList.map((stakeListItem) => (
+                              <TableRow key={stakeListItem.stakeTxHash}>
                                 <TableCell>
-                                  {flexibleStakeListItem.stakeTxHash.substring(
+                                  {stakeListItem.stakeTxHash.substring(
                                     0,
                                     10,
                                   )}
-                                  {flexibleStakeListItem.stakeTxHash.length >=
+                                  {stakeListItem.stakeTxHash.length >=
                                     10 && `...`}
                                   <ShowTxButton
                                     chainId={CHAIN_ID_SOLANA}
-                                    txId={flexibleStakeListItem.stakeTxHash}
+                                    txId={stakeListItem.stakeTxHash}
                                   />
                                 </TableCell>
                                 <TableCell>
-                                  {!flexibleStakeListItem.stakeClaimDate ? (
+                                  {!stakeListItem.stakeClaimDate ? (
                                     <>
                                       <Moment format="YYYY-MM-DD">
-                                        {flexibleStakeListItem.stakeStartDate}
+                                        {stakeListItem.stakeStartDate}
                                       </Moment>{' '}
                                       to{' '}
                                       <Moment format="YYYY-MM-DD">
-                                        {flexibleStakeListItem.stakeEndDate}
+                                        {stakeListItem.stakeEndDate}
                                       </Moment>
                                       <br />
                                       {new Date() <
                                       new Date(
-                                        flexibleStakeListItem.stakeEndDate,
+                                        stakeListItem.stakeEndDate,
                                       ) ? (
                                         <>
                                           <Moment
@@ -460,7 +437,7 @@ export const BalanceInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
                                               new Date()
                                             }
                                             date={
-                                              flexibleStakeListItem.stakeEndDate
+                                              stakeListItem.stakeEndDate
                                             }
                                             format="d"
                                           />{' '}
@@ -471,17 +448,17 @@ export const BalanceInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
                                       )}
                                     </>
                                   ) : null}
-                                  {flexibleStakeListItem.stakeClaimDate &&
-                                  flexibleStakeListItem.unstakeTxHash ? (
+                                  {stakeListItem.stakeClaimDate &&
+                                  stakeListItem.unstakeTxHash ? (
                                     <>
                                       Unstaked on{' '}
                                       <Moment format="YYYY-MM-DD">
-                                        {flexibleStakeListItem.stakeStartDate}
+                                        {stakeListItem.stakeStartDate}
                                       </Moment>
                                       <ShowTxButton
                                         chainId={CHAIN_ID_SOLANA}
                                         txId={
-                                          flexibleStakeListItem.unstakeTxHash
+                                          stakeListItem.unstakeTxHash
                                         }
                                       />
                                     </>
@@ -491,7 +468,7 @@ export const BalanceInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
                                   <NumberFormat
                                     value={
                                       Math.round(
-                                        flexibleStakeListItem.chicksAmount as unknown as number,
+                                        stakeListItem.chicksAmount as unknown as number,
                                       ) / 1000000000
                                     }
                                     displayType="text"
@@ -504,7 +481,7 @@ export const BalanceInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
                                   <NumberFormat
                                     value={
                                       Math.round(
-                                        flexibleStakeListItem.xChicksAmount as unknown as number,
+                                        stakeListItem.xChicksAmount as unknown as number,
                                       ) / 1000000000
                                     }
                                     displayType="text"
@@ -516,15 +493,15 @@ export const BalanceInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
                                   <br />
                                 </TableCell>
                                 <TableCell>
-                                  {!flexibleStakeListItem.stakeClaimDate ||
-                                  !flexibleStakeListItem.unstakeTxHash ? (
+                                  {!stakeListItem.stakeClaimDate ||
+                                  !stakeListItem.unstakeTxHash ? (
                                     <>
                                       <Button
                                         variant="outlined"
                                         onClick={() =>
                                           handleUnstakeButtonClick(
-                                            flexibleStakeListItem.xChicksAmount,
-                                            flexibleStakeListItem.handle,
+                                            stakeListItem.xChicksAmount,
+                                            stakeListItem.handle,
                                           )
                                         }
                                         disabled={
@@ -540,7 +517,7 @@ export const BalanceInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
                                       </Button>
                                       {new Date() <
                                       new Date(
-                                        flexibleStakeListItem.stakeEndDate,
+                                        stakeListItem.stakeEndDate,
                                       ) ? (
                                         <div
                                           style={{
@@ -556,9 +533,9 @@ export const BalanceInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
                                     </>
                                   ) : null}
                                   {currentHandle ===
-                                  flexibleStakeListItem.handle ? (
+                                  stakeListItem.handle ? (
                                     <>
-                                      {!flexibleStakeListItem.unstakeTxHash &&
+                                      {!stakeListItem.unstakeTxHash &&
                                       !errorMessage &&
                                       statusMessage ? (
                                         <Typography
@@ -569,7 +546,7 @@ export const BalanceInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
                                           {statusMessage}
                                         </Typography>
                                       ) : null}
-                                      {!flexibleStakeListItem.unstakeTxHash &&
+                                      {!stakeListItem.unstakeTxHash &&
                                       sourceTxId > '' ? (
                                         <div style={{ marginTop: '16px' }}>
                                           {sourceTxId.substring(0, 10)}

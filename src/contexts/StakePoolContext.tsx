@@ -26,7 +26,8 @@ import {
   SOLCHICK_STAKING_FLEXIBLE_PROGRAM_IDL,
   SOLCHICK_STAKING_LOCKED_PROGRAM_IDL,
   SOLCHICK_TOKEN_MINT_ON_SOL,
-  URL_SUBMIT_FLEX_LIST, URL_SUBMIT_LOCKED_LIST,
+  URL_SUBMIT_FLEX_LIST,
+  URL_SUBMIT_LOCKED_LIST,
 } from '../utils/solchickConsts';
 import {useSolanaWallet} from './SolanaWalletContext';
 import {SOLANA_HOST} from '../utils/consts';
@@ -65,7 +66,7 @@ export const StakePoolProvider = ({
 }) => {
   const walletSolana = useSolanaWallet();
   const [tokenBalance, setTokenBalance] = useState('');
-  const [currentStakeMode, setCurrentStakeMode] = useState<StakeMode|null>(null);
+  const [currentStakeMode, setCurrentStakeMode] = useState<StakeMode|null>(StakeMode.FLEXIBLE);
   const [currentLockedPoolKind, setCurrentLockedPoolKind] = useState<StakeLockedKind|null>(null);
   const [totalInfo, setTotalInfo] = useState<IStakeBalance>();
   const [userInfo, setUserInfo] = useState<IStakeBalance>();
@@ -77,6 +78,13 @@ export const StakePoolProvider = ({
   );
 
   const { publicKey: walletPublicKey } = walletSolana;
+
+  ConsoleHelper(
+    `stakePoolContext -> currentStakeMode: ${currentStakeMode}, currentLockedPoolKind: ${currentLockedPoolKind}`,
+  );
+  ConsoleHelper(
+    `stakePoolContext -> walletPublicKey: ${walletPublicKey}`,
+  );
 
   const getAnchorProvider = useCallback(async () => {
     const opts = {
@@ -240,12 +248,12 @@ export const StakePoolProvider = ({
               stakeEndDate: item.stake_end_date,
             });
           });
-          ConsoleHelper(`stakeList -> ${JSON.stringify(stakeList)}`);
+          ConsoleHelper(`stakeList`, list);
           ConsoleHelper(`userTotalChicks -> ${userTotalChicks}`);
           ConsoleHelper(
             `userTotalXChicks -> ${JSON.stringify(userTotalXChicks)}`,
           );
-          setStakeList(stakeList);
+          setStakeList(list);
           setUserInfo({
             chicksAmount: (
               Math.round(userTotalChicks.toNumber()) / 1000000000
@@ -290,12 +298,13 @@ export const StakePoolProvider = ({
   }
 
   useEffect(() => {
-    refreshLockedPool().then();
-    refreshFlexiblePool().then();
+    if (!currentStakeMode) {
+      return;
+    }
+    refreshPool(currentStakeMode, currentLockedPoolKind);
   }, [
-    refreshFlexiblePool,
-    refreshLockedPool,
-    solanaConnection,
+    currentStakeMode,
+    currentLockedPoolKind,
     walletPublicKey,
   ]);
 

@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import axios from 'axios';
 import BN from 'bn.js';
-import { ConfirmOptions, Connection } from '@solana/web3.js';
+import bs58 from 'bs58';
+import {ConfirmOptions, Connection, PublicKey, TransactionResponse} from '@solana/web3.js';
 import * as anchor from '@project-serum/anchor';
 import {
   Context,
@@ -44,7 +45,7 @@ import {
 import { sleep } from '../utils/helper';
 import { useStakePool } from '../contexts/StakePoolContext';
 
-enum ReconcileStatusCode {
+export enum ReconcileStatusCode {
   NONE = 0,
   START,
   PROCESSING,
@@ -154,6 +155,33 @@ function useStakeReconcile(): IReconcileStatus {
     );
   };
 
+  const parseTransaction = (txInfo: TransactionResponse, programId: PublicKey) => {
+    ConsoleHelper('parseTransaction', txInfo);
+
+    const {accountKeys, instructions: txInstructions} = txInfo.transaction.message;
+    ConsoleHelper('parseTransaction - accountKeys[0]', accountKeys[0].toString());
+    ConsoleHelper('parseTransaction - accountKeys[1]', accountKeys[1].toString());
+    ConsoleHelper('parseTransaction - accountKeys[2]', accountKeys[2].toString());
+    ConsoleHelper('parseTransaction - accountKeys[3]', accountKeys[3].toString());
+    ConsoleHelper('parseTransaction - accountKeys[4]', accountKeys[4].toString());
+    ConsoleHelper('parseTransaction - accountKeys[5]', accountKeys[5].toString());
+    ConsoleHelper('parseTransaction - accountKeys[6]', accountKeys[6].toString());
+    ConsoleHelper('parseTransaction - accountKeys[7]', accountKeys[7].toString());
+    ConsoleHelper('parseTransaction - accountKeys[8]', accountKeys[8].toString());
+    ConsoleHelper('parseTransaction - accountKeys[9]', accountKeys[9].toString());
+    if (accountKeys[9].equals(programId)) {
+      return {success: false}
+    }
+
+    if (!Array.isArray(txInstructions) || txInstructions.length !== 1) {
+      return {success: false}
+    }
+
+    const inputData = bs58.decode(txInstructions[0].data);
+    ConsoleHelper('inputData', inputData);
+    return {success: true}
+  }
+
   const processReconcile = async (
     mode: StakeMode,
     lockedKind: StakeLockedKind | null,
@@ -216,32 +244,25 @@ function useStakeReconcile(): IReconcileStatus {
       await sleep(5000);
       const txInfo = await getTransactionInfoOnSol(solanaConnection, txId);
       ConsoleHelper(
-        `getTransactionInfoOnSol: txId: ${txId} - result ${JSON.stringify(
+        `getTransactionInfoOnSol: txId: ${txId}`,
           txInfo,
-        )}`,
       );
       if (!txInfo || !txInfo.meta || txInfo.meta.err) {
         setError(ReconcileErrorCode.RECONCILE_FAILED);
         return false;
       }
 
+      parseTransaction(txInfo, toPublicKey(programIdl.metadata.address));
       // todo get handle, x_amount
       handle = 'test';
       stakeAmount = 1;
       const [userStakingPubkey, userStakingBump] =
-        mode === StakeMode.FLEXIBLE
-          ? await anchor.web3.PublicKey.findProgramAddress(
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-ignore
-            [walletPublicKey.toBuffer(), handle],
-            program.programId,
-          )
-          : await anchor.web3.PublicKey.findProgramAddress(
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-ignore
-            [walletPublicKey.toBuffer()],
-            program.programId,
-          );
+        await anchor.web3.PublicKey.findProgramAddress(
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
+          [walletPublicKey.toBuffer(), handle],
+          program.programId,
+        );
 
       const userStakingAccount = await program.account.userStakingAccount.fetch(
         userStakingPubkey,

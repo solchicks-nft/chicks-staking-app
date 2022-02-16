@@ -81,3 +81,6 @@ export const URL_SUBMIT_LOCKED_UNSTAKE = (
 
 export const URL_SUBMIT_FLEX_LIST = (address: string) =>
   `${URL_BACKEND_BASE}/api/flex_list/?address=${address}`;
+
+export const URL_SUBMIT_LOCKED_LIST = (stakePool: StakeLockedKind | null, address: string) =>
+  `${URL_BACKEND_BASE}/api/flex_list/?pool=${stakePool}&address=${address}`;

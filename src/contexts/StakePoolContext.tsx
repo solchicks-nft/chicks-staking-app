@@ -26,7 +26,7 @@ import {
   SOLCHICK_STAKING_FLEXIBLE_PROGRAM_IDL,
   SOLCHICK_STAKING_LOCKED_PROGRAM_IDL,
   SOLCHICK_TOKEN_MINT_ON_SOL,
-  URL_SUBMIT_FLEX_LIST,
+  URL_SUBMIT_FLEX_LIST, URL_SUBMIT_LOCKED_LIST,
 } from '../utils/solchickConsts';
 import {useSolanaWallet} from './SolanaWalletContext';
 import {SOLANA_HOST} from '../utils/consts';
@@ -202,10 +202,12 @@ export const StakePoolProvider = ({
 
     if (walletPublicKey) {
       try {
-        const url = URL_SUBMIT_FLEX_LIST(walletPublicKey.toString());
+        const url = stakeMode === StakeMode.FLEXIBLE
+          ? URL_SUBMIT_FLEX_LIST(walletPublicKey.toString())
+          : URL_SUBMIT_LOCKED_LIST(poolKind, walletPublicKey.toString());
         const results = await axios.get(url);
         ConsoleHelper(
-          `refreshFlexiblePool -> flexList: ${JSON.stringify(
+          `refreshPool -> list: ${JSON.stringify(
             results.data.data,
           )}`,
         );

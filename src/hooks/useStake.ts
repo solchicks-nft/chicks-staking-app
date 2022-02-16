@@ -293,19 +293,7 @@ function useStake(mode: StakeMode, tab: StakeStepMode, pool: StakeLockedKind | n
             program.programId,
           );
 
-    let xTokenAmountPrev: BigNumber;
-    if (stakeStepMode === StakeStepMode.STAKE) {
-      if (mode === StakeMode.LOCKED) {
-        const userStakingAccountPrev =
-          await program.account.userStakingAccount.fetch(userStakingPubkey);
-        xTokenAmountPrev = BigNumber.from(
-          userStakingAccountPrev.xTokenAmount.toString(),
-        );
-      }
-    }
-
     let xTokenAmountStr;
-    let xTokenAmount: BigNumber;
 
     const accounts = {
       accounts: {
@@ -389,14 +377,7 @@ function useStake(mode: StakeMode, tab: StakeStepMode, pool: StakeLockedKind | n
         userStakingAccount = await program.account.userStakingAccount.fetch(
           userStakingPubkey,
         );
-        if (mode === StakeMode.LOCKED) {
-          xTokenAmount = BigNumber.from(userStakingAccount.xTokenAmount);
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-ignore
-          xTokenAmountStr = xTokenAmount.sub(xTokenAmountPrev).toString();
-        } else {
-          xTokenAmountStr = userStakingAccount.xTokenAmount.toString();
-        }
+        xTokenAmountStr = userStakingAccount.xTokenAmount.toString();
       }
     } catch (e) {
       ConsoleHelper(`error: `, e);

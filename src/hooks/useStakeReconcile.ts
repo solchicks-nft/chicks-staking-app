@@ -4,6 +4,8 @@ import BN from 'bn.js';
 import bs58 from 'bs58';
 import {ConfirmOptions, Connection, PublicKey, TransactionResponse} from '@solana/web3.js';
 import * as anchor from '@project-serum/anchor';
+import {Buffer} from "buffer";
+import {formatUnits} from "@ethersproject/units";
 import {
   Context,
   Idl,
@@ -159,6 +161,11 @@ function useStakeReconcile(): IReconcileStatus {
     ConsoleHelper('parseTransaction', txInfo);
 
     const {accountKeys, instructions: txInstructions} = txInfo.transaction.message;
+
+    // if (accountKeys.length !== 10) {
+    //   ConsoleHelper('accountKeys -- error');
+    //   return {success: false}
+    // }
     ConsoleHelper('parseTransaction - accountKeys[0]', accountKeys[0].toString());
     ConsoleHelper('parseTransaction - accountKeys[1]', accountKeys[1].toString());
     ConsoleHelper('parseTransaction - accountKeys[2]', accountKeys[2].toString());
@@ -169,17 +176,34 @@ function useStakeReconcile(): IReconcileStatus {
     ConsoleHelper('parseTransaction - accountKeys[7]', accountKeys[7].toString());
     ConsoleHelper('parseTransaction - accountKeys[8]', accountKeys[8].toString());
     ConsoleHelper('parseTransaction - accountKeys[9]', accountKeys[9].toString());
-    if (accountKeys[9].equals(programId)) {
+    if (!accountKeys[9].equals(programId)) {
+      ConsoleHelper('accountKeys -- error: Invalid program id');
       return {success: false}
     }
 
+    ConsoleHelper('txInstructions', txInstructions);
     if (!Array.isArray(txInstructions) || txInstructions.length !== 1) {
+      ConsoleHelper('accountKeys -- error: Invalid instruction');
       return {success: false}
     }
 
     const inputData = bs58.decode(txInstructions[0].data);
+    if (inputData.length !== 55) {
+      ConsoleHelper('accountKeys -- error: length', inputData);
+      return {success: false}
+    }
     ConsoleHelper('inputData', inputData);
-    return {success: true}
+
+    const handle = inputData.slice(15, 47).toString();
+    ConsoleHelper('hash', handle);
+
+    const bnTxAmount = new BN(Buffer.from(inputData.slice(47)), 'hex', 'le');
+    ConsoleHelper('bnTxAmount', bnTxAmount.toString());
+    const txAmount = formatUnits(bnTxAmount.toString(), 9);
+    // const txAmount = formatUnits('6123456789', 9);
+    ConsoleHelper('txAmount', txAmount);
+
+    return {success: true, handle, amount: txAmount}
   }
 
   const processReconcile = async (
@@ -252,10 +276,22 @@ function useStakeReconcile(): IReconcileStatus {
         return false;
       }
 
-      parseTransaction(txInfo, toPublicKey(programIdl.metadata.address));
-      // todo get handle, x_amount
-      handle = 'test';
-      stakeAmount = 1;
+      const ret = parseTransaction(txInfo, toPublicKey(programIdl.metadata.address));
+      ConsoleHelper(
+        `parseTransaction: result: `,
+        ret,
+      );
+      if (!ret.success) {
+        setError(ReconcileErrorCode.RECONCILE_FAILED);
+        return false;
+      }
+
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      handle = ret.handle;
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      stakeAmount = ret.amount;
       const [userStakingPubkey, userStakingBump] =
         await anchor.web3.PublicKey.findProgramAddress(
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment

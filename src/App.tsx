@@ -21,6 +21,7 @@ import SolChicksLogo from './icons/chicks.svg';
 import { COLORS, theme } from './muiTheme.js';
 import { FlexiblePoolView } from './pages/FlexiblePoolView';
 import { HelpView } from './pages/HelpView';
+import { LockedPoolView } from './pages/LockedPoolView';
 
 const useStyles = makeStyles(() => ({
   appBar: {
@@ -122,12 +123,14 @@ function App() {
               indicatorColor="primary"
             >
               <Tab className={classes.tab} label="Flexible Pool" value="/" />
+              <Tab className={classes.tab} label="Locked Pool" value="/locked" />
               <Tab className={classes.tab} label="Help" value="/help" />
             </Tabs>
           </Container>
         </div>
         <Routes>
           <Route path="" element={<FlexiblePoolView />} />
+          <Route path="locked" element={<LockedPoolView />} />
           <Route path="*" element={<FlexiblePoolView />} />
           <Route path="help" element={<HelpView />} />
         </Routes>

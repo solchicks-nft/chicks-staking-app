@@ -62,7 +62,7 @@ export const BalanceInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
     refreshFlexiblePool,
     refreshLockedPool,
     setStakeMode,
-    setLockedKind,
+    setLockedPoolType,
     stakeList,
     userInfo,
     totalInfo,
@@ -70,14 +70,11 @@ export const BalanceInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
   } = useStakePool();
   const { publicKey: solanaAddress } = useSolanaWallet();
 
-  const handleChange = useCallback(
-    (event, value) => {
-      setTab(value);
-      setSuccessMessage('');
-      setErrorMessage('');
-    },
-    [],
-  );
+  const handleChange = useCallback((event, value) => {
+    setTab(value);
+    setSuccessMessage('');
+    setErrorMessage('');
+  }, []);
 
   const statusMessage = useMemo(() => {
     if (isProcessing || statusCode !== StakeStatusCode.FAILED) {
@@ -193,22 +190,22 @@ export const BalanceInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
           <div className={classes.contentHeading}>CHICKS Amount</div>
           <div className={classes.contentText}>
             {userInfo && userInfo.chicksAmount.length > 0 ? (
-                <NumberFormat
-                  value={userInfo.chicksAmount}
-                  displayType="text"
-                  thousandSeparator
-                  decimalScale={1}
-                  fixedDecimalScale
-                />
-              ) : (
-                <NumberFormat
-                  value={0}
-                  displayType="text"
-                  thousandSeparator
-                  decimalScale={1}
-                  fixedDecimalScale
-                />
-              )}
+              <NumberFormat
+                value={userInfo.chicksAmount}
+                displayType="text"
+                thousandSeparator
+                decimalScale={1}
+                fixedDecimalScale
+              />
+            ) : (
+              <NumberFormat
+                value={0}
+                displayType="text"
+                thousandSeparator
+                decimalScale={1}
+                fixedDecimalScale
+              />
+            )}
           </div>
         </div>
         <div className={classes.mainContent}>
@@ -405,12 +402,9 @@ export const BalanceInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
                             {stakeList.map((stakeListItem) => (
                               <TableRow key={stakeListItem.stakeTxHash}>
                                 <TableCell>
-                                  {stakeListItem.stakeTxHash.substring(
-                                    0,
-                                    10,
-                                  )}
-                                  {stakeListItem.stakeTxHash.length >=
-                                    10 && `...`}
+                                  {stakeListItem.stakeTxHash.substring(0, 10)}
+                                  {stakeListItem.stakeTxHash.length >= 10 &&
+                                    `...`}
                                   <ShowTxButton
                                     chainId={CHAIN_ID_SOLANA}
                                     txId={stakeListItem.stakeTxHash}
@@ -428,17 +422,11 @@ export const BalanceInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
                                       </Moment>
                                       <br />
                                       {new Date() <
-                                      new Date(
-                                        stakeListItem.stakeEndDate,
-                                      ) ? (
+                                      new Date(stakeListItem.stakeEndDate) ? (
                                         <>
                                           <Moment
-                                            duration={
-                                              new Date()
-                                            }
-                                            date={
-                                              stakeListItem.stakeEndDate
-                                            }
+                                            duration={new Date()}
+                                            date={stakeListItem.stakeEndDate}
                                             format="d"
                                           />{' '}
                                           days to go
@@ -457,9 +445,7 @@ export const BalanceInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
                                       </Moment>
                                       <ShowTxButton
                                         chainId={CHAIN_ID_SOLANA}
-                                        txId={
-                                          stakeListItem.unstakeTxHash
-                                        }
+                                        txId={stakeListItem.unstakeTxHash}
                                       />
                                     </>
                                   ) : null}
@@ -516,9 +502,7 @@ export const BalanceInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
                                         Unstake
                                       </Button>
                                       {new Date() <
-                                      new Date(
-                                        stakeListItem.stakeEndDate,
-                                      ) ? (
+                                      new Date(stakeListItem.stakeEndDate) ? (
                                         <div
                                           style={{
                                             color: '#D0393E',
@@ -532,8 +516,7 @@ export const BalanceInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
                                       ) : null}
                                     </>
                                   ) : null}
-                                  {currentHandle ===
-                                  stakeListItem.handle ? (
+                                  {currentHandle === stakeListItem.handle ? (
                                     <>
                                       {!stakeListItem.unstakeTxHash &&
                                       !errorMessage &&

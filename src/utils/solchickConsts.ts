@@ -1,4 +1,4 @@
-import {StakeLockedKind} from "./stakeHelper";
+import {StakeLockedPoolType} from "./stakeHelper";
 
 export const SOLCHICK_TOKEN_MINT_ON_SOL = process.env
   .REACT_APP_SOLCHICK_TOKEN_MINT_ON_SOL as string;
@@ -62,7 +62,7 @@ export const URL_SUBMIT_FLEX_UNSTAKE = (
   `${URL_BACKEND_BASE}/api/flex_unstake/?address=${address}&tx_id=${txId}&handle=${handle}&x_token=${xAmount}`;
 
 export const URL_SUBMIT_LOCKED_STAKE = (
-  stakePool: StakeLockedKind | null,
+  stakePool: StakeLockedPoolType | null,
   address: string,
   amount: number,
   txId: string,
@@ -72,7 +72,7 @@ export const URL_SUBMIT_LOCKED_STAKE = (
   `${URL_BACKEND_BASE}/api/locked_stake/?pool=${stakePool}&address=${address}&amount=${amount}&tx_id=${txId}&x_token=${xTokenAmount}`;
 
 export const URL_SUBMIT_LOCKED_UNSTAKE = (
-  stakePool: StakeLockedKind | null,
+  stakePool: StakeLockedPoolType | null,
   address: string,
   txId: string,
   xAmount: string,
@@ -82,5 +82,5 @@ export const URL_SUBMIT_LOCKED_UNSTAKE = (
 export const URL_SUBMIT_FLEX_LIST = (address: string) =>
   `${URL_BACKEND_BASE}/api/flex_list/?address=${address}`;
 
-export const URL_SUBMIT_LOCKED_LIST = (stakePool: StakeLockedKind | null, address: string) =>
+export const URL_SUBMIT_LOCKED_LIST = (stakePool: StakeLockedPoolType | null, address: string) =>
   `${URL_BACKEND_BASE}/api/flex_list/?pool=${stakePool}&address=${address}`;

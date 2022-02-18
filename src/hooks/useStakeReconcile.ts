@@ -37,7 +37,7 @@ import {
   getPoolHandle,
   getServerInfo,
   isEnoughTokenOnSolana,
-  StakeLockedKind,
+  StakeLockedPoolType,
   StakeMode,
   StakeStepMode,
 } from '../utils/stakeHelper';
@@ -64,7 +64,7 @@ export enum ReconcileErrorCode {
 }
 
 interface IReconcileStatus {
-  reconcile(mode: StakeMode, lockedKind: StakeLockedKind | null, txId: string): void;
+  reconcile(mode: StakeMode, lockedKind: StakeLockedPoolType | null, txId: string): void;
   isProcessing: boolean;
   statusCode: ReconcileStatusCode;
   errorCode: ReconcileErrorCode;
@@ -72,7 +72,7 @@ interface IReconcileStatus {
 }
 
 const createReconcileStatus = (
-  reconcile: (mode: StakeMode, lockedKind: StakeLockedKind | null, txId: string) => void,
+  reconcile: (mode: StakeMode, lockedKind: StakeLockedPoolType | null, txId: string) => void,
   isProcessing: boolean,
   statusCode = ReconcileStatusCode.NONE,
   errorCode: ReconcileErrorCode,
@@ -120,7 +120,7 @@ function useStakeReconcile(): IReconcileStatus {
 
   const submitStakeResult = async (
     mode: StakeMode,
-    stakePool: StakeLockedKind | null,
+    stakePool: StakeLockedPoolType | null,
     address: string,
     amount: number,
     txId: string,
@@ -156,7 +156,7 @@ function useStakeReconcile(): IReconcileStatus {
 
   const processReconcile = async (
     mode: StakeMode,
-    lockedKind: StakeLockedKind | null,
+    lockedKind: StakeLockedPoolType | null,
     txId: string,
   ) => {
     const { publicKey: walletPublicKey } = walletSolana;
@@ -266,7 +266,7 @@ function useStakeReconcile(): IReconcileStatus {
     return true;
   };
 
-  const reconcile = async (mode: StakeMode, lockedKind: StakeLockedKind | null, txId: string) => {
+  const reconcile = async (mode: StakeMode, lockedKind: StakeLockedPoolType | null, txId: string) => {
     ConsoleHelper('stake -> start');
     await processReconcile(mode, lockedKind, txId);
   };

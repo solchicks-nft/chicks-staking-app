@@ -22,8 +22,8 @@ export enum StakeStepMode {
 }
 
 export enum StakeLockedKind {
-  MONTH4 = 1, // 120 days
-  MONTH8 = 2, // 240 days
+  MONTH4 = 1,   // 120 days
+  MONTH8 = 2,   // 240 days
   MONTH12 = 3,  // 360 days
 }
 

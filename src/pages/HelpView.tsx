@@ -50,7 +50,8 @@ export const HelpView = () => {
           <p>
             If you unstake before the staking window closes, you will need to
             pay a penalty on top of your rewards. This early unstake fee goes
-            back to the rewards pool for others.
+            back to the rewards pool for others. Note that this only applies to
+            our flexible staking pools.
           </p>
           <br />
           <Typography variant="h6">What are xCHICKS?</Typography>

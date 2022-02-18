@@ -28,25 +28,24 @@ export const PoolInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
           <div className={classes.contentHeading}>Total CHICKS</div>
           <div className={classes.contentText}>
             {totalInfo && totalInfo.chicksAmount.length > 0 ? (
-                <>
-                  <NumberFormat
-                    value={totalInfo.chicksAmount}
-                    displayType="text"
-                    thousandSeparator
-                    decimalScale={1}
-                    fixedDecimalScale
-                  />
-                </>
-              ) : (
+              <>
                 <NumberFormat
-                  value={0}
+                  value={totalInfo.chicksAmount}
                   displayType="text"
                   thousandSeparator
                   decimalScale={1}
                   fixedDecimalScale
                 />
-              )
-            }
+              </>
+            ) : (
+              <NumberFormat
+                value={0}
+                displayType="text"
+                thousandSeparator
+                decimalScale={1}
+                fixedDecimalScale
+              />
+            )}
           </div>
         </div>
         <div
@@ -55,8 +54,7 @@ export const PoolInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
         >
           <div className={classes.contentHeading}>Total xCHICKS</div>
           <div className={classes.contentText}>
-            {totalInfo &&
-            totalInfo.xChicksAmount.length > 0 ? (
+            {totalInfo && totalInfo.xChicksAmount.length > 0 ? (
               <>
                 <NumberFormat
                   value={totalInfo.xChicksAmount}

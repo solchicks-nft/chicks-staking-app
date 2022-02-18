@@ -40,7 +40,7 @@ import {
   getServerInfo,
   isEnoughTokenOnSolana,
   IStakeStatus,
-  StakeErrorCode, StakeLockedKind,
+  StakeErrorCode, StakeLockedPoolType,
   StakeMode,
   StakeStatusCode,
   StakeStepMode,
@@ -48,14 +48,14 @@ import {
 import { sleep } from '../utils/helper';
 import { useStakePool } from '../contexts/StakePoolContext';
 
-function useStake(mode: StakeMode, tab: StakeStepMode, pool: StakeLockedKind | null = null): IStakeStatus {
+function useStake(mode: StakeMode, tab: StakeStepMode, pool: StakeLockedPoolType | null = null): IStakeStatus {
   const [isProcessing, setIsProcessing] = useState(false);
   const [sourceTxId, setSourceTxId] = useState('');
   const [currentMode, setCurrentMode] = useState<StakeMode>(StakeMode.FLEXIBLE);
   const [currentTab, setCurrentTab] = useState<StakeStepMode>(
     StakeStepMode.STAKE,
   );
-  const [currentPool, setCurrentPool] = useState<StakeLockedKind | null>(null);
+  const [currentPool, setCurrentPool] = useState<StakeLockedPoolType | null>(null);
   const [statusCode, setStatusCode] = useState(StakeStatusCode.NONE);
   const [errorCode, setErrorCode] = useState(StakeErrorCode.NO_ERROR);
   const [lastError, setLastError] = useState('');
@@ -146,7 +146,7 @@ function useStake(mode: StakeMode, tab: StakeStepMode, pool: StakeLockedKind | n
   }
 
   const submitStakeResult = async (
-    stakePool: StakeLockedKind | null,
+    stakePool: StakeLockedPoolType | null,
     address: string,
     amount: number,
     txId: string,
@@ -161,7 +161,7 @@ function useStake(mode: StakeMode, tab: StakeStepMode, pool: StakeLockedKind | n
   };
 
   const submitUnstakeResult = async (
-    stakePool: StakeLockedKind | null,
+    stakePool: StakeLockedPoolType | null,
     address: string,
     txId: string,
     handle: string,

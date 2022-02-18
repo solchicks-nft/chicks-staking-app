@@ -279,19 +279,12 @@ function useStake(mode: StakeMode, tab: StakeStepMode, pool: StakeLockedPoolType
 
     // noinspection TypeScriptValidateJSTypes
     const [userStakingPubkey, userStakingBump] =
-      mode === StakeMode.FLEXIBLE
-        ? await anchor.web3.PublicKey.findProgramAddress(
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-ignore
-            [walletPublicKey.toBuffer(), handle],
-            program.programId,
-          )
-        : await anchor.web3.PublicKey.findProgramAddress(
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-ignore
-            [walletPublicKey.toBuffer()],
-            program.programId,
-          );
+      await anchor.web3.PublicKey.findProgramAddress(
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        [walletPublicKey.toBuffer(), handle],
+        program.programId,
+      );
 
     let xTokenAmountStr;
 

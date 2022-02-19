@@ -8,8 +8,8 @@ import { pubkeyToString } from './solanaHelper';
 
 export const STATUS_STAKED = 0;
 export const STATUS_CLAIMED = 2;
-
 export const FLEX_POOL_DAILY_AMOUNT = 25000;
+export const LOCKED_POOL_DAILY_AMOUNT = 25000;
 
 export enum StakeMode {
   FLEXIBLE = 'flexible',
@@ -19,15 +19,17 @@ export enum StakeMode {
 export enum StakeStepMode {
   STAKE = 'stake',
   UNSTAKE = 'unstake',
+  RECONCILE = 'reconcile',
 }
 
 export enum StakeLockedPoolLength {
-  MONTH4 = 1,   // 120 days
-  MONTH8 = 2,   // 240 days
-  MONTH12 = 3,  // 360 days
+  MONTH4 = 1, // 120 days
+  MONTH8 = 2, // 240 days
+  MONTH12 = 3, // 360 days
 }
 
-export const getPoolHandle = (pool: StakeLockedPoolLength | null) => `pool${pool}`
+export const getPoolHandle = (pool: StakeLockedPoolLength | null) =>
+  `pool${pool}`;
 
 export enum StakeStatusCode {
   NONE = 0,
@@ -52,28 +54,28 @@ export enum StakeErrorCode {
 export interface IStakeStatus {
   stake(amount: number): void;
   unstake(amount: string, handle: string): void;
-  isProcessing: boolean;
-  statusCode: StakeStatusCode;
-  errorCode: StakeErrorCode;
-  lastError: string | null;
+  isStakeProcessing: boolean;
+  stakeStatusCode: StakeStatusCode;
+  stakeErrorCode: StakeErrorCode;
+  stakeLastError: string | null;
   sourceTxId: string;
 }
 
 export const createStakeStatus = (
   stake: (amount: number) => void,
   unstake: (handle: string, amount: string) => void,
-  isProcessing: boolean,
-  statusCode = StakeStatusCode.NONE,
-  errorCode: StakeErrorCode,
-  lastError: string | null,
+  isStakeProcessing: boolean,
+  stakeStatusCode = StakeStatusCode.NONE,
+  stakeErrorCode: StakeErrorCode,
+  stakeLastError: string | null,
   sourceTxId: string,
 ) => ({
   stake,
   unstake,
-  isProcessing,
-  statusCode,
-  errorCode,
-  lastError,
+  isStakeProcessing,
+  stakeStatusCode,
+  stakeErrorCode,
+  stakeLastError,
   sourceTxId,
 });
 
@@ -130,4 +132,8 @@ export const isEnoughTokenOnSolana = async (
   return true;
 };
 
-export const calculateFlexibleTotalAPR = (chicksTotal: number) => (FLEX_POOL_DAILY_AMOUNT / chicksTotal) * 365 * 100;
+export const calculateFlexibleTotalApr = (chicksTotal: number) =>
+  (FLEX_POOL_DAILY_AMOUNT / chicksTotal) * 365 * 100;
+
+export const calculateLockedTotalApr = (chicksTotal: number) =>
+  (LOCKED_POOL_DAILY_AMOUNT / chicksTotal) * 365 * 100;

@@ -1,4 +1,4 @@
-import {StakeLockedPoolLength} from "./stakeHelper";
+import { StakeLockedPoolLength } from './stakeHelper';
 
 export const SOLCHICK_TOKEN_MINT_ON_SOL = process.env
   .REACT_APP_SOLCHICK_TOKEN_MINT_ON_SOL as string;
@@ -18,7 +18,7 @@ const FLEXIBLE_PROGRAM_IDL =
     : require('../idl/chicks_staking_flexible_dev.json');
 
 const LOCKED_PROGRAM_IDL =
-    process.env.REACT_APP_CLUSTER === 'mainnet'
+  process.env.REACT_APP_CLUSTER === 'mainnet'
     ? require('../idl/chicks_staking_locked_prod.json')
     : require('../idl/chicks_staking_locked_dev.json');
 
@@ -82,5 +82,7 @@ export const URL_SUBMIT_LOCKED_UNSTAKE = (
 export const URL_SUBMIT_FLEX_LIST = (address: string) =>
   `${URL_BACKEND_BASE}/api/flex_list/?address=${address}`;
 
-export const URL_SUBMIT_LOCKED_LIST = (stakePool: StakeLockedPoolLength | null, address: string) =>
-  `${URL_BACKEND_BASE}/api/flex_list/?pool=${stakePool}&address=${address}`;
+export const URL_SUBMIT_LOCKED_LIST = (
+  stakePool: StakeLockedPoolLength | null,
+  address: string,
+) => `${URL_BACKEND_BASE}/api/flex_list/?pool=${stakePool}&address=${address}`;

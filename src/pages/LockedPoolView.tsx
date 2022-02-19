@@ -1,11 +1,10 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import React from 'react';
 import { Card, Container } from '@material-ui/core';
-import { BalanceInfoContainer } from '../components/BalanceInfoContainer';
-import { PoolInfoContainer } from '../components/PoolInfoContainer';
-import { StakeMode } from '../utils/stakeHelper';
 import { useStyles } from './useStyles';
 import StakeAlert from '../components/StakeAlert';
+import { LockedPoolInfoContainer } from '../components/LockedPoolInfoContainer';
+import { LockedPoolBalanceInfoContainer } from '../components/LockedPoolBalanceInfoContainer';
 
 export const LockedPoolView = () => {
   const classes = useStyles();
@@ -13,9 +12,12 @@ export const LockedPoolView = () => {
   return (
     <Container className="container">
       <Card className={classes.mainCard}>
-        <StakeAlert stakeAlertText="Please note that you will be able to unstake your tokens" />
-        <PoolInfoContainer tabType={StakeMode.LOCKED} />
-        <BalanceInfoContainer tabType={StakeMode.LOCKED} />
+        <StakeAlert
+          stakeAlertText="Please note that your tokens won't be redeemable
+        before the staking window closes."
+        />
+        <LockedPoolInfoContainer />
+        <LockedPoolBalanceInfoContainer />
       </Card>
     </Container>
   );

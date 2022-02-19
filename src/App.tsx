@@ -123,7 +123,11 @@ function App() {
               indicatorColor="primary"
             >
               <Tab className={classes.tab} label="Flexible Pool" value="/" />
-              <Tab className={classes.tab} label="Locked Pool" value="/locked" />
+              <Tab
+                className={classes.tab}
+                label="Locked Pool"
+                value="/locked"
+              />
               <Tab className={classes.tab} label="Help" value="/help" />
             </Tabs>
           </Container>

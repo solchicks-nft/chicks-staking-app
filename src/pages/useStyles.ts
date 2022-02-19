@@ -129,7 +129,7 @@ export const useStyles = makeStyles((theme) => ({
     },
   },
   mainTab: {
-    padding: '20px 100px',
+    padding: '20px 40px',
   },
   centerTab: {
     border: '1px solid rgba(119, 136, 152, 0.3)',

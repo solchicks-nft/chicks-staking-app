@@ -62,38 +62,42 @@ export enum ReconcileErrorCode {
 interface IReconcileStatus {
   reconcile(
     mode: StakeMode,
-    lockedKind: StakeLockedPoolLength | null,
+    lockedPoolLength: StakeLockedPoolLength | null,
     txId: string,
   ): void;
-  isProcessing: boolean;
-  statusCode: ReconcileStatusCode;
-  errorCode: ReconcileErrorCode;
-  lastError: string | null;
+  isReconcileProcessing: boolean;
+  reconcileStatusCode: ReconcileStatusCode;
+  reconcileErrorCode: ReconcileErrorCode;
+  reconcileLastError: string | null;
 }
 
 const createReconcileStatus = (
   reconcile: (
     mode: StakeMode,
-    lockedKind: StakeLockedPoolLength | null,
+    lockedPoolLength: StakeLockedPoolLength | null,
     txId: string,
   ) => void,
-  isProcessing: boolean,
-  statusCode = ReconcileStatusCode.NONE,
-  errorCode: ReconcileErrorCode,
-  lastError: string | null,
+  isReconcileProcessing: boolean,
+  reconcileStatusCode = ReconcileStatusCode.NONE,
+  reconcileErrorCode: ReconcileErrorCode,
+  reconcileLastError: string | null,
 ) => ({
   reconcile,
-  isProcessing,
-  statusCode,
-  errorCode,
-  lastError,
+  isReconcileProcessing,
+  reconcileStatusCode,
+  reconcileErrorCode,
+  reconcileLastError,
 });
 
 function useStakeReconcile(): IReconcileStatus {
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [statusCode, setStatusCode] = useState(ReconcileStatusCode.NONE);
-  const [errorCode, setErrorCode] = useState(ReconcileErrorCode.NO_ERROR);
-  const [lastError, setLastError] = useState('');
+  const [isReconcileProcessing, setIsReconcileProcessing] = useState(false);
+  const [reconcileStatusCode, setReconcileStatusCode] = useState(
+    ReconcileStatusCode.NONE,
+  );
+  const [reconcileErrorCode, setReconcileErrorCode] = useState(
+    ReconcileErrorCode.NO_ERROR,
+  );
+  const [reconcileLastError, setReconcileLastError] = useState('');
   const walletSolana = useSolanaWallet();
 
   const solanaConnection = useMemo(
@@ -117,9 +121,9 @@ function useStakeReconcile(): IReconcileStatus {
 
   const setError = (error: ReconcileErrorCode) => {
     ConsoleHelper('useStake setError', error);
-    setStatusCode(ReconcileStatusCode.FAILED);
-    setErrorCode(error);
-    setIsProcessing(false);
+    setReconcileStatusCode(ReconcileStatusCode.FAILED);
+    setReconcileErrorCode(error);
+    setIsReconcileProcessing(false);
   };
 
   const submitStakeResult = async (
@@ -146,11 +150,11 @@ function useStakeReconcile(): IReconcileStatus {
       (results) => {
         ConsoleHelper(`processStakeResult: ${JSON.stringify(results)}`);
         if (results.data.success) {
-          setStatusCode(ReconcileStatusCode.SUCCESS);
-          setIsProcessing(false);
+          setReconcileStatusCode(ReconcileStatusCode.SUCCESS);
+          setIsReconcileProcessing(false);
         } else {
           const errorMessage = results.data.error_message || 'Unknown error';
-          setLastError(
+          setReconcileLastError(
             `${errorMessage} (Error code: ${results.data.error_code})`,
           );
           setError(ReconcileErrorCode.SUBMIT_FAILED);
@@ -158,7 +162,7 @@ function useStakeReconcile(): IReconcileStatus {
       },
       (error) => {
         ConsoleHelper(`processStakeResult: ${error}`);
-        setLastError(`Unknown error`);
+        setReconcileLastError(`Unknown error`);
         setError(ReconcileErrorCode.SUBMIT_FAILED);
       },
     );
@@ -168,63 +172,60 @@ function useStakeReconcile(): IReconcileStatus {
     txInfo: TransactionResponse,
     programId: PublicKey,
   ) => {
-    ConsoleHelper('parseTransaction', txInfo);
+    ConsoleHelper(`parseTransaction: ${txInfo}`);
 
     const { accountKeys, instructions: txInstructions } =
       txInfo.transaction.message;
 
-    // if (accountKeys.length !== 10) {
-    //   ConsoleHelper('accountKeys -- error');
-    //   return {success: false}
-    // }
     ConsoleHelper(
-      'parseTransaction - accountKeys[0]',
+      `parseTransaction -> accountKeys[0]: ${accountKeys[0].toString()}`,
       accountKeys[0].toString(),
     );
     ConsoleHelper(
-      'parseTransaction - accountKeys[1]',
+      `parseTransaction -> accountKeys[1]: ${accountKeys[1].toString()}`,
       accountKeys[1].toString(),
     );
     ConsoleHelper(
-      'parseTransaction - accountKeys[2]',
+      `parseTransaction -> accountKeys[2]: ${accountKeys[2].toString()}`,
       accountKeys[2].toString(),
     );
     ConsoleHelper(
-      'parseTransaction - accountKeys[3]',
+      `parseTransaction -> accountKeys[3]: ${accountKeys[3].toString()}`,
       accountKeys[3].toString(),
     );
     ConsoleHelper(
-      'parseTransaction - accountKeys[4]',
+      `parseTransaction -> accountKeys[4]: ${accountKeys[4].toString()}`,
       accountKeys[4].toString(),
     );
     ConsoleHelper(
-      'parseTransaction - accountKeys[5]',
+      `parseTransaction -> accountKeys[5]: ${accountKeys[5].toString()}`,
       accountKeys[5].toString(),
     );
     ConsoleHelper(
-      'parseTransaction - accountKeys[6]',
+      `parseTransaction -> accountKeys[6]: ${accountKeys[6].toString()}`,
       accountKeys[6].toString(),
     );
     ConsoleHelper(
-      'parseTransaction - accountKeys[7]',
+      `parseTransaction -> accountKeys[7]: ${accountKeys[7].toString()}`,
       accountKeys[7].toString(),
     );
     ConsoleHelper(
-      'parseTransaction - accountKeys[8]',
+      `parseTransaction -> accountKeys[8]: ${accountKeys[8].toString()}`,
       accountKeys[8].toString(),
     );
     ConsoleHelper(
-      'parseTransaction - accountKeys[9]',
+      `parseTransaction -> accountKeys[9]: ${accountKeys[9].toString()}`,
       accountKeys[9].toString(),
     );
+
     if (!accountKeys[9].equals(programId)) {
-      ConsoleHelper('accountKeys -- error: Invalid program id');
+      ConsoleHelper('accountKeys -> error: Invalid program id');
       return { success: false };
     }
 
     ConsoleHelper('txInstructions', txInstructions);
     if (!Array.isArray(txInstructions) || txInstructions.length !== 1) {
-      ConsoleHelper('accountKeys -- error: Invalid instruction');
+      ConsoleHelper('accountKeys -> error: Invalid instruction');
       return { success: false };
     }
 
@@ -241,7 +242,6 @@ function useStakeReconcile(): IReconcileStatus {
     const bnTxAmount = new BN(Buffer.from(inputData.slice(47)), 'hex', 'le');
     ConsoleHelper('bnTxAmount', bnTxAmount.toString());
     const txAmount = formatUnits(bnTxAmount.toString(), 9);
-    // const txAmount = formatUnits('6123456789', 9);
     ConsoleHelper('txAmount', txAmount);
 
     return { success: true, handle, amount: txAmount };
@@ -285,10 +285,10 @@ function useStakeReconcile(): IReconcileStatus {
       provider,
     );
 
-    setIsProcessing(true);
-    setStatusCode(ReconcileStatusCode.START);
+    setIsReconcileProcessing(true);
+    setReconcileStatusCode(ReconcileStatusCode.START);
 
-    setStatusCode(ReconcileStatusCode.PROCESSING);
+    setReconcileStatusCode(ReconcileStatusCode.PROCESSING);
     const outcome = await getServerInfo();
     if (!outcome) {
       setError(ReconcileErrorCode.SERVER_INVALID);
@@ -343,7 +343,7 @@ function useStakeReconcile(): IReconcileStatus {
       return false;
     }
 
-    setStatusCode(ReconcileStatusCode.SUBMITTING);
+    setReconcileStatusCode(ReconcileStatusCode.SUBMITTING);
     await submitStakeResult(
       mode,
       lockedKind,
@@ -367,10 +367,10 @@ function useStakeReconcile(): IReconcileStatus {
 
   return createReconcileStatus(
     reconcile,
-    isProcessing,
-    statusCode,
-    errorCode,
-    lastError,
+    isReconcileProcessing,
+    reconcileStatusCode,
+    reconcileErrorCode,
+    reconcileLastError,
   );
 }
 

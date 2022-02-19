@@ -22,7 +22,7 @@ export const FlexiblePoolView = () => {
         />
         <PoolInfoContainer tabType={StakeMode.FLEXIBLE} />
         <BalanceInfoContainer tabType={StakeMode.FLEXIBLE} />
-        <ReconcileContainer mode={StakeMode.FLEXIBLE} lockedKind={null} />
+        <ReconcileContainer mode={StakeMode.FLEXIBLE} lockedPoolLength={null} />
       </Card>
     </Container>
   );

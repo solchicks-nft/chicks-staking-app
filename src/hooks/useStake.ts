@@ -12,7 +12,6 @@ import {
 import { parseUnits } from 'ethers/lib/utils';
 import { AnchorWallet } from '@solana/wallet-adapter-react';
 import { Md5 } from 'md5-typescript';
-import { BigNumber } from 'ethers';
 import { TOKEN_PROGRAM_ID } from '@solana/spl-token';
 import { useSolanaWallet } from '../contexts/SolanaWalletContext';
 import { SOLANA_HOST } from '../utils/consts';
@@ -36,11 +35,13 @@ import {
 import { getSolChicksAssociatedAddress } from '../utils/solchickHelper';
 import ConsoleHelper from '../utils/consoleHelper';
 import {
-  createStakeStatus, getPoolHandle,
+  createStakeStatus,
+  getPoolHandle,
   getServerInfo,
   isEnoughTokenOnSolana,
   IStakeStatus,
-  StakeErrorCode, StakeLockedPoolType,
+  StakeErrorCode,
+  StakeLockedPoolLength,
   StakeMode,
   StakeStatusCode,
   StakeStepMode,
@@ -48,14 +49,20 @@ import {
 import { sleep } from '../utils/helper';
 import { useStakePool } from '../contexts/StakePoolContext';
 
-function useStake(mode: StakeMode, tab: StakeStepMode, pool: StakeLockedPoolType | null = null): IStakeStatus {
+function useStake(
+  mode: StakeMode,
+  tab: StakeStepMode,
+  pool: StakeLockedPoolLength | null = null,
+): IStakeStatus {
   const [isProcessing, setIsProcessing] = useState(false);
   const [sourceTxId, setSourceTxId] = useState('');
   const [currentMode, setCurrentMode] = useState<StakeMode>(StakeMode.FLEXIBLE);
   const [currentTab, setCurrentTab] = useState<StakeStepMode>(
     StakeStepMode.STAKE,
   );
-  const [currentPool, setCurrentPool] = useState<StakeLockedPoolType | null>(null);
+  const [currentPool, setCurrentPool] = useState<StakeLockedPoolLength | null>(
+    null,
+  );
   const [statusCode, setStatusCode] = useState(StakeStatusCode.NONE);
   const [errorCode, setErrorCode] = useState(StakeErrorCode.NO_ERROR);
   const [lastError, setLastError] = useState('');
@@ -146,7 +153,7 @@ function useStake(mode: StakeMode, tab: StakeStepMode, pool: StakeLockedPoolType
   }
 
   const submitStakeResult = async (
-    stakePool: StakeLockedPoolType | null,
+    stakePool: StakeLockedPoolLength | null,
     address: string,
     amount: number,
     txId: string,
@@ -156,12 +163,18 @@ function useStake(mode: StakeMode, tab: StakeStepMode, pool: StakeLockedPoolType
     const url =
       mode === StakeMode.FLEXIBLE
         ? URL_SUBMIT_FLEX_STAKE(address, amount, txId, handle, xTokenAmount)
-        : URL_SUBMIT_LOCKED_STAKE(stakePool, address, amount, txId, xTokenAmount);
+        : URL_SUBMIT_LOCKED_STAKE(
+            stakePool,
+            address,
+            amount,
+            txId,
+            xTokenAmount,
+          );
     processStakeResult(url, txId, StakeStepMode.STAKE);
   };
 
   const submitUnstakeResult = async (
-    stakePool: StakeLockedPoolType | null,
+    stakePool: StakeLockedPoolLength | null,
     address: string,
     txId: string,
     handle: string,
@@ -180,6 +193,7 @@ function useStake(mode: StakeMode, tab: StakeStepMode, pool: StakeLockedPoolType
     xAmount = '',
     handle = '',
   ) => {
+    // noinspection DuplicatedCode
     const { publicKey: walletPublicKey } = walletSolana;
 
     const provider = await getAnchorProvider();
@@ -258,7 +272,9 @@ function useStake(mode: StakeMode, tab: StakeStepMode, pool: StakeLockedPoolType
         // @ts-ignore
         mode === StakeMode.FLEXIBLE
           ? [tokenMintPubkey.toBuffer()]
-          : [tokenMintPubkey.toBuffer(), poolHandle],
+          : ([tokenMintPubkey.toBuffer(), poolHandle] as Array<
+              Buffer | Uint8Array
+            >),
         program.programId,
       );
 
@@ -268,7 +284,10 @@ function useStake(mode: StakeMode, tab: StakeStepMode, pool: StakeLockedPoolType
         // @ts-ignore
         mode === StakeMode.FLEXIBLE
           ? [Buffer.from(anchor.utils.bytes.utf8.encode('staking'))]
-          : [Buffer.from(anchor.utils.bytes.utf8.encode('staking')), poolHandle],
+          : ([
+              Buffer.from(anchor.utils.bytes.utf8.encode('staking')),
+              poolHandle,
+            ] as Array<Buffer | Uint8Array>),
         program.programId,
       );
 
@@ -336,14 +355,14 @@ function useStake(mode: StakeMode, tab: StakeStepMode, pool: StakeLockedPoolType
                 accounts as unknown as Context,
               )
             : await program.rpc.unstake(
-              vaultBump,
-              stakingBump,
-              userStakingBump,
-              poolHandle,
-              handle,
-              new anchor.BN(xAmount as unknown as BN),
-              accounts as unknown as Context,
-            );
+                vaultBump,
+                stakingBump,
+                userStakingBump,
+                poolHandle,
+                handle,
+                new anchor.BN(xAmount as unknown as BN),
+                accounts as unknown as Context,
+              );
       }
 
       ConsoleHelper(`txId: ${txId}`);

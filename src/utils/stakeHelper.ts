@@ -21,13 +21,13 @@ export enum StakeStepMode {
   UNSTAKE = 'unstake',
 }
 
-export enum StakeLockedKind {
+export enum StakeLockedPoolLength {
   MONTH4 = 1,   // 120 days
   MONTH8 = 2,   // 240 days
   MONTH12 = 3,  // 360 days
 }
 
-export const getPoolHandle = (pool: StakeLockedKind | null) => `pool${pool}`
+export const getPoolHandle = (pool: StakeLockedPoolLength | null) => `pool${pool}`
 
 export enum StakeStatusCode {
   NONE = 0,

@@ -57,17 +57,7 @@ export const BalanceInfoContainer = ({ tabType }: { tabType: StakeMode }) => {
     lastError,
     sourceTxId,
   } = useStake(tabType, tab);
-  const {
-    getBalance,
-    refreshFlexiblePool,
-    refreshLockedPool,
-    setStakeMode,
-    setLockedPoolType,
-    stakeList,
-    userInfo,
-    totalInfo,
-    tokenBalance,
-  } = useStakePool();
+  const { getBalance, stakeList, userInfo, tokenBalance } = useStakePool();
   const { publicKey: solanaAddress } = useSolanaWallet();
 
   const handleChange = useCallback((event, value) => {

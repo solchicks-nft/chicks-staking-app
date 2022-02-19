@@ -1,35 +1,26 @@
-import React, {
-  useEffect,
-  useMemo,
-  useState,
-} from 'react';
-import {
-  Button,
-  TextField,
-  Typography,
-} from '@material-ui/core';
+import React, { useEffect, useMemo, useState } from 'react';
+import { Button, TextField, Typography } from '@material-ui/core';
 import { useStyles } from '../pages/useStyles';
 import ConsoleHelper from '../utils/consoleHelper';
-import {
-  StakeLockedKind,
-  StakeMode,
-} from '../utils/stakeHelper';
-import { useSolanaWallet } from '../contexts/SolanaWalletContext';
-import useStakeReconcile, {ReconcileErrorCode, ReconcileStatusCode } from "../hooks/useStakeReconcile";
+import { StakeLockedPoolLength, StakeMode } from '../utils/stakeHelper';
+import useStakeReconcile, {
+  ReconcileErrorCode,
+  ReconcileStatusCode,
+} from '../hooks/useStakeReconcile';
 
-export const ReconcileContainer = ({ mode, lockedKind }: { mode: StakeMode, lockedKind: StakeLockedKind | null }) => {
+export const ReconcileContainer = ({
+  mode,
+  lockedPoolLength,
+}: {
+  mode: StakeMode;
+  lockedPoolLength: StakeLockedPoolLength | null;
+}) => {
   const classes = useStyles();
   const [transactionId, setTransactionId] = useState('');
   const [successMessage, setSuccessMessage] = React.useState('');
   const [errorMessage, setErrorMessage] = React.useState('');
-  const {
-    reconcile,
-    isProcessing,
-    statusCode,
-    errorCode,
-    lastError,
-  } = useStakeReconcile();
-  const { publicKey: solanaAddress } = useSolanaWallet();
+  const { reconcile, isProcessing, statusCode, errorCode, lastError } =
+    useStakeReconcile();
 
   const statusMessage = useMemo(() => {
     if (isProcessing || statusCode !== ReconcileStatusCode.FAILED) {
@@ -81,16 +72,16 @@ export const ReconcileContainer = ({ mode, lockedKind }: { mode: StakeMode, lock
 
   const onRecover = async () => {
     if (transactionId === '') {
-      setErrorMessage('Please provide the transaction hash');
+      setErrorMessage('Please provide a transaction hash');
       return;
     }
-    reconcile(mode, lockedKind, transactionId);
+    reconcile(mode, lockedPoolLength, transactionId);
   };
 
   return (
     <div className={classes.card}>
-      <div className={classes.header}>Reconcile</div>
-      <div style={{ padding: '2rem'}}>
+      <div className={classes.header}>RECONCILE</div>
+      <div style={{ padding: '2rem' }}>
         <div style={{ paddingTop: '20px', width: '32rem' }}>
           <TextField
             label="Transaction Hash"
@@ -102,7 +93,7 @@ export const ReconcileContainer = ({ mode, lockedKind }: { mode: StakeMode, lock
             }}
           />
         </div>
-        <div style={{marginTop: '1rem'}}>
+        <div style={{ marginTop: '1rem' }}>
           <Button
             variant="contained"
             color="primary"

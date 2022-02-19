@@ -1,4 +1,4 @@
-/* eslint-disable no-empty,@typescript-eslint/no-empty-function */
+/* eslint-disable no-empty,@typescript-eslint/no-empty-function,camelcase */
 import React, {
   JSXElementConstructor,
   ReactChildren,
@@ -9,15 +9,19 @@ import React, {
   useMemo,
   useState,
 } from 'react';
-import {ConfirmOptions, Connection, PublicKey} from '@solana/web3.js';
+import { ConfirmOptions, Connection, PublicKey } from '@solana/web3.js';
 import * as anchor from '@project-serum/anchor';
-import {Idl, Program, Provider as AnchorProvider} from '@project-serum/anchor';
-import {AnchorWallet} from '@solana/wallet-adapter-react';
-import {parseUnits} from 'ethers/lib/utils';
-import {BigNumber} from 'ethers';
+import {
+  Idl,
+  Program,
+  Provider as AnchorProvider,
+} from '@project-serum/anchor';
+import { AnchorWallet } from '@solana/wallet-adapter-react';
+import { parseUnits } from 'ethers/lib/utils';
+import { BigNumber } from 'ethers';
 import axios from 'axios';
-import {getTokenBalance, toPublicKey} from '../utils/solanaHelper';
-import {toTokenBalanceString} from '../utils/solchickHelper';
+import { getTokenBalance, toPublicKey } from '../utils/solanaHelper';
+import { toTokenBalanceString } from '../utils/solchickHelper';
 import ConsoleHelper from '../utils/consoleHelper';
 import {
   IStakeBalance,
@@ -29,16 +33,21 @@ import {
   URL_SUBMIT_FLEX_LIST,
   URL_SUBMIT_LOCKED_LIST,
 } from '../utils/solchickConsts';
-import {useSolanaWallet} from './SolanaWalletContext';
-import {SOLANA_HOST} from '../utils/consts';
-import {getPoolHandle, StakeLockedKind, StakeMode, STATUS_STAKED} from '../utils/stakeHelper';
+import { useSolanaWallet } from './SolanaWalletContext';
+import { SOLANA_HOST } from '../utils/consts';
+import {
+  getPoolHandle,
+  StakeLockedPoolLength,
+  StakeMode,
+  STATUS_STAKED,
+} from '../utils/stakeHelper';
 
 interface IStakePoolContext {
   getBalance(): void;
   refreshLockedPool(): void;
   refreshFlexiblePool(): void;
   setStakeMode(mode: StakeMode): void;
-  setLockedKind(kind: StakeLockedKind): void;
+  setLockedLength(Length: StakeLockedPoolLength): void;
   tokenBalance: string;
   totalInfo: IStakeBalance | undefined;
   userInfo: IStakeBalance | undefined;
@@ -50,7 +59,7 @@ const StackPoolContext = React.createContext<IStakePoolContext>({
   refreshLockedPool: () => {},
   refreshFlexiblePool: () => {},
   setStakeMode: (mode: StakeMode) => {},
-  setLockedKind: (kind: StakeLockedKind) => {},
+  setLockedLength: (length: StakeLockedPoolLength) => {},
   tokenBalance: '',
   totalInfo: undefined,
   userInfo: undefined,
@@ -66,8 +75,11 @@ export const StakePoolProvider = ({
 }) => {
   const walletSolana = useSolanaWallet();
   const [tokenBalance, setTokenBalance] = useState('');
-  const [currentStakeMode, setCurrentStakeMode] = useState<StakeMode|null>(StakeMode.FLEXIBLE);
-  const [currentLockedPoolKind, setCurrentLockedPoolKind] = useState<StakeLockedKind|null>(null);
+  const [currentStakeMode, setCurrentStakeMode] = useState<StakeMode | null>(
+    StakeMode.FLEXIBLE,
+  );
+  const [currentLockedPoolLength, setCurrentLockedPoolLength] =
+    useState<StakeLockedPoolLength | null>(null);
   const [totalInfo, setTotalInfo] = useState<IStakeBalance>();
   const [userInfo, setUserInfo] = useState<IStakeBalance>();
   const [stakeList, setStakeList] = useState<IStakeInfo[]>();
@@ -80,11 +92,9 @@ export const StakePoolProvider = ({
   const { publicKey: walletPublicKey } = walletSolana;
 
   ConsoleHelper(
-    `stakePoolContext -> currentStakeMode: ${currentStakeMode}, currentLockedPoolKind: ${currentLockedPoolKind}`,
+    `stakePoolContext -> currentStakeMode: ${currentStakeMode}, currentLockedPoolLength: ${currentLockedPoolLength}`,
   );
-  ConsoleHelper(
-    `stakePoolContext -> walletPublicKey: ${walletPublicKey}`,
-  );
+  ConsoleHelper(`stakePoolContext -> walletPublicKey: ${walletPublicKey}`);
 
   const getAnchorProvider = useCallback(async () => {
     const opts = {
@@ -122,7 +132,10 @@ export const StakePoolProvider = ({
     setTokenBalance(returnVal);
   }, [solanaConnection, walletPublicKey]);
 
-  const refreshPool = async (stakeMode: StakeMode, poolKind: StakeLockedKind | null = null) => {
+  const refreshPool = async (
+    stakeMode: StakeMode,
+    poolLength: StakeLockedPoolLength | null = null,
+  ) => {
     if (!solanaConnection) {
       return;
     }
@@ -131,14 +144,15 @@ export const StakePoolProvider = ({
       return;
     }
 
-    if (stakeMode === StakeMode.LOCKED && !poolKind) {
+    if (stakeMode === StakeMode.LOCKED && !poolLength) {
       return;
     }
 
     const provider = await getAnchorProvider();
-    const programIdl = stakeMode === StakeMode.FLEXIBLE
-      ? SOLCHICK_STAKING_FLEXIBLE_PROGRAM_IDL
-      : SOLCHICK_STAKING_LOCKED_PROGRAM_IDL;
+    const programIdl =
+      stakeMode === StakeMode.FLEXIBLE
+        ? SOLCHICK_STAKING_FLEXIBLE_PROGRAM_IDL
+        : SOLCHICK_STAKING_LOCKED_PROGRAM_IDL;
 
     if (!provider) {
       return;
@@ -150,40 +164,34 @@ export const StakePoolProvider = ({
       provider,
     );
 
-    ConsoleHelper(
-      `refreshPool -> program id`,
-      program.programId.toString()
-    );
+    ConsoleHelper(`refreshPool -> program id`, program.programId.toString());
 
-    const poolHandle = getPoolHandle(poolKind);
+    const poolHandle = getPoolHandle(poolLength);
 
     const [stakingPubkey, stakingBump] =
       await anchor.web3.PublicKey.findProgramAddress(
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
         stakeMode === StakeMode.FLEXIBLE
           ? [Buffer.from(anchor.utils.bytes.utf8.encode('staking'))]
-          : [Buffer.from(anchor.utils.bytes.utf8.encode('staking')), poolHandle],
+          : ([
+              Buffer.from(anchor.utils.bytes.utf8.encode('staking')),
+              poolHandle,
+            ] as Array<Buffer | Uint8Array>),
         program.programId,
       );
 
-    ConsoleHelper(
-      `refreshPool -> stakingPubkey: ${stakingPubkey.toString()}`,
-    );
+    ConsoleHelper(`refreshPool -> stakingPubkey: ${stakingPubkey.toString()}`);
     ConsoleHelper(`refreshPool -> stakingBump: ${stakingBump}`);
 
     const [vaultPubkey, vaultBump] =
       await anchor.web3.PublicKey.findProgramAddress(
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
         stakeMode === StakeMode.FLEXIBLE
           ? [tokenMintPubkey.toBuffer()]
-          : [tokenMintPubkey.toBuffer(), poolHandle],
+          : ([tokenMintPubkey.toBuffer(), poolHandle] as Array<
+              Buffer | Uint8Array
+            >),
         program.programId,
       );
-    ConsoleHelper(
-      `refreshPool -> vaultPubkey: ${vaultPubkey.toString()}`,
-    );
+    ConsoleHelper(`refreshPool -> vaultPubkey: ${vaultPubkey.toString()}`);
     ConsoleHelper(`refreshPool -> vaultBump: ${vaultBump}`);
 
     try {
@@ -194,7 +202,10 @@ export const StakePoolProvider = ({
         const totalXToken = toTokenBalanceString(stakingAccount.totalXToken);
         ConsoleHelper(`refreshPool -> totalXToken: ${totalXToken}`);
 
-        const totalBalance = await getTokenBalance(solanaConnection, vaultPubkey);
+        const totalBalance = await getTokenBalance(
+          solanaConnection,
+          vaultPubkey,
+        );
         if (totalBalance) {
           const totalToken = toTokenBalanceString(totalBalance);
           ConsoleHelper(`refreshPool -> totalToken: ${totalToken}`);
@@ -210,23 +221,20 @@ export const StakePoolProvider = ({
 
     if (walletPublicKey) {
       try {
-        const url = stakeMode === StakeMode.FLEXIBLE
-          ? URL_SUBMIT_FLEX_LIST(walletPublicKey.toString())
-          : URL_SUBMIT_LOCKED_LIST(poolKind, walletPublicKey.toString());
+        const url =
+          stakeMode === StakeMode.FLEXIBLE
+            ? URL_SUBMIT_FLEX_LIST(walletPublicKey.toString())
+            : URL_SUBMIT_LOCKED_LIST(poolLength, walletPublicKey.toString());
         const results = await axios.get(url);
         ConsoleHelper(
-          `refreshPool -> list: ${JSON.stringify(
-            results.data.data,
-          )}`,
+          `refreshPool -> list: ${JSON.stringify(results.data.data)}`,
         );
 
         if (results.data.data) {
           let userTotalChicks = BigNumber.from(0);
           let userTotalXChicks = BigNumber.from(0);
           const list: IStakeInfo[] = [];
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-ignore
-          results.data.data.forEach((item) => {
+          results.data.data.forEach((item: any) => {
             const amount = parseUnits(
               item.amount.toString(),
               SOLCHICK_DECIMALS_ON_SOL,
@@ -269,44 +277,42 @@ export const StakePoolProvider = ({
     } else {
       setUserInfo({ chicksAmount: '', xChicksAmount: '' });
     }
-  }
+  };
 
   const refreshLockedPool = useCallback(async () => {
-    ConsoleHelper(
-      `refreshLockedPool -> start`,
-    );
+    ConsoleHelper(`refreshLockedPool -> start`);
     await refreshPool(StakeMode.LOCKED);
   }, [getAnchorProvider, solanaConnection, tokenMintPubkey, walletPublicKey]);
 
   const refreshFlexiblePool = useCallback(async () => {
-    ConsoleHelper(
-        `refreshFlexiblePool -> start`,
-    );
+    ConsoleHelper(`refreshFlexiblePool -> start`);
     await refreshPool(StakeMode.FLEXIBLE);
   }, [getAnchorProvider, solanaConnection, tokenMintPubkey, walletPublicKey]);
 
-  const setLockedKind = (kind: StakeLockedKind) => {
-    setCurrentLockedPoolKind(kind);
-  }
+  const setLockedLength = useCallback(
+    async (StakeLockedPoolType: StakeLockedPoolLength) => {
+      setCurrentLockedPoolLength(StakeLockedPoolType);
+    },
+    [setCurrentLockedPoolLength],
+  );
 
-  const setStakeMode = (mode: StakeMode) => {
-    setCurrentStakeMode(mode);
-    if (mode === StakeMode.LOCKED) {
-      setCurrentLockedPoolKind(StakeLockedKind.MONTH4);
-    }
-    refreshPool(mode, StakeLockedKind.MONTH4);
-  }
+  const setStakeMode = useCallback(
+    async (mode: StakeMode) => {
+      setCurrentStakeMode(mode);
+      if (mode === StakeMode.LOCKED) {
+        setCurrentLockedPoolLength(StakeLockedPoolLength.MONTH4);
+      }
+      refreshPool(mode, StakeLockedPoolLength.MONTH4).then();
+    },
+    [refreshPool],
+  );
 
   useEffect(() => {
     if (!currentStakeMode) {
       return;
     }
-    refreshPool(currentStakeMode, currentLockedPoolKind);
-  }, [
-    currentStakeMode,
-    currentLockedPoolKind,
-    walletPublicKey,
-  ]);
+    refreshPool(currentStakeMode, currentLockedPoolLength).then();
+  }, [currentStakeMode, currentLockedPoolLength, walletPublicKey, refreshPool]);
 
   const contextValue = useMemo(
     () => ({
@@ -314,7 +320,7 @@ export const StakePoolProvider = ({
       refreshLockedPool,
       refreshFlexiblePool,
       setStakeMode,
-      setLockedKind,
+      setLockedLength,
       tokenBalance,
       totalInfo,
       userInfo,
@@ -325,7 +331,7 @@ export const StakePoolProvider = ({
       refreshLockedPool,
       refreshFlexiblePool,
       setStakeMode,
-      setLockedKind,
+      setLockedLength,
       tokenBalance,
       totalInfo,
       userInfo,

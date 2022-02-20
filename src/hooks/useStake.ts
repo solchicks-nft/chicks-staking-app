@@ -115,7 +115,7 @@ function useStake(
   }
 
   const setError = (error: StakeErrorCode) => {
-    ConsoleHelper('useStake setError', error);
+    ConsoleHelper(`setError: ${error}`);
     setStakeStatusCode(StakeStatusCode.FAILED);
     setStakeErrorCode(error);
     setIsStakeProcessing(false);
@@ -399,7 +399,7 @@ function useStake(
         xTokenAmountStr = userStakingAccount.xTokenAmount.toString();
       }
     } catch (e) {
-      ConsoleHelper(`error: `, e);
+      ConsoleHelper(`error: ${JSON.stringify(e)}`);
       setError(StakeErrorCode.STAKE_FAILED);
       return false;
     }

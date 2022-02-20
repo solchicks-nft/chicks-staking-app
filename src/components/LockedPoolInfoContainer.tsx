@@ -27,6 +27,7 @@ export const LockedPoolInfoContainer = () => {
     if (totalInfo && totalInfo.chicksAmount) {
       lockedTotalApr = calculateLockedTotalApr(
         totalInfo.chicksAmount as unknown as number,
+        tab,
       );
     }
     return lockedTotalApr && lockedTotalApr > 0 && lockedTotalApr !== Infinity

@@ -253,7 +253,7 @@ export const StakePoolProvider = ({
                 stakeEndDate: item.stake_end_date,
               });
             });
-            ConsoleHelper(`stakeList`, list);
+            ConsoleHelper(`stakeList -> ${JSON.stringify(list)}`);
             ConsoleHelper(`userTotalChicks -> ${userTotalChicks}`);
             ConsoleHelper(
               `userTotalXChicks -> ${JSON.stringify(userTotalXChicks)}`,

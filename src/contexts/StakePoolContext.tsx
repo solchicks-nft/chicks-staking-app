@@ -54,7 +54,7 @@ interface IStakePoolContext {
   stakeList: IStakeInfo[] | undefined;
 }
 
-const StackPoolContext = React.createContext<IStakePoolContext>({
+const StakePoolContext = React.createContext<IStakePoolContext>({
   getBalance: () => {},
   refreshLockedPool: () => {},
   refreshFlexiblePool: () => {},
@@ -338,9 +338,9 @@ export const StakePoolProvider = ({
     ],
   );
   return (
-    <StackPoolContext.Provider value={contextValue}>
+    <StakePoolContext.Provider value={contextValue}>
       {children}
-    </StackPoolContext.Provider>
+    </StakePoolContext.Provider>
   );
 };
-export const useStakePool = () => useContext(StackPoolContext);
+export const useStakePool = () => useContext(StakePoolContext);

@@ -1,22 +1,20 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import { Tab, Tabs } from '@material-ui/core';
+import React, { useEffect, useState } from 'react';
 import { useStyles } from '../pages/useStyles';
 import { StakeLockedPoolLength, StakeMode } from '../utils/stakeHelper';
 import { useStakePool } from '../contexts/StakePoolContext';
 import BalanceInfoContainer from './BalanceInfoContainer';
 import { StakeContainer } from './StakeContainer';
 
-export const LockedPoolBalanceInfoContainer = () => {
+export const LockedPoolBalanceInfoContainer = ({
+  tab,
+}: {
+  tab: StakeLockedPoolLength;
+}) => {
   const classes = useStyles();
-  const [tab, setTab] = useState(StakeLockedPoolLength.MONTH4);
   const [currentStakeMode, setCurrentStakeMode] = useState<StakeMode | null>(
     StakeMode.LOCKED,
   );
   const { userInfo, setLockedPoolLength, setStakeMode } = useStakePool();
-
-  const handleTabChange = useCallback((event, value) => {
-    setTab(value);
-  }, []);
 
   useEffect(() => {
     setCurrentStakeMode(StakeMode.LOCKED);
@@ -27,34 +25,8 @@ export const LockedPoolBalanceInfoContainer = () => {
   return (
     <div className={classes.card}>
       <div className={classes.header}>MY BALANCE</div>
-      <div className={classes.mainTab}>
-        <div className={classes.centerTab}>
-          <Tabs
-            value={tab}
-            variant="fullWidth"
-            indicatorColor="primary"
-            onChange={handleTabChange}
-          >
-            <Tab
-              className={classes.tab}
-              label="4 MONTHS"
-              value={StakeLockedPoolLength.MONTH4}
-            />
-            <Tab
-              className={classes.tab}
-              label="8 MONTHS"
-              value={StakeLockedPoolLength.MONTH8}
-            />
-            <Tab
-              className={classes.tab}
-              label="12 MONTHS"
-              value={StakeLockedPoolLength.MONTH12}
-            />
-          </Tabs>
-          <BalanceInfoContainer userInfo={userInfo} />
-          <StakeContainer stakeMode={StakeMode.LOCKED} lockedPoolLength={tab} />
-        </div>
-      </div>
+      <BalanceInfoContainer userInfo={userInfo} />
+      <StakeContainer stakeMode={StakeMode.LOCKED} lockedPoolLength={tab} />
     </div>
   );
 };

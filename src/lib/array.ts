@@ -4,14 +4,14 @@ import { hexValue, hexZeroPad, stripZeros } from 'ethers/lib/utils';
 import { arrayify, zeroPad } from '@ethersproject/bytes';
 
 import {
-  ChainId,
+  CHAIN_ID_AVAX,
   CHAIN_ID_BSC,
   CHAIN_ID_ETH,
+  CHAIN_ID_ETHEREUM_ROPSTEN,
+  CHAIN_ID_POLYGON,
   CHAIN_ID_SOLANA,
   CHAIN_ID_TERRA,
-  CHAIN_ID_POLYGON,
-  CHAIN_ID_ETHEREUM_ROPSTEN,
-  CHAIN_ID_AVAX,
+  ChainId,
 } from './consts';
 
 export const isEVMChain = (chainId: ChainId) =>

@@ -20,7 +20,11 @@ import {
 } from '../utils/solchickConsts';
 import {getTransactionInfoOnSol, pubkeyToString, toPublicKey,} from '../utils/solanaHelper';
 import ConsoleHelper from '../utils/consoleHelper';
-import {getServerInfo, StakeLockedPoolLength, StakeMode,} from '../utils/stakeHelper';
+import {
+  getServerInfo,
+  StakeLockedPoolLength,
+  StakeMode,
+} from '../utils/stakeHelper';
 
 export enum ReconcileStatusCode {
   NONE = 0,
@@ -120,7 +124,14 @@ function useStakeReconcile(): IReconcileStatus {
   ) => {
     const url =
       mode === StakeMode.FLEXIBLE
-        ? URL_SUBMIT_FLEX_STAKE(address, amount, txId, handle, xTokenAmount, startTime)
+        ? URL_SUBMIT_FLEX_STAKE(
+            address,
+            amount,
+            txId,
+            handle,
+            xTokenAmount,
+            startTime,
+          )
         : URL_SUBMIT_LOCKED_STAKE(
             stakePool,
             address,
@@ -128,7 +139,7 @@ function useStakeReconcile(): IReconcileStatus {
             txId,
             handle,
             xTokenAmount,
-            startTime
+            startTime,
           );
 
     axios.get(url).then(
@@ -273,7 +284,11 @@ function useStakeReconcile(): IReconcileStatus {
         : SOLCHICK_STAKING_LOCKED;
 
     if (programIdl.metadata.address !== envProgramId) {
-      ConsoleHelper(`Invalid program id`, envProgramId, programIdl.metadata.address);
+      ConsoleHelper(
+        `Invalid program id`,
+        envProgramId,
+        programIdl.metadata.address,
+      );
       return false;
     }
 

@@ -5,8 +5,8 @@ import { CHAIN_ID_SOLANA, ChainId } from '../lib/consts';
 import { isEVMChain } from '../lib/array';
 import { getAssociatedTokenAddress } from './solanaHelper';
 import {
-  SOLCHICK_TOKEN_MINT_ON_SOL,
   SOLCHICK_DECIMALS_ON_SOL,
+  SOLCHICK_TOKEN_MINT_ON_SOL,
 } from './solchickConsts';
 
 export const getSolChicksAssociatedAddress = async (

@@ -315,19 +315,32 @@ function useStake(
 
     let xTokenAmountStr;
 
-    const accounts = {
-      accounts: {
-        tokenMint: tokenMintPubkey,
-        tokenFrom: associatedKey,
-        tokenFromAuthority: walletPublicKey,
-        tokenVault: vaultPubkey,
-        stakingAccount: stakingPubkey,
-        userStakingAccount: userStakingPubkey,
-        systemProgram: anchor.web3.SystemProgram.programId,
-        tokenProgram: TOKEN_PROGRAM_ID,
-        rent: anchor.web3.SYSVAR_RENT_PUBKEY,
-      },
-    };
+    const accounts =
+      stakeStepMode === StakeStepMode.STAKE
+        ? {
+          accounts: {
+            tokenMint: tokenMintPubkey,
+            tokenFrom: associatedKey,
+            tokenFromAuthority: walletPublicKey,
+            tokenVault: vaultPubkey,
+            stakingAccount: stakingPubkey,
+            userStakingAccount: userStakingPubkey,
+            systemProgram: anchor.web3.SystemProgram.programId,
+            tokenProgram: TOKEN_PROGRAM_ID,
+            rent: anchor.web3.SYSVAR_RENT_PUBKEY,
+          },
+        }
+      : {
+        accounts: {
+          tokenMint: tokenMintPubkey,
+          xTokenFromAuthority: walletPublicKey,
+          tokenVault: vaultPubkey,
+          stakingAccount: stakingPubkey,
+          userStakingAccount: userStakingPubkey,
+          tokenTo: associatedKey,
+          tokenProgram: TOKEN_PROGRAM_ID,
+        },
+      };
 
     let txId;
     try {

@@ -215,10 +215,15 @@ function useStakeReconcile(): IReconcileStatus {
       accountKeys[9].toString(),
     );
 
-    if (!accountKeys[6].equals(programId)) {
-      ConsoleHelper('accountKeys -> error: Invalid program id', programId.toString());
-      return { success: false };
-    }
+    if (mode === StakeMode.FLEXIBLE) {
+      if (!accountKeys[9].equals(programId)) {
+        ConsoleHelper('accountKeys -> error: Invalid program id', programId.toString());
+        return { success: false };
+      }
+    } else if (!accountKeys[6].equals(programId)) {
+        ConsoleHelper('accountKeys -> error: Invalid program id', programId.toString());
+        return { success: false };
+      }
 
     ConsoleHelper('txInstructions', txInstructions);
     if (!Array.isArray(txInstructions) || txInstructions.length !== 1) {

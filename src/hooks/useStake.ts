@@ -400,7 +400,7 @@ function useStake(
         xTokenAmountStr = userStakingAccount.xTokenAmount.toString();
       }
     } catch (e) {
-      ConsoleHelper(`error: ${JSON.stringify(e)}`);
+      ConsoleHelper(`error: `, e);
       setError(StakeErrorCode.STAKE_FAILED);
       return false;
     }

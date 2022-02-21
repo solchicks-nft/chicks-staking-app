@@ -109,7 +109,7 @@ function useStakeReconcile(): IReconcileStatus {
     const opts = {
       preflightCommitment: 'confirmed',
     };
-    if (!solanaConnection || !walletSolana) {
+    if (!solanaConnection) {
       return null;
     }
     return new AnchorProvider(
@@ -134,16 +134,18 @@ function useStakeReconcile(): IReconcileStatus {
     txId: string,
     handle: string,
     xTokenAmount: string,
+    startTime: string,
   ) => {
     const url =
       mode === StakeMode.FLEXIBLE
-        ? URL_SUBMIT_FLEX_STAKE(address, amount, txId, handle, xTokenAmount)
+        ? URL_SUBMIT_FLEX_STAKE(address, amount, txId, handle, xTokenAmount, startTime)
         : URL_SUBMIT_LOCKED_STAKE(
             stakePool,
             address,
             amount,
             txId,
             xTokenAmount,
+            startTime
           );
 
     axios.get(url).then(
@@ -245,7 +247,7 @@ function useStakeReconcile(): IReconcileStatus {
     const txAmount = formatUnits(bnTxAmount.toString(), 9);
     ConsoleHelper('txAmount', txAmount);
 
-    return { success: true, handle, amount: txAmount };
+    return { success: true, handle, amount: txAmount, wallet: accountKeys[0] };
   };
 
   const processReconcile = async (
@@ -253,15 +255,14 @@ function useStakeReconcile(): IReconcileStatus {
     lockedKind: StakeLockedPoolLength | null,
     txId: string,
   ) => {
-    // noinspection DuplicatedCode
-    const { publicKey: walletPublicKey } = walletSolana;
-
+    setReconcileErrorCode(ReconcileErrorCode.NO_ERROR);
+    setReconcileLastError('');
     const provider = await getAnchorProvider();
     if (!provider) {
       return false;
     }
 
-    if (!walletPublicKey || !solanaConnection) {
+    if (!solanaConnection) {
       return false;
     }
 
@@ -276,7 +277,7 @@ function useStakeReconcile(): IReconcileStatus {
         : SOLCHICK_STAKING_LOCKED;
 
     if (programIdl.metadata.address !== envProgramId) {
-      ConsoleHelper(`Invalid program id`);
+      ConsoleHelper(`Invalid program id`, envProgramId, programIdl.metadata.address);
       return false;
     }
 
@@ -299,6 +300,8 @@ function useStakeReconcile(): IReconcileStatus {
     let xTokenAmountStr;
     let handle = '';
     let stakeAmount = 0;
+    let startTime;
+    let walletPublicKey: PublicKey;
 
     try {
       ConsoleHelper(`txId: ${txId}`);
@@ -308,7 +311,6 @@ function useStakeReconcile(): IReconcileStatus {
         return false;
       }
 
-      await sleep(5000);
       const txInfo = await getTransactionInfoOnSol(solanaConnection, txId);
       ConsoleHelper(`getTransactionInfoOnSol: txId: ${txId}`, txInfo);
       if (!txInfo || !txInfo.meta || txInfo.meta.err) {
@@ -328,6 +330,7 @@ function useStakeReconcile(): IReconcileStatus {
 
       handle = ret.handle as string;
       stakeAmount = ret.amount as unknown as number;
+      walletPublicKey = ret.wallet as unknown as PublicKey;
       const [userStakingPubkey] =
         await anchor.web3.PublicKey.findProgramAddress(
           [walletPublicKey.toBuffer(), handle] as Array<Buffer | Uint8Array>,
@@ -338,6 +341,8 @@ function useStakeReconcile(): IReconcileStatus {
         userStakingPubkey,
       );
       xTokenAmountStr = userStakingAccount.xTokenAmount.toString();
+      startTime = userStakingAccount.startTime.toString();
+      ConsoleHelper(`parseTransaction: result: `, xTokenAmountStr, startTime);
     } catch (e) {
       ConsoleHelper(`error: `, e);
       setError(ReconcileErrorCode.RECONCILE_FAILED);
@@ -353,6 +358,7 @@ function useStakeReconcile(): IReconcileStatus {
       txId,
       handle,
       xTokenAmountStr,
+      startTime,
     );
     return true;
   };
@@ -362,7 +368,7 @@ function useStakeReconcile(): IReconcileStatus {
     lockedKind: StakeLockedPoolLength | null,
     txId: string,
   ) => {
-    ConsoleHelper('stake -> start');
+    ConsoleHelper('stake -> start', mode, lockedKind, txId);
     await processReconcile(mode, lockedKind, txId);
   };
 

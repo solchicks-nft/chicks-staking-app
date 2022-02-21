@@ -249,6 +249,8 @@ export const StakeContainer = ({
       } else if (reconcileStatusCode === ReconcileStatusCode.FAILED) {
         setReconcileErrorMessage(reconcileStatusMessage);
       }
+    } else {
+      setReconcileErrorMessage('');
     }
   }, [
     isReconcileProcessing,
@@ -258,12 +260,21 @@ export const StakeContainer = ({
     reconcileSuccessMessage,
   ]);
 
+  ConsoleHelper('reconcile info',
+    isReconcileProcessing,
+    reconcileStatusCode,
+    reconcileStatusMessage,
+    reconcileErrorCode,
+    reconcileSuccessMessage,
+    );
+
   const onReconcile = async () => {
     if (reconcileTxHash === '') {
       setReconcileErrorMessage('Please provide a transaction hash');
       return;
     }
-    reconcile(StakeMode.FLEXIBLE, null, reconcileTxHash);
+    setReconcileErrorMessage('');
+    reconcile(stakeMode, lockedPoolLength, reconcileTxHash);
   };
 
   return (
@@ -635,24 +646,26 @@ export const StakeContainer = ({
                     {isReconcileProcessing ? 'Processing' : 'Reconcile'}
                   </Button>
                 </div>
-                {!reconcileErrorMessage && reconcileStatusMessage ? (
-                  <Typography
-                    variant="body2"
-                    color="primary"
-                    className={classes.statusMessage}
-                  >
-                    {reconcileStatusMessage}
-                  </Typography>
-                ) : null}
-                {reconcileErrorMessage ? (
-                  <Typography
-                    variant="body2"
-                    color="error"
-                    className={classes.statusMessage}
-                  >
-                    {reconcileErrorMessage}
-                  </Typography>
-                ) : null}
+                <div style={{ paddingLeft: '1rem' }}>
+                  {!reconcileErrorMessage && reconcileStatusMessage ? (
+                    <Typography
+                      variant="body2"
+                      color="primary"
+                      className={classes.statusMessage}
+                    >
+                      {reconcileStatusMessage}
+                    </Typography>
+                  ) : null}
+                  {reconcileErrorMessage ? (
+                    <Typography
+                      variant="body2"
+                      color="error"
+                      className={classes.statusMessage}
+                    >
+                      {reconcileErrorMessage}
+                    </Typography>
+                  ) : null}
+                </div>
               </div>
             ) : null}
           </div>

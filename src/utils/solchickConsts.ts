@@ -49,9 +49,10 @@ export const URL_SUBMIT_FLEX_STAKE = (
   txId: string,
   handle: string,
   xTokenAmount: string,
+  startTime = '',
 ) =>
   // eslint-disable-next-line max-len
-  `${URL_BACKEND_BASE}/api/flex_stake/?address=${address}&amount=${amount}&tx_id=${txId}&handle=${handle}&x_token=${xTokenAmount}`;
+  `${URL_BACKEND_BASE}/api/flex_stake/?address=${address}&amount=${amount}&tx_id=${txId}&handle=${handle}&x_token=${xTokenAmount}&start_time=${startTime}`;
 
 export const URL_SUBMIT_FLEX_UNSTAKE = (
   address: string,
@@ -67,9 +68,10 @@ export const URL_SUBMIT_LOCKED_STAKE = (
   amount: number,
   txId: string,
   xTokenAmount: string,
+  startTime = '',
 ) =>
   // eslint-disable-next-line max-len
-  `${URL_BACKEND_BASE}/api/locked_stake/?pool=${stakePool}&address=${address}&amount=${amount}&tx_id=${txId}&x_token=${xTokenAmount}`;
+  `${URL_BACKEND_BASE}/api/locked_stake/?pool=${stakePool}&address=${address}&amount=${amount}&tx_id=${txId}&x_token=${xTokenAmount}&start_time=${startTime}`;
 
 export const URL_SUBMIT_LOCKED_UNSTAKE = (
   stakePool: StakeLockedPoolLength | null,

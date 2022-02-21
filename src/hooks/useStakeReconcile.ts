@@ -194,6 +194,7 @@ function useStakeReconcile(): IReconcileStatus {
     }
     ConsoleHelper('inputData', inputData);
 
+    // TODO fix handle for locked pool
     const handle = inputData.slice(15, 47).toString();
     ConsoleHelper('hash', handle);
 

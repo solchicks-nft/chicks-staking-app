@@ -236,6 +236,7 @@ function useStakeReconcile(): IReconcileStatus {
 
     let handle = '';
     let strAmount;
+    let pool = StakeLockedPoolLength.MONTH4;
     if (mode === StakeMode.FLEXIBLE) {
       if (inputData.length !== 55) {
         ConsoleHelper('accountKeys -- error: length', inputData);
@@ -248,6 +249,12 @@ function useStakeReconcile(): IReconcileStatus {
         ConsoleHelper('accountKeys -- error: length', inputData);
         return { success: false };
       }
+      const strPool = inputData.slice(15, 15 + 5).toString();
+      if (strPool === `pool${StakeLockedPoolLength.MONTH8}`) {
+        pool = StakeLockedPoolLength.MONTH8;
+      } else if (strPool === `pool${StakeLockedPoolLength.MONTH12}`) {
+        pool = StakeLockedPoolLength.MONTH12;
+      }
       handle = inputData.slice(24, 24 + 32).toString();
       strAmount = inputData.slice(56);
     }
@@ -259,7 +266,7 @@ function useStakeReconcile(): IReconcileStatus {
     const txAmount = formatUnits(bnTxAmount.toString(), 9);
     ConsoleHelper('txAmount', txAmount);
 
-    return { success: true, handle, amount: txAmount, wallet: accountKeys[0] };
+    return { success: true, handle, amount: txAmount, wallet: accountKeys[0], pool };
   };
 
   const processReconcile = async (
@@ -318,6 +325,7 @@ function useStakeReconcile(): IReconcileStatus {
     let stakeAmount = 0;
     let startTime;
     let walletPublicKey: PublicKey;
+    let pool = StakeLockedPoolLength.MONTH4;
 
     try {
       ConsoleHelper(`txId: ${txId}`);
@@ -353,6 +361,9 @@ function useStakeReconcile(): IReconcileStatus {
           [walletPublicKey.toBuffer(), handle] as Array<Buffer | Uint8Array>,
           program.programId,
         );
+      if (mode === StakeMode.LOCKED) {
+        pool = ret.pool as StakeLockedPoolLength;
+      }
 
       const userStakingAccount = await program.account.userStakingAccount.fetch(
         userStakingPubkey,
@@ -369,7 +380,7 @@ function useStakeReconcile(): IReconcileStatus {
     setReconcileStatusCode(ReconcileStatusCode.SUBMITTING);
     await submitStakeResult(
       mode,
-      lockedKind,
+      pool,
       pubkeyToString(walletPublicKey),
       stakeAmount,
       txId,

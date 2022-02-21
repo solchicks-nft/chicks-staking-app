@@ -35,7 +35,11 @@ import SolanaWalletKey from './SolanaWalletKey';
 import ShowTx from './ShowTx';
 import { CHAIN_ID_SOLANA } from '../lib/consts';
 import ShowTxButton from './ShowTxButton';
-import { FLEX_UNSTAKE_ACTIVE, UNSTAKE_FEE } from '../utils/consts';
+import {
+  FLEX_UNSTAKE_ACTIVE,
+  LOCKED_UNSTAKE_ACTIVE,
+  UNSTAKE_FEE,
+} from '../utils/consts';
 import useStakeReconcile, {
   ReconcileErrorCode,
   ReconcileStatusCode,
@@ -259,15 +263,6 @@ export const StakeContainer = ({
     reconcileErrorCode,
     reconcileSuccessMessage,
   ]);
-  //
-  // ConsoleHelper(
-  //   `reconcile status ->
-  //   isReconcileProcessing: ${isReconcileProcessing},
-  //   reconcileStatusCode: ${reconcileStatusCode},
-  //   reconcileStatusMessage: ${reconcileStatusMessage},
-  //   reconcileErrorCode: ${reconcileErrorCode},
-  //   reconcileSuccessMessage: ${reconcileSuccessMessage}`,
-  // );
 
   const onReconcile = async () => {
     if (reconcileTxHash === '') {
@@ -532,8 +527,36 @@ export const StakeContainer = ({
                                 <br />
                               </TableCell>
                               <TableCell>
-                                {!stakeListItem.stakeClaimDate ||
-                                !stakeListItem.unstakeTxHash ? (
+                                {stakeMode === StakeMode.LOCKED ? (
+                                  <>
+                                    <Button
+                                      variant="outlined"
+                                      onClick={() =>
+                                        handleUnstakeButtonClick(
+                                          stakeListItem.xChicksAmount,
+                                          stakeListItem.handle,
+                                        )
+                                      }
+                                      disabled={
+                                        !isAddress(
+                                          solanaAddress as PublicKey | string,
+                                        ) ||
+                                        isStakeProcessing ||
+                                        !LOCKED_UNSTAKE_ACTIVE ||
+                                        new Date() <
+                                          new Date(
+                                            stakeListItem.stakeEndDate,
+                                          ) ||
+                                        sourceTxId > ''
+                                      }
+                                    >
+                                      Unstake
+                                    </Button>
+                                  </>
+                                ) : null}
+                                {(!stakeListItem.stakeClaimDate ||
+                                  !stakeListItem.unstakeTxHash) &&
+                                stakeMode === StakeMode.FLEXIBLE ? (
                                   <>
                                     <Button
                                       variant="outlined"
@@ -555,7 +578,8 @@ export const StakeContainer = ({
                                       Unstake
                                     </Button>
                                     {new Date() <
-                                    new Date(stakeListItem.stakeEndDate) ? (
+                                      new Date(stakeListItem.stakeEndDate) &&
+                                    stakeMode === StakeMode.FLEXIBLE ? (
                                       <div
                                         style={{
                                           color: '#D0393E',

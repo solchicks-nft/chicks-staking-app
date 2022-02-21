@@ -275,7 +275,7 @@ export const StakePoolProvider = ({
         setUserInfo({ chicksAmount: '', xChicksAmount: '' });
       }
     },
-    [tokenMintPubkey, walletPublicKey],
+    [getAnchorProvider, solanaConnection, tokenMintPubkey, walletPublicKey],
   );
 
   const refreshLockedPool = useCallback(async () => {
@@ -315,7 +315,11 @@ export const StakePoolProvider = ({
     if (!currentStakeMode) {
       return;
     }
-    ConsoleHelper(`useEffect -> refreshPool`, currentStakeMode, currentLockedPoolLength);
+    ConsoleHelper(
+      `useEffect -> refreshPool`,
+      currentStakeMode,
+      currentLockedPoolLength,
+    );
     refreshPool(currentStakeMode, currentLockedPoolLength).then();
   }, [currentStakeMode, currentLockedPoolLength, walletPublicKey, refreshPool]);
 

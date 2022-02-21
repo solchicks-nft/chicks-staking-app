@@ -44,10 +44,8 @@ export const LockedPoolView = () => {
           />
         </Tabs>
         <div className={classes.mainTab}>
-          <div className={classes.centerTab}>
-            <LockedPoolInfoContainer tab={tab} />
-            <LockedPoolBalanceInfoContainer tab={tab} />
-          </div>
+          <LockedPoolInfoContainer tab={tab} />
+          <LockedPoolBalanceInfoContainer tab={tab} />
         </div>
       </Card>
     </Container>

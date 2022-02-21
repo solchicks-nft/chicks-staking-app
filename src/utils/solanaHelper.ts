@@ -83,4 +83,3 @@ export const getTransactionInfoOnSol = async (
   }
   return txInfo;
 };
-

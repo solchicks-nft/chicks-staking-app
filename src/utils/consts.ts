@@ -152,8 +152,8 @@ export const getExplorerName = (chainId: ChainId) =>
     ? 'Etherscan'
     : // eslint-disable-next-line no-nested-ternary
     chainId === CHAIN_ID_BSC
-      ? 'BscScan'
-      : 'Explorer';
+    ? 'BscScan'
+    : 'Explorer';
 
 export const getExplorerAddress = (chainId: ChainId, txId: string) => {
   if (chainId === CHAIN_ID_ETH) {

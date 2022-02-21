@@ -1,8 +1,8 @@
-import { PublicKey, Connection, Signer } from '@solana/web3.js';
+import { Connection, PublicKey, Signer } from '@solana/web3.js';
 import {
-  TOKEN_PROGRAM_ID,
   ASSOCIATED_TOKEN_PROGRAM_ID,
   Token,
+  TOKEN_PROGRAM_ID,
 } from '@solana/spl-token';
 import * as anchor from '@project-serum/anchor';
 import ConsoleHelper from './consoleHelper';

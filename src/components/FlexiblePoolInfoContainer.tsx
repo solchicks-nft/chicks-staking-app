@@ -11,7 +11,7 @@ export const FlexiblePoolInfoContainer = () => {
     StakeMode.FLEXIBLE,
   );
 
-  const getFlexibleTotalAPR = () => {
+  const getFlexibleTotalApr = () => {
     let flexibleTotalApr = 0;
     if (totalInfo && totalInfo.chicksAmount) {
       flexibleTotalApr = calculateFlexibleTotalApr(
@@ -35,7 +35,7 @@ export const FlexiblePoolInfoContainer = () => {
       <div className={classes.header}>POOL INFO</div>
       <PoolInfoContainer
         totalInfo={totalInfo}
-        currentApr={getFlexibleTotalAPR()}
+        currentApr={getFlexibleTotalApr()}
       />
     </div>
   );

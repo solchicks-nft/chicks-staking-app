@@ -7,10 +7,10 @@ import React, {
 import { WalletDialogProvider } from '@solana/wallet-adapter-material-ui';
 import { useWallet, WalletProvider } from '@solana/wallet-adapter-react';
 import {
+  getMathWallet,
   getPhantomWallet,
   getSolflareWallet,
   getSolletWallet,
-  getMathWallet,
 } from '@solana/wallet-adapter-wallets';
 
 export const SolanaWalletProvider = ({

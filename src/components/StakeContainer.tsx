@@ -260,13 +260,14 @@ export const StakeContainer = ({
     reconcileSuccessMessage,
   ]);
 
-  ConsoleHelper('reconcile info',
-    isReconcileProcessing,
-    reconcileStatusCode,
-    reconcileStatusMessage,
-    reconcileErrorCode,
-    reconcileSuccessMessage,
-    );
+  ConsoleHelper(
+    `reconcile status -> 
+    isReconcileProcessing: ${isReconcileProcessing}, 
+    reconcileStatusCode: ${reconcileStatusCode},
+    reconcileStatusMessage: ${reconcileStatusMessage},
+    reconcileErrorCode: ${reconcileErrorCode},
+    reconcileSuccessMessage: ${reconcileSuccessMessage}`,
+  );
 
   const onReconcile = async () => {
     if (reconcileTxHash === '') {

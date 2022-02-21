@@ -1,6 +1,5 @@
 import { clusterApiUrl } from '@solana/web3.js';
 import {
-  ChainId,
   CHAIN_ID_AVAX,
   CHAIN_ID_BSC,
   CHAIN_ID_ETH,
@@ -8,6 +7,7 @@ import {
   CHAIN_ID_POLYGON,
   CHAIN_ID_SOLANA,
   CHAIN_ID_TERRA,
+  ChainId,
 } from '../lib/consts';
 import { isEVMChain } from '../lib/array';
 

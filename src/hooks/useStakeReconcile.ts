@@ -1,24 +1,15 @@
-import { useMemo, useState } from 'react';
+import {useMemo, useState} from 'react';
 import axios from 'axios';
 import BN from 'bn.js';
 import bs58 from 'bs58';
-import {
-  ConfirmOptions,
-  Connection,
-  PublicKey,
-  TransactionResponse,
-} from '@solana/web3.js';
+import {ConfirmOptions, Connection, PublicKey, TransactionResponse,} from '@solana/web3.js';
 import * as anchor from '@project-serum/anchor';
-import {
-  Idl,
-  Program,
-  Provider as AnchorProvider,
-} from '@project-serum/anchor';
-import { Buffer } from 'buffer';
-import { formatUnits } from '@ethersproject/units';
-import { AnchorWallet } from '@solana/wallet-adapter-react';
-import { useSolanaWallet } from '../contexts/SolanaWalletContext';
-import { SOLANA_HOST } from '../utils/consts';
+import {Idl, Program, Provider as AnchorProvider} from '@project-serum/anchor';
+import {Buffer} from 'buffer';
+import {formatUnits} from '@ethersproject/units';
+import {AnchorWallet} from '@solana/wallet-adapter-react';
+import {useSolanaWallet} from '../contexts/SolanaWalletContext';
+import {SOLANA_HOST} from '../utils/consts';
 import {
   SOLCHICK_STAKING_FLEXIBLE,
   SOLCHICK_STAKING_FLEXIBLE_PROGRAM_IDL,
@@ -27,18 +18,9 @@ import {
   URL_SUBMIT_FLEX_STAKE,
   URL_SUBMIT_LOCKED_STAKE,
 } from '../utils/solchickConsts';
-import {
-  getTransactionInfoOnSol,
-  pubkeyToString,
-  toPublicKey,
-} from '../utils/solanaHelper';
+import {getTransactionInfoOnSol, pubkeyToString, toPublicKey,} from '../utils/solanaHelper';
 import ConsoleHelper from '../utils/consoleHelper';
-import {
-  getServerInfo,
-  StakeLockedPoolLength,
-  StakeMode,
-} from '../utils/stakeHelper';
-import { sleep } from '../utils/helper';
+import {getServerInfo, StakeLockedPoolLength, StakeMode,} from '../utils/stakeHelper';
 
 export enum ReconcileStatusCode {
   NONE = 0,
@@ -144,6 +126,7 @@ function useStakeReconcile(): IReconcileStatus {
             address,
             amount,
             txId,
+            handle,
             xTokenAmount,
             startTime
           );
@@ -171,6 +154,7 @@ function useStakeReconcile(): IReconcileStatus {
   };
 
   const parseTransaction = (
+    mode: StakeMode,
     txInfo: TransactionResponse,
     programId: PublicKey,
   ) => {
@@ -220,8 +204,8 @@ function useStakeReconcile(): IReconcileStatus {
       accountKeys[9].toString(),
     );
 
-    if (!accountKeys[9].equals(programId)) {
-      ConsoleHelper('accountKeys -> error: Invalid program id');
+    if (!accountKeys[6].equals(programId)) {
+      ConsoleHelper('accountKeys -> error: Invalid program id', programId.toString());
       return { success: false };
     }
 
@@ -232,17 +216,29 @@ function useStakeReconcile(): IReconcileStatus {
     }
 
     const inputData = bs58.decode(txInstructions[0].data);
-    if (inputData.length !== 55) {
-      ConsoleHelper('accountKeys -- error: length', inputData);
-      return { success: false };
-    }
     ConsoleHelper('inputData', inputData);
 
-    // TODO fix handle for locked pool
-    const handle = inputData.slice(15, 47).toString();
+    let handle = '';
+    let strAmount;
+    if (mode === StakeMode.FLEXIBLE) {
+      if (inputData.length !== 55) {
+        ConsoleHelper('accountKeys -- error: length', inputData);
+        return { success: false };
+      }
+      handle = inputData.slice(15, 15 + 32).toString();
+      strAmount = inputData.slice(47);
+    } else {
+      if (inputData.length !== 64) {
+        ConsoleHelper('accountKeys -- error: length', inputData);
+        return { success: false };
+      }
+      handle = inputData.slice(24, 24 + 32).toString();
+      strAmount = inputData.slice(56);
+    }
+
     ConsoleHelper('hash', handle);
 
-    const bnTxAmount = new BN(Buffer.from(inputData.slice(47)), 'hex', 'le');
+    const bnTxAmount = new BN(Buffer.from(strAmount), 'hex', 'le');
     ConsoleHelper('bnTxAmount', bnTxAmount.toString());
     const txAmount = formatUnits(bnTxAmount.toString(), 9);
     ConsoleHelper('txAmount', txAmount);
@@ -319,6 +315,7 @@ function useStakeReconcile(): IReconcileStatus {
       }
 
       const ret = parseTransaction(
+        mode,
         txInfo,
         toPublicKey(programIdl.metadata.address),
       );

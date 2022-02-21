@@ -175,6 +175,7 @@ function useStake(
             address,
             amount,
             txId,
+            handle,
             xTokenAmount,
           );
     processStakeResult(url, txId, StakeStepMode.STAKE);

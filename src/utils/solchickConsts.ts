@@ -67,11 +67,12 @@ export const URL_SUBMIT_LOCKED_STAKE = (
   address: string,
   amount: number,
   txId: string,
+  handle: string,
   xTokenAmount: string,
   startTime = '',
 ) =>
   // eslint-disable-next-line max-len
-  `${URL_BACKEND_BASE}/api/locked_stake/?pool=${stakePool}&address=${address}&amount=${amount}&tx_id=${txId}&x_token=${xTokenAmount}&start_time=${startTime}`;
+  `${URL_BACKEND_BASE}/api/locked_stake/?pool=${stakePool}&address=${address}&amount=${amount}&tx_id=${txId}&handle=${handle}&x_token=${xTokenAmount}&start_time=${startTime}`;
 
 export const URL_SUBMIT_LOCKED_UNSTAKE = (
   stakePool: StakeLockedPoolLength | null,

@@ -222,6 +222,8 @@ export const StakeContainer = ({
       switch (reconcileErrorCode) {
         case ReconcileErrorCode.NO_ERROR:
           return 'No error message';
+        case ReconcileErrorCode.RECONCILE_FAILED:
+          return 'Invalid transaction hash';
         case ReconcileErrorCode.CANT_CONNECT_SOLANA:
           return "Can't connect to the Solana network";
         case ReconcileErrorCode.TOKEN_AMOUNT_NOT_ENOUGH:

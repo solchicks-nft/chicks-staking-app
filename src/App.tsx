@@ -135,7 +135,16 @@ function App() {
         </div>
         <Routes>
           <Route path="" element={<FlexiblePoolView />} />
-          <Route path="locked" element={<LockedPoolView />} />
+          <Route
+            path="locked"
+            element={
+              process.env.NODE_ENV === 'production' ? (
+                <FlexiblePoolView />
+              ) : (
+                <LockedPoolView />
+              )
+            }
+          />
           <Route path="*" element={<FlexiblePoolView />} />
           <Route path="help" element={<HelpView />} />
         </Routes>

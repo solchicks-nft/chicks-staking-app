@@ -127,6 +127,7 @@ function App() {
                 className={classes.tab}
                 label="Locked Pool"
                 value="/locked"
+                disabled={process.env.NODE_ENV === 'production'}
               />
               <Tab className={classes.tab} label="Help" value="/help" />
             </Tabs>

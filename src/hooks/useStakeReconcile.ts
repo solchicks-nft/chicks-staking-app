@@ -216,7 +216,7 @@ function useStakeReconcile(): IReconcileStatus {
     );
 
     if (mode === StakeMode.FLEXIBLE) {
-      if (!accountKeys[9].equals(programId)) {
+      if (!accountKeys[9].equals(programId) && !accountKeys[6].equals(programId)) {
         ConsoleHelper('accountKeys -> error: Invalid program id', programId.toString());
         return { success: false };
       }

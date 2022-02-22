@@ -1,5 +1,5 @@
 {
-  "version": "0.0.0",
+  "version": "0.1.0",
   "name": "chicks_staking_locked",
   "instructions": [
     {
@@ -51,13 +51,17 @@
           "type": "u8"
         },
         {
-          "name": "lockEndDate",
+          "name": "poolHandle",
+          "type": "string"
+        },
+        {
+          "name": "lockTime",
           "type": "u64"
         }
       ]
     },
     {
-      "name": "updateLockEndDate",
+      "name": "updateLockTime",
       "accounts": [
         {
           "name": "initializer",
@@ -76,8 +80,12 @@
           "type": "u8"
         },
         {
-          "name": "newLockEndDate",
+          "name": "newLockTime",
           "type": "u64"
+        },
+        {
+          "name": "poolHandle",
+          "type": "string"
         }
       ]
     },
@@ -99,6 +107,10 @@
         {
           "name": "nonceStaking",
           "type": "u8"
+        },
+        {
+          "name": "poolHandle",
+          "type": "string"
         }
       ]
     },
@@ -165,6 +177,14 @@
           "type": "u8"
         },
         {
+          "name": "poolHandle",
+          "type": "string"
+        },
+        {
+          "name": "handle",
+          "type": "string"
+        },
+        {
           "name": "amount",
           "type": "u64"
         }
@@ -223,7 +243,100 @@
           "type": "u8"
         },
         {
+          "name": "poolHandle",
+          "type": "string"
+        },
+        {
+          "name": "handle",
+          "type": "string"
+        },
+        {
           "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "stakeByService",
+      "accounts": [
+        {
+          "name": "tokenMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenFrom",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "targetUserAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenFromAuthority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "tokenVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "stakingAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userStakingAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "nonceVault",
+          "type": "u8"
+        },
+        {
+          "name": "nonceStaking",
+          "type": "u8"
+        },
+        {
+          "name": "nonceUserStaking",
+          "type": "u8"
+        },
+        {
+          "name": "poolHandle",
+          "type": "string"
+        },
+        {
+          "name": "handle",
+          "type": "string"
+        },
+        {
+          "name": "amount",
+          "type": "u64"
+        },
+        {
+          "name": "startTime",
           "type": "u64"
         }
       ]
@@ -247,7 +360,12 @@
           "isSigner": false
         }
       ],
-      "args": []
+      "args": [
+        {
+          "name": "poolHandle",
+          "type": "string"
+        }
+      ]
     },
     {
       "name": "emitReward",
@@ -278,7 +396,12 @@
           "isSigner": false
         }
       ],
-      "args": []
+      "args": [
+        {
+          "name": "poolHandle",
+          "type": "string"
+        }
+      ]
     }
   ],
   "accounts": [
@@ -292,7 +415,7 @@
             "type": "publicKey"
           },
           {
-            "name": "lockEndDate",
+            "name": "lockTime",
             "type": "u64"
           },
           {
@@ -313,6 +436,10 @@
         "fields": [
           {
             "name": "amount",
+            "type": "u64"
+          },
+          {
+            "name": "startTime",
             "type": "u64"
           },
           {
@@ -382,12 +509,12 @@
   ],
   "errors": [
     {
-      "code": 300,
+      "code": 6000,
       "name": "NotExceedLockEndDate",
       "msg": "Not exceed lock end date"
     }
   ],
   "metadata": {
-    "address": "GL2uhXcjYgvkzL8A4Ki12JVFwCBbD5y65F7ezam7zn47"
+    "address": "7ANFv22yZ6qxxg6yZjgQmaaJAQUJKjq3hJpWpjz8JJ1e"
   }
 }

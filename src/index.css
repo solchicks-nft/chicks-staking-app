@@ -1,4 +1,6 @@
-body > iframe[style*="2147483647"]:not([id="webpack-dev-server-client-overlay"]) {
+body {
+}
+> iframe[style*='2147483647']:not([id='webpack-dev-server-client-overlay']) {
   display: none;
 }
 

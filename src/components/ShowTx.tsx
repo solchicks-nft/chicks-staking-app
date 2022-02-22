@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button, makeStyles, Typography } from '@material-ui/core';
 import { ChainId } from '../lib/consts';
-import { getExplorerName, getExplorerAddress } from '../utils/consts';
+import { getExplorerAddress, getExplorerName } from '../utils/consts';
 
 const useStyles = makeStyles((theme) => ({
   tx: {

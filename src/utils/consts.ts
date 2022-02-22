@@ -1,6 +1,5 @@
 import { clusterApiUrl } from '@solana/web3.js';
 import {
-  ChainId,
   CHAIN_ID_AVAX,
   CHAIN_ID_BSC,
   CHAIN_ID_ETH,
@@ -8,6 +7,7 @@ import {
   CHAIN_ID_POLYGON,
   CHAIN_ID_SOLANA,
   CHAIN_ID_TERRA,
+  ChainId,
 } from '../lib/consts';
 import { isEVMChain } from '../lib/array';
 
@@ -152,8 +152,8 @@ export const getExplorerName = (chainId: ChainId) =>
     ? 'Etherscan'
     : // eslint-disable-next-line no-nested-ternary
     chainId === CHAIN_ID_BSC
-      ? 'BscScan'
-      : 'Explorer';
+    ? 'BscScan'
+    : 'Explorer';
 
 export const getExplorerAddress = (chainId: ChainId, txId: string) => {
   if (chainId === CHAIN_ID_ETH) {
@@ -177,3 +177,4 @@ export const getExplorerAddress = (chainId: ChainId, txId: string) => {
 export const UNSTAKE_FEE = 20;
 export const FLEX_UNLOCK_WEEKS = 8;
 export const FLEX_UNSTAKE_ACTIVE = true;
+export const LOCKED_UNSTAKE_ACTIVE = false;

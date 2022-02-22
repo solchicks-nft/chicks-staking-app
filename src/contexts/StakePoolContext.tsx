@@ -1,4 +1,4 @@
-/* eslint-disable no-empty,@typescript-eslint/no-empty-function */
+/* eslint-disable no-empty,@typescript-eslint/no-empty-function,camelcase,@typescript-eslint/no-explicit-any */
 import React, {
   JSXElementConstructor,
   ReactChildren,
@@ -31,33 +31,39 @@ import {
   SOLCHICK_STAKING_LOCKED_PROGRAM_IDL,
   SOLCHICK_TOKEN_MINT_ON_SOL,
   URL_SUBMIT_FLEX_LIST,
+  URL_SUBMIT_LOCKED_LIST,
 } from '../utils/solchickConsts';
 import { useSolanaWallet } from './SolanaWalletContext';
 import { SOLANA_HOST } from '../utils/consts';
-import { STATUS_STAKED } from '../utils/stakeHelper';
+import {
+  getPoolHandle,
+  StakeLockedPoolLength,
+  StakeMode,
+  STATUS_STAKED,
+} from '../utils/stakeHelper';
 
 interface IStakePoolContext {
   getBalance(): void;
   refreshLockedPool(): void;
   refreshFlexiblePool(): void;
+  setStakeMode(mode: StakeMode): void;
+  setLockedPoolLength(Length: StakeLockedPoolLength): void;
   tokenBalance: string;
-  lockedTotalInfo: IStakeBalance | undefined;
-  lockedUserInfo: IStakeBalance | undefined;
-  flexibleTotalInfo: IStakeBalance | undefined;
-  flexibleUserInfo: IStakeBalance | undefined;
-  flexibleStakeList: IStakeInfo[] | undefined;
+  totalInfo: IStakeBalance | undefined;
+  userInfo: IStakeBalance | undefined;
+  stakeList: IStakeInfo[] | undefined;
 }
 
-const StackPoolContext = React.createContext<IStakePoolContext>({
+const StakePoolContext = React.createContext<IStakePoolContext>({
   getBalance: () => {},
   refreshLockedPool: () => {},
   refreshFlexiblePool: () => {},
+  setStakeMode: () => {},
+  setLockedPoolLength: () => {},
   tokenBalance: '',
-  lockedTotalInfo: undefined,
-  lockedUserInfo: undefined,
-  flexibleTotalInfo: undefined,
-  flexibleUserInfo: undefined,
-  flexibleStakeList: undefined,
+  totalInfo: undefined,
+  userInfo: undefined,
+  stakeList: undefined,
 });
 export const StakePoolProvider = ({
   children,
@@ -69,11 +75,14 @@ export const StakePoolProvider = ({
 }) => {
   const walletSolana = useSolanaWallet();
   const [tokenBalance, setTokenBalance] = useState('');
-  const [lockedTotalInfo, setLockedTotalInfo] = useState<IStakeBalance>();
-  const [lockedUserInfo, setLockedUserInfo] = useState<IStakeBalance>();
-  const [flexibleTotalInfo, setFlexibleTotalInfo] = useState<IStakeBalance>();
-  const [flexibleUserInfo, setFlexibleUserInfo] = useState<IStakeBalance>();
-  const [flexibleStakeList, setFlexibleStakeList] = useState<IStakeInfo[]>();
+  const [currentStakeMode, setCurrentStakeMode] = useState<StakeMode | null>(
+    StakeMode.FLEXIBLE,
+  );
+  const [currentLockedPoolLength, setCurrentLockedPoolLength] =
+    useState<StakeLockedPoolLength | null>(null);
+  const [totalInfo, setTotalInfo] = useState<IStakeBalance>();
+  const [userInfo, setUserInfo] = useState<IStakeBalance>();
+  const [stakeList, setStakeList] = useState<IStakeInfo[]>();
 
   const solanaConnection = useMemo(
     () => new Connection(SOLANA_HOST, 'confirmed'),
@@ -81,6 +90,11 @@ export const StakePoolProvider = ({
   );
 
   const { publicKey: walletPublicKey } = walletSolana;
+
+  ConsoleHelper(
+    `stakePoolContext -> currentStakeMode: ${currentStakeMode}, currentLockedPoolLength: ${currentLockedPoolLength}`,
+  );
+  ConsoleHelper(`stakePoolContext -> walletPublicKey: ${walletPublicKey}`);
 
   const getAnchorProvider = useCallback(async () => {
     const opts = {
@@ -100,7 +114,7 @@ export const StakePoolProvider = ({
   );
 
   const getBalance = useCallback(async () => {
-    let returnVal = '';
+    let walletTokenBalance = '';
     if (walletPublicKey) {
       const mintPubkey = new PublicKey(SOLCHICK_TOKEN_MINT_ON_SOL);
       const splBalance = await solanaConnection.getParsedTokenAccountsByOwner(
@@ -109,274 +123,234 @@ export const StakePoolProvider = ({
           mint: mintPubkey,
         },
       );
-
-      returnVal =
+      walletTokenBalance =
         splBalance.value[0].account.data.parsed.info.tokenAmount.uiAmountString;
     }
-
-    ConsoleHelper(returnVal);
-    setTokenBalance(returnVal);
+    ConsoleHelper(`getBalance -> ${walletTokenBalance}`);
+    setTokenBalance(walletTokenBalance);
   }, [solanaConnection, walletPublicKey]);
 
-  const refreshLockedPool = useCallback(async () => {
-    if (!solanaConnection) {
-      return;
-    }
-    const provider = await getAnchorProvider();
-    const programIdl = SOLCHICK_STAKING_LOCKED_PROGRAM_IDL;
-    if (!provider) {
-      return;
-    }
-    const program = new Program(
-      programIdl as unknown as Idl,
-      toPublicKey(programIdl.metadata.address),
-      provider,
-    );
+  const refreshPool = useCallback(
+    async (
+      stakeMode: StakeMode,
+      poolLength: StakeLockedPoolLength | null = null,
+    ) => {
+      if (!solanaConnection) {
+        return;
+      }
 
-    const [stakingPubkey, stakingBump] =
-      await anchor.web3.PublicKey.findProgramAddress(
-        [Buffer.from(anchor.utils.bytes.utf8.encode('staking'))],
-        program.programId,
+      if (stakeMode === StakeMode.LOCKED && !poolLength) {
+        return;
+      }
+
+      const provider = await getAnchorProvider();
+      const programIdl =
+        stakeMode === StakeMode.FLEXIBLE
+          ? SOLCHICK_STAKING_FLEXIBLE_PROGRAM_IDL
+          : SOLCHICK_STAKING_LOCKED_PROGRAM_IDL;
+
+      if (!provider) {
+        return;
+      }
+
+      const program = new Program(
+        programIdl as unknown as Idl,
+        toPublicKey(programIdl.metadata.address),
+        provider,
       );
-    ConsoleHelper(
-      `refreshLockedPool -> stakingPubkey: ${stakingPubkey.toString()}`,
-    );
-    ConsoleHelper(`refreshLockedPool -> stakingBump: ${stakingBump}`);
-    try {
-      const stakingAccount = await program.account.stakingAccount.fetch(
-        stakingPubkey,
+
+      ConsoleHelper(`refreshPool -> program id`, program.programId.toString());
+
+      const poolHandle = getPoolHandle(poolLength);
+
+      const [stakingPubkey, stakingBump] =
+        await anchor.web3.PublicKey.findProgramAddress(
+          stakeMode === StakeMode.FLEXIBLE
+            ? [Buffer.from(anchor.utils.bytes.utf8.encode('staking'))]
+            : ([
+                Buffer.from(anchor.utils.bytes.utf8.encode('staking')),
+                poolHandle,
+              ] as Array<Buffer | Uint8Array>),
+          program.programId,
+        );
+
+      ConsoleHelper(
+        `refreshPool -> stakingPubkey: ${stakingPubkey.toString()}`,
       );
+      ConsoleHelper(`refreshPool -> stakingBump: ${stakingBump}`);
 
       const [vaultPubkey, vaultBump] =
-          await anchor.web3.PublicKey.findProgramAddress(
-              [tokenMintPubkey.toBuffer()],
-              program.programId,
-          );
-      ConsoleHelper(
-          `refreshLockedPool -> vaultPubkey: ${vaultPubkey.toString()}`,
-      );
-      ConsoleHelper(`refreshLockedPool -> vaultBump: ${vaultBump}`);
+        await anchor.web3.PublicKey.findProgramAddress(
+          stakeMode === StakeMode.FLEXIBLE
+            ? [tokenMintPubkey.toBuffer()]
+            : ([tokenMintPubkey.toBuffer(), poolHandle] as Array<
+                Buffer | Uint8Array
+              >),
+          program.programId,
+        );
+      ConsoleHelper(`refreshPool -> vaultPubkey: ${vaultPubkey.toString()}`);
+      ConsoleHelper(`refreshPool -> vaultBump: ${vaultBump}`);
 
-      if (stakingAccount) {
-        const totalXToken = toTokenBalanceString(stakingAccount.totalXToken);
-        ConsoleHelper(`refreshLockedPool -> totalXToken: ${totalXToken}`);
-
-        const totalBalance = await getTokenBalance(solanaConnection, vaultPubkey);
-        if (totalBalance) {
-          const totalToken = toTokenBalanceString(totalBalance);
-          ConsoleHelper(`refreshLockedPool -> totalToken: ${totalToken}`);
-          setLockedTotalInfo({
-            chicksAmount: totalToken,
-            xChicksAmount: totalXToken,
-          });
-        }
-      }
-    } catch (e) {
-      ConsoleHelper(`refreshLockedPool -> error: `, e);
-    }
-
-    if (walletPublicKey) {
       try {
-        const [userStakingPubkey, userStakingBump] =
-          await anchor.web3.PublicKey.findProgramAddress(
-            [walletPublicKey.toBuffer()],
-            program.programId,
-          );
-        const userStakingAccount =
-          await program.account.userStakingAccount.fetch(userStakingPubkey);
-        ConsoleHelper(
-          `refreshLockedPool -> userStakingPubkey: ${userStakingPubkey}`,
+        const stakingAccount = await program.account.stakingAccount.fetch(
+          stakingPubkey,
         );
-        ConsoleHelper(
-          `refreshLockedPool -> userStakingBump: ${userStakingBump}`,
-        );
+        if (stakingAccount) {
+          const totalXToken = toTokenBalanceString(stakingAccount.totalXToken);
+          ConsoleHelper(`refreshPool -> totalXToken: ${totalXToken}`);
 
-        if (userStakingAccount) {
-          const userTokenAmount = toTokenBalanceString(
-            userStakingAccount.amount,
+          const totalBalance = await getTokenBalance(
+            solanaConnection,
+            vaultPubkey,
           );
-          const userXTokenAmount = toTokenBalanceString(
-            userStakingAccount.xTokenAmount,
-          );
-          ConsoleHelper(
-            `refreshLockedPool -> userTokenAmount: ${userTokenAmount}`,
-          );
-          setLockedUserInfo({
-            chicksAmount: userTokenAmount,
-            xChicksAmount: userXTokenAmount,
-          });
+          if (totalBalance) {
+            const totalToken = toTokenBalanceString(totalBalance);
+            ConsoleHelper(`refreshPool -> totalToken: ${totalToken}`);
+            setTotalInfo({
+              chicksAmount: totalToken,
+              xChicksAmount: totalXToken,
+            });
+          }
         }
-        ConsoleHelper(
-          `refreshLockedPool -> userStakingAccount: ${userStakingAccount}`,
-        );
       } catch (e) {
-        ConsoleHelper(`refreshLockedPool -> error: ${JSON.stringify(e)}`);
+        ConsoleHelper(`refreshPool -> Failed to fetch staking account`);
       }
-    } else {
-      setLockedUserInfo({ chicksAmount: '', xChicksAmount: '' });
-    }
-  }, [getAnchorProvider, solanaConnection, tokenMintPubkey, walletPublicKey]);
+
+      if (walletPublicKey) {
+        try {
+          const url =
+            stakeMode === StakeMode.FLEXIBLE
+              ? URL_SUBMIT_FLEX_LIST(walletPublicKey.toString())
+              : URL_SUBMIT_LOCKED_LIST(poolLength, walletPublicKey.toString());
+          const results = await axios.get(url);
+          ConsoleHelper(
+            `refreshPool -> list: ${JSON.stringify(results.data.data)}`,
+          );
+
+          if (results.data.data) {
+            let userTotalChicks = BigNumber.from(0);
+            let userTotalXChicks = BigNumber.from(0);
+            const list: IStakeInfo[] = [];
+            results.data.data.forEach((item: any) => {
+              const amount = parseUnits(
+                item.amount.toString(),
+                SOLCHICK_DECIMALS_ON_SOL,
+              );
+              if (item.status === STATUS_STAKED) {
+                userTotalChicks = userTotalChicks.add(amount);
+                userTotalXChicks = userTotalXChicks.add(
+                  BigNumber.from(item.x_token),
+                );
+              }
+              list.push({
+                chicksAmount: amount.toString(),
+                xChicksAmount: item.x_token,
+                handle: item.handle,
+                stakeTxHash: item.stake_tx_hash,
+                unstakeTxHash: item.unstake_tx_hash,
+                stakeStartDate: item.stake_start_date,
+                stakeClaimDate: item.stake_claim_date,
+                stakeEndDate: item.stake_end_date,
+              });
+            });
+            ConsoleHelper(`stakeList -> ${JSON.stringify(list)}`);
+            ConsoleHelper(`userTotalChicks -> ${userTotalChicks}`);
+            ConsoleHelper(
+              `userTotalXChicks -> ${JSON.stringify(userTotalXChicks)}`,
+            );
+            setStakeList(list);
+            setUserInfo({
+              chicksAmount: (
+                Math.round(userTotalChicks.toNumber()) / 1000000000
+              ).toFixed(1),
+              xChicksAmount: (
+                Math.round(userTotalXChicks.toNumber()) / 1000000000
+              ).toFixed(1),
+            });
+          }
+        } catch (e) {
+          ConsoleHelper(`refreshFlexiblePool -> error: ${JSON.stringify(e)}`);
+        }
+      } else {
+        setUserInfo({ chicksAmount: '', xChicksAmount: '' });
+      }
+    },
+    [getAnchorProvider, solanaConnection, tokenMintPubkey, walletPublicKey],
+  );
+
+  const refreshLockedPool = useCallback(async () => {
+    ConsoleHelper(`refreshLockedPool -> start`);
+    await refreshPool(StakeMode.LOCKED);
+  }, [refreshPool]);
 
   const refreshFlexiblePool = useCallback(async () => {
-    ConsoleHelper(
-        `refreshFlexiblePool -> start`,
-    );
-    if (!solanaConnection) {
-      return;
-    }
-    const provider = await getAnchorProvider();
-    const programIdl = SOLCHICK_STAKING_FLEXIBLE_PROGRAM_IDL;
-    if (!provider) {
-      return;
-    }
-    const program = new Program(
-      programIdl as unknown as Idl,
-      toPublicKey(programIdl.metadata.address),
-      provider,
-    );
+    ConsoleHelper(`refreshFlexiblePool -> start`);
+    await refreshPool(StakeMode.FLEXIBLE);
+  }, [refreshPool]);
 
-    ConsoleHelper(
-        `refreshFlexiblePool -> program id`,
-        program.programId.toString()
-    );
+  const setLockedPoolLength = useCallback(
+    async (StakeLockedPoolType: StakeLockedPoolLength) => {
+      setCurrentLockedPoolLength(StakeLockedPoolType);
+    },
+    [setCurrentLockedPoolLength],
+  );
 
-    const [stakingPubkey, stakingBump] =
-      await anchor.web3.PublicKey.findProgramAddress(
-        [Buffer.from(anchor.utils.bytes.utf8.encode('staking'))],
-        program.programId,
-      );
-    const stakingAccount = await program.account.stakingAccount.fetch(
-      stakingPubkey,
-    );
-    ConsoleHelper(
-      `refreshFlexiblePool -> stakingPubkey: ${stakingPubkey.toString()}`,
-    );
-    ConsoleHelper(`refreshFlexiblePool -> stakingBump: ${stakingBump}`);
-
-    const [vaultPubkey, vaultBump] =
-      await anchor.web3.PublicKey.findProgramAddress(
-        [tokenMintPubkey.toBuffer()],
-        program.programId,
-      );
-    ConsoleHelper(
-      `refreshFlexiblePool -> vaultPubkey: ${vaultPubkey.toString()}`,
-    );
-    ConsoleHelper(`refreshFlexiblePool -> vaultBump: ${vaultBump}`);
-
-    if (stakingAccount) {
-      const totalXToken = toTokenBalanceString(stakingAccount.totalXToken);
-      ConsoleHelper(`refreshFlexiblePool -> totalXToken: ${totalXToken}`);
-
-      const totalBalance = await getTokenBalance(solanaConnection, vaultPubkey);
-      if (totalBalance) {
-        const totalToken = toTokenBalanceString(totalBalance);
-        ConsoleHelper(`refreshFlexiblePool -> totalToken: ${totalToken}`);
-        setFlexibleTotalInfo({
-          chicksAmount: totalToken,
-          xChicksAmount: totalXToken,
-        });
+  const setStakeMode = useCallback(
+    async (mode: StakeMode) => {
+      ConsoleHelper(`setStakeMode -> refreshPool`, mode, currentStakeMode);
+      if (mode === currentStakeMode) {
+        return;
       }
-    }
-
-    if (walletPublicKey) {
-      try {
-        const url = URL_SUBMIT_FLEX_LIST(walletPublicKey.toString());
-        const results = await axios.get(url);
-        ConsoleHelper(
-          `refreshFlexiblePool -> flexList: ${JSON.stringify(
-            results.data.data,
-          )}`,
-        );
-
-        if (results.data.data) {
-          let userTotalChicks = BigNumber.from(0);
-          let userTotalXChicks = BigNumber.from(0);
-          const stakeList: IStakeInfo[] = [];
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-ignore
-          results.data.data.forEach((item) => {
-            const amount = parseUnits(
-              item.amount.toString(),
-              SOLCHICK_DECIMALS_ON_SOL,
-            );
-            if (item.status === STATUS_STAKED) {
-              userTotalChicks = userTotalChicks.add(amount);
-              userTotalXChicks = userTotalXChicks.add(
-                BigNumber.from(item.x_token),
-              );
-            }
-            stakeList.push({
-              chicksAmount: amount.toString(),
-              xChicksAmount: item.x_token,
-              handle: item.handle,
-              stakeTxHash: item.stake_tx_hash,
-              unstakeTxHash: item.unstake_tx_hash,
-              stakeStartDate: item.stake_start_date,
-              stakeClaimDate: item.stake_claim_date,
-              stakeEndDate: item.stake_end_date,
-            });
-          });
-          ConsoleHelper(`stakeList -> ${JSON.stringify(stakeList)}`);
-          ConsoleHelper(`userTotalChicks -> ${userTotalChicks}`);
-          ConsoleHelper(
-            `userTotalXChicks -> ${JSON.stringify(userTotalXChicks)}`,
-          );
-          setFlexibleStakeList(stakeList);
-          setFlexibleUserInfo({
-            chicksAmount: (
-              Math.round(userTotalChicks.toNumber()) / 1000000000
-            ).toFixed(1),
-            xChicksAmount: (
-              Math.round(userTotalXChicks.toNumber()) / 1000000000
-            ).toFixed(1),
-          });
-        }
-      } catch (e) {
-        ConsoleHelper(`refreshFlexiblePool -> error: ${JSON.stringify(e)}`);
+      setCurrentStakeMode(mode);
+      if (mode === StakeMode.LOCKED) {
+        setCurrentLockedPoolLength(StakeLockedPoolLength.MONTH4);
       }
-    } else {
-      setFlexibleUserInfo({ chicksAmount: '', xChicksAmount: '' });
-    }
-  }, [getAnchorProvider, solanaConnection, tokenMintPubkey, walletPublicKey]);
+      ConsoleHelper(`setStakeMode -> refreshPool`, mode);
+      refreshPool(mode, StakeLockedPoolLength.MONTH4).then();
+    },
+    [refreshPool, currentStakeMode],
+  );
 
   useEffect(() => {
-    refreshLockedPool().then();
-    refreshFlexiblePool().then();
-  }, [
-    refreshFlexiblePool,
-    refreshLockedPool,
-    solanaConnection,
-    walletPublicKey,
-  ]);
+    if (!currentStakeMode) {
+      return;
+    }
+    ConsoleHelper(
+      `useEffect -> refreshPool`,
+      currentStakeMode,
+      currentLockedPoolLength,
+    );
+    refreshPool(currentStakeMode, currentLockedPoolLength).then();
+  }, [currentStakeMode, currentLockedPoolLength, walletPublicKey, refreshPool]);
 
   const contextValue = useMemo(
     () => ({
       getBalance,
       refreshLockedPool,
       refreshFlexiblePool,
+      setStakeMode,
+      setLockedPoolLength,
       tokenBalance,
-      lockedTotalInfo,
-      lockedUserInfo,
-      flexibleTotalInfo,
-      flexibleUserInfo,
-      flexibleStakeList,
+      totalInfo,
+      userInfo,
+      stakeList,
     }),
     [
       getBalance,
       refreshLockedPool,
       refreshFlexiblePool,
+      setStakeMode,
+      setLockedPoolLength,
       tokenBalance,
-      lockedTotalInfo,
-      lockedUserInfo,
-      flexibleTotalInfo,
-      flexibleUserInfo,
-      flexibleStakeList,
+      totalInfo,
+      userInfo,
+      stakeList,
     ],
   );
   return (
-    <StackPoolContext.Provider value={contextValue}>
+    <StakePoolContext.Provider value={contextValue}>
       {children}
-    </StackPoolContext.Provider>
+    </StakePoolContext.Provider>
   );
 };
-export const useStakePool = () => useContext(StackPoolContext);
+export const useStakePool = () => useContext(StakePoolContext);

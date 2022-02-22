@@ -7,6 +7,7 @@ import {
 } from '../utils/stakeHelper';
 import { useStakePool } from '../contexts/StakePoolContext';
 import PoolInfoContainer from './PoolInfoContainer';
+import { LOCKED_UNSTAKE_ACTIVE } from '../utils/consts';
 
 export const LockedPoolInfoContainer = ({
   tab,
@@ -54,7 +55,7 @@ export const LockedPoolInfoContainer = ({
         <div className={classes.centerTab}>
           <PoolInfoContainer
             totalInfo={totalInfo}
-            currentApr={lockedTotalApr}
+            currentApr={LOCKED_UNSTAKE_ACTIVE ? lockedTotalApr : 120}
           />
         </div>
       </div>

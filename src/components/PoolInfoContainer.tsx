@@ -2,7 +2,6 @@
 import React from 'react';
 import NumberFormat from 'react-number-format';
 import { useStyles } from '../pages/useStyles';
-import { LOCKED_UNSTAKE_ACTIVE } from '../utils/consts';
 
 export default function PoolInfoContainer({
   totalInfo,
@@ -69,7 +68,7 @@ export default function PoolInfoContainer({
           {totalInfo && totalInfo.chicksAmount.length > 0 ? (
             <>
               <NumberFormat
-                value={LOCKED_UNSTAKE_ACTIVE ? currentApr : 120}
+                value={currentApr}
                 displayType="text"
                 thousandSeparator
                 decimalScale={1}

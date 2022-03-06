@@ -26,6 +26,7 @@ import {
   URL_SUBMIT_FLEX_UNSTAKE,
   URL_SUBMIT_LOCKED_STAKE,
   URL_SUBMIT_LOCKED_UNSTAKE,
+  URL_SUBMIT_LOCKED_REWARD,
 } from '../utils/solchickConsts';
 import {
   getTransactionInfoOnSol,
@@ -195,6 +196,17 @@ function useStake(
     processStakeResult(url, txId, StakeStepMode.UNSTAKE);
   };
 
+  const submitRewardResult = async (
+    stakePool: StakeLockedPoolLength | null,
+    address: string,
+    txId: string,
+    handle: string
+  ) => {
+    const url = URL_SUBMIT_LOCKED_REWARD(stakePool, address, txId);
+    processStakeResult(url, txId, StakeStepMode.REWARD);
+  };
+
+
   const processTokenOnSol = async (
     stakeStepMode: StakeStepMode,
     stakeAmount = 0,
@@ -360,32 +372,49 @@ function useStake(
                 stakingBump,
                 userStakingBump,
                 handle,
+                stakeAmount,
                 new anchor.BN(xAmount as unknown as BN),
                 accounts as unknown as Context,
               );
       } else {
-        txId =
-          stakeStepMode === StakeStepMode.STAKE
-            ? await program.rpc.stake(
-                vaultBump,
-                stakingBump,
-                userStakingBump,
-                poolHandle,
-                handle,
-                new anchor.BN(bnStakeAmount as unknown as BN),
-                accounts as unknown as Context,
-              )
-            : await program.rpc.unstake(
-                vaultBump,
-                stakingBump,
-                userStakingBump,
-                poolHandle,
-                handle,
-                new anchor.BN(xAmount as unknown as BN),
-                accounts as unknown as Context,
-              );
-      }
 
+        switch(stakeStepMode) {
+          case StakeStepMode.STAKE:
+            txId = await program.rpc.stake(
+              vaultBump,
+              stakingBump,
+              userStakingBump,
+              poolHandle,
+              handle,
+              new anchor.BN(bnStakeAmount as unknown as BN),
+              accounts as unknown as Context,
+            );
+            break;
+          case StakeStepMode.UNSTAKE:
+            txId = await program.rpc.unstake(
+              vaultBump,
+              stakingBump,
+              userStakingBump,
+              poolHandle,
+              handle,
+              new anchor.BN(amount as unknown as BN),
+              new anchor.BN(xAmount as unknown as BN),
+              accounts as unknown as Context,
+            );
+            break;
+          case StakeStepMode.REWARD:
+            txId = await program.rpc.reward(
+              vaultBump,
+              stakingBump,
+              userStakingBump,
+              poolHandle,
+              handle,
+              accounts as unknown as Context,
+            );
+            break;
+        }
+     
+      }
       ConsoleHelper(`txId: ${txId}`);
       if (!txId) {
         ConsoleHelper(`getTransactionInfoOnSol: invalid txId`);
@@ -428,13 +457,20 @@ function useStake(
         handle,
         xTokenAmountStr,
       );
-    } else {
+    } else if(stakeStepMode === StakeStepMode.UNSTAKE) {
       await submitUnstakeResult(
         lockedPoolLength,
         pubkeyToString(walletPublicKey),
         txId,
         handle,
         xAmount,
+      );
+    } else {
+      await submitRewardResult(
+        lockedPoolLength,
+        pubkeyToString(walletPublicKey),
+        txId,
+        handle
       );
     }
     return true;
@@ -446,15 +482,23 @@ function useStake(
     await processTokenOnSol(StakeStepMode.STAKE, stakeAmount, '', '');
   };
 
-  const unstake = async (xAmount: string, handle = '') => {
+  const unstake = async (amount: number, xAmount: string, handle = '') => {
     setSourceTxId('');
     ConsoleHelper('unstake -> start');
-    await processTokenOnSol(StakeStepMode.UNSTAKE, 0, xAmount, handle);
+    await processTokenOnSol(StakeStepMode.UNSTAKE, amount, xAmount, handle);
   };
+
+  const reward = async ( handle = '') => {
+    setSourceTxId('');
+    ConsoleHelper('reward -> start');
+    await processTokenOnSol(StakeStepMode.REWARD, 0, '', handle);
+  };
+
 
   return createStakeStatus(
     stake,
     unstake,
+    reward,
     isStakeProcessing,
     stakeStatusCode,
     stakeErrorCode,

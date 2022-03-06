@@ -80,8 +80,17 @@ export const URL_SUBMIT_LOCKED_UNSTAKE = (
   txId: string,
   xAmount: string,
 ) =>
-  `${URL_BACKEND_BASE}/api/locked_unstake/?pool=${stakePool}&address=${address}&tx_id=${txId}&x_token=${xAmount}`;
+  `${URL_BACKEND_BASE}/api/locked_reward/?pool=${stakePool}&address=${address}&tx_id=${txId}&x_token=${xAmount}`;
 
+
+export const URL_SUBMIT_LOCKED_REWARD = (
+  stakePool: StakeLockedPoolLength | null,
+  address: string,
+  txId: string
+) =>
+  `${URL_BACKEND_BASE}/api/locked_unstake/?pool=${stakePool}&address=${address}&tx_id=${txId}`;
+
+    
 export const URL_SUBMIT_FLEX_LIST = (address: string) =>
   `${URL_BACKEND_BASE}/api/flex_list/?address=${address}`;
 

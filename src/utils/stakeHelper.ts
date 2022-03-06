@@ -21,6 +21,7 @@ export enum StakeMode {
 export enum StakeStepMode {
   STAKE = 'stake',
   UNSTAKE = 'unstake',
+  REWARD = 'reward',
   RECONCILE = 'reconcile',
 }
 
@@ -66,6 +67,7 @@ export interface IStakeStatus {
 export const createStakeStatus = (
   stake: (amount: number) => void,
   unstake: (handle: string, amount: string) => void,
+  reward: (handle: string) => void,
   isStakeProcessing: boolean,
   stakeStatusCode = StakeStatusCode.NONE,
   stakeErrorCode: StakeErrorCode,
@@ -74,6 +76,7 @@ export const createStakeStatus = (
 ) => ({
   stake,
   unstake,
+  reward,
   isStakeProcessing,
   stakeStatusCode,
   stakeErrorCode,

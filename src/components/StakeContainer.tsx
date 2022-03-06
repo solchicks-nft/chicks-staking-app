@@ -66,6 +66,7 @@ export const StakeContainer = ({
   const {
     stake,
     unstake,
+    reward,
     isStakeProcessing,
     stakeStatusCode,
     stakeErrorCode,
@@ -175,19 +176,33 @@ export const StakeContainer = ({
     setInput('');
   };
 
-  const handleUnstakeButtonClick = (xAmount: string, handle = ''): void => {
+  const handleUnstakeButtonClick = (amount: number, xAmount: string, handle = ''): void => {
     if (
       wallet.connected &&
       xAmount.toString().length > 0 &&
       handle.length > 0
     ) {
       setCurrentHandle(handle);
-      unstake(xAmount.toString(), handle);
+      unstake(amount, xAmount.toString(), handle);
     } else {
       setStakeErrorMessage('You cannot unstake at this moment in time.');
       ConsoleHelper(stakeErrorMessage);
     }
   };
+
+  const handleRewardButtonClick = (amount: number, xAmount: string, handle = ''): void => {
+    if (
+      wallet.connected&&
+      handle.length > 0
+    ) {
+      setCurrentHandle(handle);
+      reward(handle);
+    } else {
+      setStakeErrorMessage('You cannot get rewards at this moment in time.');
+      ConsoleHelper(stakeErrorMessage);
+    }
+  };
+
 
   const handleStakeAmountChange = (e: ChangeEvent<HTMLInputElement>): void => {
     setInput(e.target.value.toString());
@@ -529,14 +544,17 @@ export const StakeContainer = ({
                                 <br />
                               </TableCell>
                               <TableCell>
-                                {stakeMode === StakeMode.LOCKED ? (
-                                  <>
+                                {stakeMode === StakeMode.LOCKED ? (                                  
+                                  
+                                  stakeListItem.status == '0' ? 
+                                  
                                     <Button
                                       variant="outlined"
                                       onClick={() =>
                                         handleUnstakeButtonClick(
+                                          Number(stakeListItem.chicksAmount),
                                           stakeListItem.xChicksAmount,
-                                          stakeListItem.handle,
+                                          stakeListItem.handle
                                         )
                                       }
                                       disabled={
@@ -554,7 +572,32 @@ export const StakeContainer = ({
                                     >
                                       Unstake
                                     </Button>
-                                  </>
+                                    :
+                                    <Button
+                                      variant="outlined"
+                                      onClick={() =>
+                                        handleRewardButtonClick(
+                                          Number(stakeListItem.chicksAmount),
+                                          stakeListItem.xChicksAmount,
+                                          stakeListItem.handle
+                                        )
+                                      }
+                                      disabled={
+                                        !isAddress(
+                                          solanaAddress as PublicKey | string,
+                                        ) ||
+                                        isStakeProcessing ||
+                                        !LOCKED_UNSTAKE_ACTIVE ||
+                                        new Date() <
+                                          new Date(
+                                            stakeListItem.rewardStartDate,
+                                          ) ||
+                                        sourceTxId > ''
+                                      }
+                                    >
+                                      Reward
+                                    </Button>                                 
+                                  
                                 ) : null}
                                 {(!stakeListItem.stakeClaimDate ||
                                   !stakeListItem.unstakeTxHash) &&

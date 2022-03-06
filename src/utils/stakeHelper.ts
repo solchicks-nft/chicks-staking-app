@@ -57,6 +57,7 @@ export enum StakeErrorCode {
 export interface IStakeStatus {
   stake(amount: number): void;
   unstake(amount: string, handle: string): void;
+  reward(handle: string):void;
   isStakeProcessing: boolean;
   stakeStatusCode: StakeStatusCode;
   stakeErrorCode: StakeErrorCode;

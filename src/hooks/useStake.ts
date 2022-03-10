@@ -372,7 +372,7 @@ function useStake(
                 stakingBump,
                 userStakingBump,
                 handle,
-                stakeAmount,
+                new anchor.BN(bnStakeAmount as unknown as BN),
                 new anchor.BN(xAmount as unknown as BN),
                 accounts as unknown as Context,
               );

@@ -190,7 +190,7 @@ export const StakeContainer = ({
     }
   };
 
-  const handleRewardButtonClick = (amount: number, xAmount: string, handle = ''): void => {
+  const handleRewardButtonClick = (handle = ''): void => {
     if (
       wallet.connected&&
       handle.length > 0
@@ -577,8 +577,6 @@ export const StakeContainer = ({
                                       variant="outlined"
                                       onClick={() =>
                                         handleRewardButtonClick(
-                                          Number(stakeListItem.chicksAmount),
-                                          stakeListItem.xChicksAmount,
                                           stakeListItem.handle
                                         )
                                       }

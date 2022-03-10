@@ -38,6 +38,8 @@ export interface IStakeInfo {
   stakeStartDate: string;
   stakeClaimDate: string;
   stakeEndDate: string;
+  rewardStartDate?: string;
+  status?: string;
   handle: string;
 }
 

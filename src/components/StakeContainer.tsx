@@ -546,7 +546,7 @@ export const StakeContainer = ({
                               <TableCell>
                                 {stakeMode === StakeMode.LOCKED ? (                                  
                                   
-                                  stakeListItem.status == '0' ? 
+                                  stakeListItem.status === '0' ? 
                                   
                                     <Button
                                       variant="outlined"
@@ -605,6 +605,7 @@ export const StakeContainer = ({
                                       variant="outlined"
                                       onClick={() =>
                                         handleUnstakeButtonClick(
+                                          0,
                                           stakeListItem.xChicksAmount,
                                           stakeListItem.handle,
                                         )
